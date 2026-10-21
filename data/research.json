@@ -1,0 +1,526 @@
+{
+  "summary": "The best-supported way to learn a complex skill quickly is to spend most of your time recalling and producing, not rereading or watching: test yourself, spread practice out over days and weeks, mix problem types, and get fast feedback on your errors. For programming, that means studying worked examples early (reading, tracing, Parsons problems, modifying working code), then moving quickly to writing code yourself with less and less scaffolding. Move on only once you can do the current material unaided, and check yourself with tests rather than with how familiar it feels, because effortful practice feels worse while it works better. Deliberate practice matters but explains well under half of skill differences, and AI assistants help or hurt depending on use: having them write your code during practice reduces what you learn, while using them for explanations and conceptual questions does much less harm.",
+  "principles": [
+    {
+      "id": "retrieval",
+      "name": "Retrieval practice (testing effect)",
+      "claim": "Pulling information out of memory strengthens it more than reading it again.",
+      "evidence": "In Roediger & Karpicke (2006, Exp. 2), students who read a passage once and were then tested three times recalled 61% of it a week later, against 40% for students who read it four times, even though the rereaders did better on a test 5 minutes later. Karpicke & Blunt (2011) found retrieval practice beat concept mapping on comprehension and inference questions, and even on a final test that asked students to draw concept maps. Meta-analyses put the average advantage over restudying at roughly g = 0.50 (Rowland 2014) to g = 0.61 (Adesope et al. 2017).",
+      "strength": "strong",
+      "howToApply": "Close the tutorial and rewrite the code from memory, predict a program's output before you run it, and answer your own flashcards ('what does this function return?') before checking. Treat every practice session as a quiz, not a reread.",
+      "sources": [
+        {
+          "label": "Roediger & Karpicke (2006), Psychological Science",
+          "url": "https://doi.org/10.1111/j.1467-9280.2006.01693.x"
+        },
+        {
+          "label": "Karpicke & Blunt (2011), Science",
+          "url": "https://doi.org/10.1126/science.1199327"
+        },
+        {
+          "label": "Rowland (2014), Psychological Bulletin meta-analysis",
+          "url": "https://doi.org/10.1037/a0037559"
+        },
+        {
+          "label": "Adesope, Trevisan & Sundararajan (2017), Review of Educational Research",
+          "url": "https://doi.org/10.3102/0034654316689306"
+        }
+      ]
+    },
+    {
+      "id": "spacing",
+      "name": "Spacing (distributed practice)",
+      "claim": "Spreading the same practice over separate days produces much better long-term retention than cramming it into one session.",
+      "evidence": "Cepeda et al. (2006) synthesized 839 comparisons from 317 experiments and found that the best gap between sessions grows as the time you need to remember grows. In Cepeda et al. (2008, more than 1,350 learners), the best gap was about 20-40% of the retention interval when the test was a week away, falling to about 5-10% when the test was a year away. For spaced versus massed retrieval specifically, Latimier et al. (2021) report g = 0.74 across 29 studies.",
+      "strength": "strong",
+      "howToApply": "Revisit each concept (closures, recursion, SQL joins, Big-O) on a schedule of days and weeks rather than repeating it ten times in one night. Daily sessions of 1-2 hours beat one weekend binge of the same total length.",
+      "sources": [
+        {
+          "label": "Cepeda et al. (2006), Psychological Bulletin",
+          "url": "https://doi.org/10.1037/0033-2909.132.3.354"
+        },
+        {
+          "label": "Cepeda et al. (2008), Psychological Science",
+          "url": "https://doi.org/10.1111/j.1467-9280.2008.02209.x"
+        },
+        {
+          "label": "Latimier, Peyre & Ramus (2021), Educational Psychology Review",
+          "url": "https://doi.org/10.1007/s10648-020-09572-8"
+        }
+      ]
+    },
+    {
+      "id": "technique-ratings",
+      "name": "Choose study techniques by evidence (Dunlosky et al. 2013)",
+      "claim": "Common study habits differ widely in how well they work, and the most popular ones are among the weakest.",
+      "evidence": "Dunlosky et al. (2013) reviewed ten techniques and rated only practice testing and distributed practice as high utility. Interleaved practice, elaborative interrogation and self-explanation were rated moderate. Summarization, highlighting, the keyword mnemonic, imagery for text and rereading were rated low.",
+      "strength": "strong",
+      "howToApply": "Budget most study time for self-testing and spaced review. Skip highlighting docs and rewatching videos; if you summarize, do it from memory, which turns it into retrieval practice.",
+      "sources": [
+        {
+          "label": "Dunlosky et al. (2013), Psychological Science in the Public Interest",
+          "url": "https://doi.org/10.1177/1529100612453266"
+        }
+      ]
+    },
+    {
+      "id": "interleaving",
+      "name": "Interleaving",
+      "claim": "Mixing different problem types in one session teaches you to recognize which approach a problem needs, which blocked practice does not.",
+      "evidence": "In Rohrer & Taylor (2007), students who practiced mixed math problems scored 63% on a test a week later, against 20% for students who practiced in blocks, although the block group did better during practice. A classroom study (Rohrer, Dedrick & Stershic 2015) found 72% vs 38%. A meta-analysis (Brunmair & Richter 2019) found a moderate overall effect (g = 0.42) but only g = 0.34 for math, unclear results for expository text, and an advantage for blocking with word lists (g = -0.39), so the benefit depends on the material.",
+      "strength": "moderate",
+      "howToApply": "Once you know a few techniques, practice from shuffled sets (two-pointer, hashing, recursion, DP) without topic labels so that recognizing which technique applies is part of the exercise. Block a brand-new concept briefly first, then mix.",
+      "sources": [
+        {
+          "label": "Rohrer & Taylor (2007), Instructional Science",
+          "url": "https://doi.org/10.1007/s11251-007-9015-8"
+        },
+        {
+          "label": "Rohrer, Dedrick & Stershic (2015), Journal of Educational Psychology",
+          "url": "https://doi.org/10.1037/edu0000001"
+        },
+        {
+          "label": "Brunmair & Richter (2019), Psychological Bulletin meta-analysis",
+          "url": "https://doi.org/10.1037/bul0000209"
+        }
+      ]
+    },
+    {
+      "id": "desirable-difficulties",
+      "name": "Desirable difficulties (learning vs. performance)",
+      "claim": "Conditions that make practice slower and harder (spacing, testing, mixing, varying) often produce better long-term learning, so how well practice is going is a poor guide to how much you are learning.",
+      "evidence": "Soderstrom & Bjork (2015) review decades of studies showing that performance during training and long-term learning can come apart, sometimes in opposite directions. Bjork & Bjork (2020) note a difficulty is only 'desirable' if the learner can respond to it successfully; struggling with material far beyond your current knowledge just causes failure. This is an organizing framework that rests on the specific effects above, not a separate tested intervention.",
+      "strength": "moderate",
+      "howToApply": "Expect practice to feel effortful and error-prone, and don't switch back to rereading because it feels smoother. If you are failing almost everything, go back a step and add scaffolding.",
+      "sources": [
+        {
+          "label": "Soderstrom & Bjork (2015), Perspectives on Psychological Science",
+          "url": "https://doi.org/10.1177/1745691615569000"
+        },
+        {
+          "label": "Bjork & Bjork (2020), Journal of Applied Research in Memory and Cognition",
+          "url": "https://doi.org/10.1016/j.jarmac.2020.09.003"
+        }
+      ]
+    },
+    {
+      "id": "worked-examples",
+      "name": "Cognitive load, worked examples, and expertise reversal",
+      "claim": "Beginners learn faster from studying worked solutions than from solving problems unaided, but this advantage disappears or reverses as they gain expertise.",
+      "evidence": "Working memory holds only about four chunks (Cowan 2001), and unguided problem solving uses up that capacity on search instead of learning (Sweller 1988). Studying worked examples beat solving equivalent problems for novices (Sweller & Cooper 1985), and in programming, worked examples with subgoal labels improved performance and transfer (Margulieux, Guzdial & Catrambone 2012; Morrison, Margulieux & Guzdial 2015). The expertise reversal effect (Kalyuga et al. 2003) shows the same guidance becomes redundant or harmful for more advanced learners. The dispute over how much guidance to give (Kirschner, Sweller & Clark 2006) is still not settled.",
+      "strength": "moderate",
+      "howToApply": "When a topic is new, study 2-3 annotated solutions and label each step's purpose ('initialize accumulator', 'base case') before attempting one yourself. Fade examples quickly: complete half-finished code, then write from a blank file.",
+      "sources": [
+        {
+          "label": "Sweller (1988), Cognitive Science",
+          "url": "https://doi.org/10.1207/s15516709cog1202_4"
+        },
+        {
+          "label": "Cowan (2001), Behavioral and Brain Sciences",
+          "url": "https://doi.org/10.1017/S0140525X01003922"
+        },
+        {
+          "label": "Sweller & Cooper (1985), Cognition and Instruction",
+          "url": "https://doi.org/10.1207/s1532690xci0201_3"
+        },
+        {
+          "label": "Kalyuga, Ayres, Chandler & Sweller (2003), Educational Psychologist",
+          "url": "https://doi.org/10.1207/S15326985EP3801_4"
+        },
+        {
+          "label": "Morrison, Margulieux & Guzdial (2015), ICER",
+          "url": "https://doi.org/10.1145/2787622.2787733"
+        },
+        {
+          "label": "Margulieux, Guzdial & Catrambone (2012), ICER",
+          "url": "https://doi.org/10.1145/2361276.2361291"
+        },
+        {
+          "label": "Kirschner, Sweller & Clark (2006), Educational Psychologist",
+          "url": "https://doi.org/10.1207/s15326985ep4102_1"
+        }
+      ]
+    },
+    {
+      "id": "generation",
+      "name": "Generation effect and productive failure",
+      "claim": "Trying to produce an answer, even a wrong one, before being shown it can deepen later learning, as long as instruction follows.",
+      "evidence": "A meta-analysis of the generation effect (Bertsch et al. 2007) found that generated items are remembered better than read items (about d = 0.40). A meta-analysis of 53 studies (Sinha & Kapur 2021) found problem solving followed by instruction beat instruction followed by problem solving (g = 0.36), though not for young children or for domain-general skills. This sits awkwardly next to the worked-example findings; one reasonable reading is that a short attempt before instruction helps, while long unguided searching does not.",
+      "strength": "mixed",
+      "howToApply": "Before reading how an algorithm works, spend 10-15 minutes sketching your own attempt, then study the reference solution and compare. Keep the attempt short and always follow it with the explanation.",
+      "sources": [
+        {
+          "label": "Slamecka & Graf (1978), JEP: Human Learning and Memory",
+          "url": "https://doi.org/10.1037/0278-7393.4.6.592"
+        },
+        {
+          "label": "Bertsch et al. (2007), Memory & Cognition meta-analysis",
+          "url": "https://doi.org/10.3758/BF03193441"
+        },
+        {
+          "label": "Sinha & Kapur (2021), Review of Educational Research",
+          "url": "https://doi.org/10.3102/00346543211019105"
+        }
+      ]
+    },
+    {
+      "id": "deliberate-practice",
+      "name": "Deliberate practice, with caveats",
+      "claim": "Practice built around specific weaknesses, with immediate feedback, matters a great deal, but it is far from the whole explanation of expertise.",
+      "evidence": "Ericsson, Krampe & Tesch-Römer (1993) found that the best student violinists reported far more accumulated solitary practice than less accomplished peers, the source of the '10,000 hours' idea. Macnamara et al.'s (2014) meta-analysis found deliberate practice explained 26% of performance variance in games, 21% in music, 18% in sports, 4% in education and under 1% in professions; in sports it explained only 1% among elite performers (Macnamara et al. 2016). A double-blind replication of the violin study did not reproduce the core finding (Macnamara & Maitra 2019).",
+      "strength": "mixed",
+      "howToApply": "Design practice around specific weaknesses with fast feedback, such as tests, a judge or code review, rather than just logging hours on comfortable work. Don't treat hours as a guarantee; also invest in the quality of feedback, mentors and the projects you choose.",
+      "sources": [
+        {
+          "label": "Ericsson, Krampe & Tesch-Römer (1993), Psychological Review",
+          "url": "https://doi.org/10.1037/0033-295X.100.3.363"
+        },
+        {
+          "label": "Macnamara, Hambrick & Oswald (2014), Psychological Science",
+          "url": "https://doi.org/10.1177/0956797614535810"
+        },
+        {
+          "label": "Macnamara, Moreau & Hambrick (2016), Perspectives on Psychological Science",
+          "url": "https://doi.org/10.1177/1745691616635591"
+        },
+        {
+          "label": "Macnamara & Maitra (2019), Royal Society Open Science",
+          "url": "https://doi.org/10.1098/rsos.190327"
+        }
+      ]
+    },
+    {
+      "id": "mastery",
+      "name": "Mastery learning and tutoring (Bloom's 2-sigma)",
+      "claim": "Requiring a passing level on each unit before moving on, with corrective feedback, reliably improves outcomes; one-to-one tutoring helps even more, though not by the famous 2 standard deviations.",
+      "evidence": "Bloom (1984) reported that tutored students with mastery learning scored about 2 SD above conventionally taught students. A meta-analysis of mastery learning programs found an average effect of about 0.52 SD (Kulik, Kulik & Bangert-Drowns 1990). VanLehn's (2011) review found human tutoring at d = 0.79 and step-based tutoring systems at 0.76, which is substantial but well below 2 sigma.",
+      "strength": "moderate",
+      "howToApply": "Set a gate for each topic, for example solving 4 of 5 unseen problems without help, and loop back with targeted practice until you pass. Get a tutor-like feedback source such as a mentor, code reviewer or a guarded AI tutor.",
+      "sources": [
+        {
+          "label": "Bloom (1984), Educational Researcher",
+          "url": "https://doi.org/10.3102/0013189X013006004"
+        },
+        {
+          "label": "Kulik, Kulik & Bangert-Drowns (1990), Review of Educational Research",
+          "url": "https://doi.org/10.3102/00346543060002265"
+        },
+        {
+          "label": "VanLehn (2011), Educational Psychologist",
+          "url": "https://doi.org/10.1080/00461520.2011.611369"
+        }
+      ]
+    },
+    {
+      "id": "programming-scaffolds",
+      "name": "Programming-specific scaffolds: reading before writing, Parsons problems, use-modify-create",
+      "claim": "Novice programmers learn more efficiently when they trace and read code, then rearrange and modify it, before writing it from scratch.",
+      "evidence": "Ericson, Margulieux & Rick (2017) found that solving Parsons problems (reordering scrambled lines of code) took significantly less time than fixing or writing the same code, with similar learning gains. A 2022 ITiCSE working group (Ericson et al.) reviewed the wider Parsons literature. Xie et al. (2019) propose teaching code reading and tracing before writing. In Lytle et al. (2019, 394 students), the use-modify-create progression lowered perceived difficulty; PRIMM (Sentance et al. 2019) uses a similar predict-run-investigate-modify-make sequence. Most of this evidence comes from short classroom studies and is less mature than the memory research above.",
+      "strength": "moderate",
+      "howToApply": "For each new construct, predict the output of 2-3 snippets, then solve a Parsons-style reordering, then modify working code, then write your own. Use tools such as Runestone or make your own scrambled versions of example code.",
+      "sources": [
+        {
+          "label": "Ericson, Margulieux & Rick (2017), Koli Calling",
+          "url": "https://doi.org/10.1145/3141880.3141895"
+        },
+        {
+          "label": "Ericson et al. (2022), Parsons Problems and Beyond, ITiCSE-WGR",
+          "url": "https://doi.org/10.1145/3571785.3574127"
+        },
+        {
+          "label": "Xie et al. (2019), Computer Science Education",
+          "url": "https://doi.org/10.1080/08993408.2019.1565235"
+        },
+        {
+          "label": "Lytle et al. (2019), Use, Modify, Create, ITiCSE",
+          "url": "https://doi.org/10.1145/3304221.3319786"
+        },
+        {
+          "label": "Sentance, Waite & Kallia (2019), PRIMM, Computer Science Education",
+          "url": "https://doi.org/10.1080/08993408.2019.1608781"
+        }
+      ]
+    },
+    {
+      "id": "self-explanation",
+      "name": "Self-explanation, elaborative interrogation, and teaching (the 'Feynman technique')",
+      "claim": "Explaining why each step works, to yourself or to an imagined beginner, improves understanding beyond studying the material passively.",
+      "evidence": "Chi et al. (1994) found that students prompted to explain each line of a text to themselves gained more understanding, and Dunlosky et al. (2013) rated self-explanation and elaborative interrogation as moderate utility. The 'Feynman technique' has no primary research source; the closest evidence is that actually teaching beats merely expecting to teach (Fiorella & Mayer 2013), and a meta-analysis supports benefits of preparing to teach and teaching (Kobayashi 2019), probably largely through retrieval and self-explanation.",
+      "strength": "moderate",
+      "howToApply": "As you read code, add a comment to each line in your own words explaining why it is there, and ask 'what breaks if I delete this?'. After each topic, explain it from memory for a beginner in writing or on a recording, then check it against the source and fix the gaps.",
+      "sources": [
+        {
+          "label": "Chi, de Leeuw, Chiu & LaVancher (1994), Cognitive Science",
+          "url": "https://doi.org/10.1207/s15516709cog1803_3"
+        },
+        {
+          "label": "Dunlosky et al. (2013)",
+          "url": "https://doi.org/10.1177/1529100612453266"
+        },
+        {
+          "label": "Fiorella & Mayer (2013), Contemporary Educational Psychology",
+          "url": "https://doi.org/10.1016/j.cedpsych.2013.06.001"
+        },
+        {
+          "label": "Kobayashi (2019), Japanese Psychological Research",
+          "url": "https://doi.org/10.1111/jpr.12221"
+        }
+      ]
+    },
+    {
+      "id": "metacognition",
+      "name": "Metacognition and illusions of competence",
+      "claim": "Learners are poor judges of their own learning: material that feels fluent is often not retained, and effortful methods that feel worse often work better.",
+      "evidence": "Koriat & Bjork (2005) documented systematic overconfidence when the answer is visible during study. In Kornell & Bjork (2008), most participants judged blocked study more effective even though interleaving produced better learning. In Deslauriers et al. (2019, PNAS), physics students in active-learning classes learned more but felt they had learned less than students in polished lectures. Karpicke, Butler & Roediger (2009) found most students rely on rereading rather than self-testing.",
+      "strength": "strong",
+      "howToApply": "Judge progress only by unaided performance: a blank-file rewrite, an unseen problem, or a quiz taken a few days later. Keep a simple log of what you could and could not do without help.",
+      "sources": [
+        {
+          "label": "Koriat & Bjork (2005), JEP: Learning, Memory, and Cognition",
+          "url": "https://doi.org/10.1037/0278-7393.31.2.187"
+        },
+        {
+          "label": "Kornell & Bjork (2008), Psychological Science",
+          "url": "https://doi.org/10.1111/j.1467-9280.2008.02127.x"
+        },
+        {
+          "label": "Deslauriers et al. (2019), PNAS",
+          "url": "https://doi.org/10.1073/pnas.1821936116"
+        },
+        {
+          "label": "Karpicke, Butler & Roediger (2009), Memory",
+          "url": "https://doi.org/10.1080/09658210802647009"
+        }
+      ]
+    },
+    {
+      "id": "sleep",
+      "name": "Sleep and consolidation",
+      "claim": "Adequate sleep supports memory formation, but the popular claim that sleep itself boosts skill performance is weaker than it sounds.",
+      "evidence": "Reviews link sleep to stabilizing and integrating declarative memories (Diekelmann & Born 2010), and one night of sleep deprivation before learning produced about a 40% encoding deficit in Yoo et al. (2007). Walker et al. (2002) reported roughly 20% motor-sequence speed gains after sleep, but a meta-analysis of 34 articles (Pan & Rickard 2015) found these gains largely disappear once methodological confounds are accounted for.",
+      "strength": "mixed",
+      "howToApply": "Protect regular sleep, especially the night before and after heavy learning sessions, and don't trade sleep for extra late-night study. Don't count on sleep to improve a skill you haven't practiced.",
+      "sources": [
+        {
+          "label": "Diekelmann & Born (2010), Nature Reviews Neuroscience",
+          "url": "https://doi.org/10.1038/nrn2762"
+        },
+        {
+          "label": "Yoo et al. (2007), Nature Neuroscience",
+          "url": "https://doi.org/10.1038/nn1851"
+        },
+        {
+          "label": "Walker et al. (2002), Neuron",
+          "url": "https://doi.org/10.1016/S0896-6273(02)00746-8"
+        },
+        {
+          "label": "Pan & Rickard (2015), Psychological Bulletin",
+          "url": "https://doi.org/10.1037/bul0000009"
+        }
+      ]
+    },
+    {
+      "id": "srs-algorithms",
+      "name": "Spaced repetition scheduling algorithms (Leitner, SM-2, FSRS)",
+      "claim": "Software can schedule each item's next review close to the point of forgetting, which cuts the review load needed to retain a large body of facts.",
+      "evidence": "The Leitner box system moves cards to less frequently reviewed boxes when answered correctly. SM-2 (Wozniak 1990) sets intervals of 1 day, then 6 days, then multiplies by a per-item ease factor (starting at 2.5). Newer data-driven models fit memory curves to review logs: Duolingo's half-life regression (Settles & Meeder 2016) and the SSP-MMC scheduler (Ye, Su & Cao 2022, trained on 220 million logs), whose authors also built FSRS, now an option in Anki. In the open srs-benchmark (about 10k users' collections), FSRS predicts recall more accurately than simpler baselines. These benchmarks measure prediction accuracy and review efficiency for flashcard-type facts, not skill gains.",
+      "strength": "moderate",
+      "howToApply": "Put durable facts (syntax, standard library APIs, complexity of operations, CLI flags, concept definitions) into Anki with FSRS enabled at about 90% target retention; keep cards small and phrased as questions. Use spaced projects and problem sets, not flashcards, for the skills themselves.",
+      "sources": [
+        {
+          "label": "Wozniak, SM-2 algorithm description",
+          "url": "https://super-memory.com/english/ol/sm2.htm"
+        },
+        {
+          "label": "Settles & Meeder (2016), ACL",
+          "url": "https://aclanthology.org/P16-1174/"
+        },
+        {
+          "label": "Ye, Su & Cao (2022), KDD",
+          "url": "https://doi.org/10.1145/3534678.3539081"
+        },
+        {
+          "label": "FSRS documentation (open-spaced-repetition)",
+          "url": "https://github.com/open-spaced-repetition/fsrs4anki/wiki/ABC-of-FSRS"
+        },
+        {
+          "label": "srs-benchmark",
+          "url": "https://github.com/open-spaced-repetition/srs-benchmark"
+        }
+      ]
+    }
+  ],
+  "protocol": [
+    {
+      "step": "Define the target and deconstruct the skill",
+      "detail": "Write down concrete target performances (e.g. 'build and deploy a CRUD web app alone', 'solve medium algorithm problems in 30 minutes') and break programming into subskills: syntax and semantics, tracing/reading, decomposition, data structures and algorithms, debugging, testing, tools (git, shell), and design. This mirrors Kaufman's 'deconstruct' step and Young's 'metalearning'; these frameworks are practitioner advice, not tested interventions, but they sensibly point practice at the subskills that matter."
+    },
+    {
+      "step": "Learn just enough from worked examples, then fade them",
+      "detail": "For each new construct, study a few annotated worked examples with labeled subgoals, predict outputs, and trace execution by hand. Move quickly through Parsons problems and modifying working code to writing from a blank file, removing scaffolding as soon as you can manage without it (expertise reversal)."
+    },
+    {
+      "step": "Make retrieval the default activity",
+      "detail": "Most of each session should be producing: rewriting code from memory, solving unseen problems, answering your own questions, explaining concepts without notes. Use a short attempt-first step (10-15 minutes) before reading solutions to new problems, and always check against the correct answer afterward."
+    },
+    {
+      "step": "Space and interleave everything",
+      "detail": "Keep a spaced flashcard deck (FSRS) for durable facts and revisit earlier topics in mixed problem sets rather than finishing a topic and never returning. Practicing daily in short sessions beats occasional long ones for the same total time."
+    },
+    {
+      "step": "Gate progress on unaided mastery",
+      "detail": "Before moving on, pass a check you set yourself, such as 4 of 5 unseen problems solved without help or AI, or a working mini-project built from scratch. If you fail, do targeted corrective practice on the specific errors and retest a day or more later."
+    },
+    {
+      "step": "Build real projects with tight feedback loops",
+      "detail": "From early on, ship small projects slightly beyond your current ability, since that is the target skill. Get fast, specific feedback through automated tests, judges, code review from stronger programmers and open-source maintainers, and keep a log of recurring mistakes to drill directly."
+    },
+    {
+      "step": "Calibrate with tests, not feelings",
+      "detail": "Assume that fluency while reading or watching overstates what you know. Track delayed, unaided performance weekly (for example, re-solve last week's problems cold) and adjust the plan from that data."
+    },
+    {
+      "step": "Use AI as a tutor, not a ghostwriter",
+      "detail": "During practice, don't ask AI to write the code you are trying to learn. Use it for conceptual questions, hints, explanations of your own errors, and code review after you have made an honest attempt, then confirm you can reproduce the result without it."
+    },
+    {
+      "step": "Sustain it over years for world-class level",
+      "detail": "Twenty hours gets you to basic competence, not expertise. Reaching elite level takes years of increasingly hard, feedback-rich work: reading excellent codebases, studying foundations (algorithms, systems, networking), working with strong peers and mentors, and taking on harder problems, while protecting sleep and consistency. Practice volume alone explains only part of the variance, so the choice of problems and the quality of feedback matter too."
+    }
+  ],
+  "spacing": {
+    "intervalsDays": [
+      1,
+      3,
+      7,
+      14,
+      30,
+      60,
+      120
+    ],
+    "rationale": "Cepeda et al. (2008) found the best gap between reviews is about 20-40% of the retention interval for a 1-week horizon, falling to about 5-10% for a 1-year horizon, so reviews should start a day or so after learning and stretch out to weeks and months for knowledge you want to keep for years. Expanding schedules are not clearly better than evenly spaced ones for long-term retention (Karpicke & Roediger 2007; Latimier et al. 2021); what matters is delaying each retrieval enough to make it effortful, so this widening fixed schedule is a reasonable default. An adaptive algorithm such as FSRS, which reschedules each item from your recall history, is preferable when you can use one; reset an item's schedule when you fail it.",
+    "sources": [
+      {
+        "label": "Cepeda et al. (2008)",
+        "url": "https://doi.org/10.1111/j.1467-9280.2008.02209.x"
+      },
+      {
+        "label": "Karpicke & Roediger (2007), JEP: Learning, Memory, and Cognition",
+        "url": "https://doi.org/10.1037/0278-7393.33.4.704"
+      },
+      {
+        "label": "Latimier, Peyre & Ramus (2021)",
+        "url": "https://doi.org/10.1007/s10648-020-09572-8"
+      }
+    ]
+  },
+  "ai": {
+    "guidance": "The evidence so far is consistent: AI that hands you answers during practice raises practice performance but can lower what you can do alone afterward. In a field experiment with nearly 1,000 students, unrestricted GPT-4 access raised practice grades 48% but lowered later unassisted exam grades 17%, while a tutor version that gave hints instead of answers avoided most of the harm (Bastani et al. 2025). In Anthropic's randomized trial with 52 developers learning a new Python library, the AI group scored 50% on a comprehension quiz versus 67% for those coding by hand (d = 0.74) with no significant speed gain; delegators did worst, while those asking conceptual questions or requesting explanations did much better (Shen & Tamkin 2026, preprint), and lab studies of Python learning likewise found that asking for solutions reduced understanding while asking for explanations improved it, with weaker students harmed most (Lehmann et al. 2024; Prather et al. 2024). So: attempt first, ask for hints, concepts and explanations rather than full solutions, have AI review code you wrote, and regularly test yourself with AI turned off; these are mostly short-term, small-sample studies, so long-term effects remain uncertain.",
+    "sources": [
+      {
+        "label": "Bastani et al. (2025), PNAS, 'Generative AI without guardrails can harm learning'",
+        "url": "https://doi.org/10.1073/pnas.2422633122"
+      },
+      {
+        "label": "Shen & Tamkin (2026), 'How AI Impacts Skill Formation', arXiv",
+        "url": "https://arxiv.org/abs/2601.20245"
+      },
+      {
+        "label": "Anthropic research summary (2026)",
+        "url": "https://www.anthropic.com/research/AI-assistance-coding-skills"
+      },
+      {
+        "label": "Lehmann, Cornelius & Sting, 'AI Meets the Classroom', arXiv",
+        "url": "https://arxiv.org/abs/2409.09047"
+      },
+      {
+        "label": "Prather et al. (2024), 'The Widening Gap', ICER",
+        "url": "https://doi.org/10.1145/3632620.3671116"
+      },
+      {
+        "label": "Kazemitabaar et al. (2023), CHI",
+        "url": "https://doi.org/10.1145/3544548.3580919"
+      }
+    ]
+  },
+  "myths": [
+    {
+      "myth": "Learning styles (visual/auditory/kinesthetic) matter, so you should match instruction to yours",
+      "reality": "Pashler et al. (2008) found almost no studies with the design needed to test this, and the few that did contradicted it. Match the format to the content, such as diagrams for data structures or code for syntax, not to a supposed personal style.",
+      "sources": [
+        {
+          "label": "Pashler, McDaniel, Rohrer & Bjork (2008), Psychological Science in the Public Interest",
+          "url": "https://doi.org/10.1111/j.1539-6053.2009.01038.x"
+        }
+      ]
+    },
+    {
+      "myth": "10,000 hours of practice makes anyone an expert",
+      "reality": "Deliberate practice explains a substantial but minority share of performance differences (26% in games, 21% in music, under 1% in professions), only 1% among elite athletes, and the original violin finding did not replicate cleanly. Practice is necessary but not sufficient, and its quality and feedback matter as much as its quantity.",
+      "sources": [
+        {
+          "label": "Macnamara et al. (2014)",
+          "url": "https://doi.org/10.1177/0956797614535810"
+        },
+        {
+          "label": "Macnamara & Maitra (2019)",
+          "url": "https://doi.org/10.1098/rsos.190327"
+        }
+      ]
+    },
+    {
+      "myth": "Rereading, highlighting and rewatching tutorials are good ways to study",
+      "reality": "Dunlosky et al. (2013) rated rereading and highlighting low utility, and repeated testing beats repeated reading on delayed tests. Watching a tutorial produces familiarity, not the ability to write the code unaided.",
+      "sources": [
+        {
+          "label": "Dunlosky et al. (2013)",
+          "url": "https://doi.org/10.1177/1529100612453266"
+        },
+        {
+          "label": "Roediger & Karpicke (2006)",
+          "url": "https://doi.org/10.1111/j.1467-9280.2006.01693.x"
+        }
+      ]
+    },
+    {
+      "myth": "If studying feels smooth and easy, you are learning well",
+      "reality": "Fluency during study is a poor signal: students rate blocked practice and passive lectures as more effective even when interleaving and active learning produce more learning. Effort often signals that learning is happening.",
+      "sources": [
+        {
+          "label": "Kornell & Bjork (2008)",
+          "url": "https://doi.org/10.1111/j.1467-9280.2008.02127.x"
+        },
+        {
+          "label": "Deslauriers et al. (2019)",
+          "url": "https://doi.org/10.1073/pnas.1821936116"
+        }
+      ]
+    },
+    {
+      "myth": "Tutoring reliably produces a 2-sigma gain (Bloom's 2-sigma effect is a settled benchmark)",
+      "reality": "Bloom's 2 SD figure came from a small number of studies. Broader reviews put human tutoring around d = 0.79 and mastery learning around 0.5 SD: large and worth pursuing, but not 2 sigma.",
+      "sources": [
+        {
+          "label": "Bloom (1984)",
+          "url": "https://doi.org/10.3102/0013189X013006004"
+        },
+        {
+          "label": "VanLehn (2011)",
+          "url": "https://doi.org/10.1080/00461520.2011.611369"
+        }
+      ]
+    }
+  ],
+  "frameworks": [
+    {
+      "name": "Ultralearning (Scott Young, 2019)",
+      "note": "Nine principles (metalearning, focus, directness, drill, retrieval, feedback, retention, intuition, experimentation) that largely repackage the evidence above into an intensive self-directed project format. Useful as a planning checklist; the book's case studies are anecdotes, not controlled evidence.",
+      "url": "https://scotthyoung.com/blog/ultralearning/"
+    },
+    {
+      "name": "The First 20 Hours (Josh Kaufman, 2013)",
+      "note": "Four steps: deconstruct the skill, learn enough to self-correct, remove barriers to practice, and commit to about 20 hours. It targets basic competence, not expertise, and the 20-hour figure is a motivating heuristic rather than an empirical finding.",
+      "url": "https://www.youtube.com/watch?v=5MgBikgcWnY"
+    }
+  ]
+}

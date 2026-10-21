@@ -1,0 +1,1286 @@
+{
+  "id": "s0",
+  "modules": [
+    {
+      "id": "s0m1",
+      "title": "Your workshop",
+      "summary": "You can move around your Mac by typing, write a Python file in VS Code, run it, and install the tools you need.",
+      "lessons": [
+        {
+          "id": "s0m1l1",
+          "title": "What programming actually is",
+          "minutes": 60,
+          "objective": "By the end you can explain, in your own words, how a Python source file becomes output, and tell a syntax error from a runtime error by reading the last line of the message.",
+          "concept": [
+            "A program is a plain-text file of instructions written in a programming language. That file is the **source code**. Your Mac's processor cannot read Python directly; it only runs machine instructions, so something has to translate. For Python, that translator is the **interpreter**, itself a program called `python3`. When you type `python3 hello.py`, the interpreter reads your file, checks that it is valid Python, then runs the statements from top to bottom. Whatever your code prints appears in the terminal as **output**.",
+            "Most of programming is not typing. It is deciding precisely what you want, writing it with zero ambiguity, running it, and comparing what happened with what you expected. The computer does exactly what the text says, not what you meant. When the two differ you have a **bug**, and the gap between your expectation and the real output is the most useful piece of information you will get all day. Always predict the output before you run something.",
+            "Errors are output too, not failure. If you write `print(\"hi\"` and forget the closing parenthesis, Python refuses to run any of the file and prints a `SyntaxError` with a line number. If the syntax is fine but a line asks for something impossible, like `print(10 / 0)`, every line before it runs, then Python stops at that line with a `ZeroDivisionError`. Read the **last line** of an error message first: it names the problem. The lines above it say where it happened."
+          ],
+          "visual": {
+            "type": "steps",
+            "title": "From text file to output",
+            "steps": [
+              {
+                "label": "Source code",
+                "detail": "hello.py: plain text you write in an editor"
+              },
+              {
+                "label": "python3 hello.py",
+                "detail": "you ask the interpreter to run the file"
+              },
+              {
+                "label": "Check syntax",
+                "detail": "the whole file must be valid Python, or nothing runs (SyntaxError)"
+              },
+              {
+                "label": "Run top to bottom",
+                "detail": "each statement executes in order; a runtime error stops it mid-way"
+              },
+              {
+                "label": "Output",
+                "detail": "text from print() and any error messages appear in the terminal"
+              }
+            ]
+          },
+          "example": {
+            "lang": "python",
+            "code": "# hello.py\nprint(\"Hello, world!\")\nprint(\"2 + 3 =\", 2 + 3)\nprint(\"2\" + \"3\")",
+            "explain": "Line 2 prints the text inside the quotes. Line 3 prints two values separated by a space: the text `2 + 3 =` and the number 5 that Python calculated. Line 4 joins two pieces of text, so it prints `23`, not 5."
+          },
+          "tryit": "Open the Terminal app (Cmd+Space, type Terminal, press Return), type `python3` and press Return to start the interactive interpreter. If macOS offers to install the command line developer tools, accept, wait for it to finish, and try again. Before each of these, write your predicted output on paper: `2 + 3`, `\"2\" + \"3\"`, `print(10 / 0)`. Run each one, then write one sentence explaining every prediction you got wrong. Type `exit()` to leave.",
+          "questions": [
+            {
+              "id": "s0m1l1q1",
+              "level": 1,
+              "type": "mcq",
+              "prompt": "What is the job of the `python3` interpreter?",
+              "options": [
+                "It turns a Word document into Python code",
+                "It reads Python source code and executes its instructions",
+                "It stores your files on GitHub",
+                "It checks your spelling in comments"
+              ],
+              "answer": 1,
+              "explain": "The interpreter is the program that reads your `.py` source file and carries out what it says. It has nothing to do with Word files, GitHub, or spelling; comments are ignored entirely."
+            },
+            {
+              "id": "s0m1l1q2",
+              "level": 2,
+              "type": "predict",
+              "prompt": "What exactly does this print?",
+              "code": "print(\"1\" + \"0\", 1 + 0)",
+              "answer": "10 1",
+              "accept": [],
+              "explain": "`\"1\" + \"0\"` joins two pieces of text into `10`. `1 + 0` is arithmetic on numbers and gives `1`. `print` puts a single space between the two values. The tempting answer `1 1` treats the quoted digits as numbers, but quotes make them text."
+            },
+            {
+              "id": "s0m1l1q3",
+              "level": 3,
+              "type": "mcq",
+              "prompt": "File A has a missing `)` on line 3. File B has `print(10 / 0)` on line 3. In both files, lines 1 and 2 are valid `print` calls. Which statement is true?",
+              "options": [
+                "Both files print lines 1 and 2, then show an error",
+                "Neither file prints anything except an error",
+                "File A prints only a SyntaxError; File B prints lines 1 and 2, then a ZeroDivisionError",
+                "File A prints lines 1 and 2; File B prints only an error"
+              ],
+              "answer": 2,
+              "explain": "Python checks the syntax of the whole file before running any of it, so a SyntaxError anywhere means nothing runs. A ZeroDivisionError only happens when line 3 actually executes, so lines 1 and 2 have already printed by then."
+            }
+          ],
+          "resource": {
+            "title": "Python tutorial: Using the Python interpreter",
+            "url": "https://docs.python.org/3/tutorial/interpreter.html"
+          }
+        },
+        {
+          "id": "s0m1l2",
+          "title": "The terminal: moving around by typing",
+          "minutes": 75,
+          "objective": "By the end you can create, move, rename and delete files and folders using only `pwd`, `ls`, `cd`, `mkdir`, `touch`, `mv` and `rm`, and explain the difference between an absolute and a relative path.",
+          "concept": [
+            "The terminal is a text window onto the same files you see in Finder. Inside it runs a **shell** (on a Mac, `zsh`): it reads the command you type, runs it, prints the result and waits for the next one. The shell is always *somewhere*: a folder called the **working directory**. `pwd` prints where you are, `ls` lists what is there, and `cd Documents` moves you into a folder. `cd ..` moves up one level, and a bare `cd` takes you home.",
+            "A **path** names a file's location. An **absolute path** starts with `/` and works from anywhere: `/Users/ada/code/hello.py`. A **relative path** is read starting from your working directory: if you are in `/Users/ada`, then `code/hello.py` means the same file. Shortcuts: `~` is your home folder, `.` is the current folder, `..` is the parent. Press **Tab** to auto-complete names. Avoid spaces in names; use `my-notes`, because `cd My Notes` is read as two separate words.",
+            "To make things: `mkdir code` creates a folder, `mkdir -p code/base-camp` creates nested folders in one go, and `touch notes.txt` creates an empty file. `mv notes.txt ideas.txt` renames; `mv ideas.txt code/` moves it into `code`. `rm ideas.txt` deletes a file and `rm -r scratch` deletes a folder and everything inside it. **There is no Trash and no undo**: `rm` is permanent. Read the command twice before pressing Return, and run `pwd` when unsure."
+          ],
+          "visual": {
+            "type": "table",
+            "title": "Core commands of week one",
+            "headers": [
+              "Command",
+              "What it does",
+              "Example"
+            ],
+            "rows": [
+              [
+                "pwd",
+                "print working directory",
+                "pwd"
+              ],
+              [
+                "ls",
+                "list contents (-a includes hidden files)",
+                "ls -a"
+              ],
+              [
+                "cd",
+                "change directory",
+                "cd ~/code"
+              ],
+              [
+                "mkdir",
+                "make a folder (-p makes parents too)",
+                "mkdir -p code/base-camp"
+              ],
+              [
+                "mv",
+                "move or rename",
+                "mv notes.txt ideas.txt"
+              ],
+              [
+                "rm",
+                "delete permanently (-r for folders)",
+                "rm -r scratch"
+              ]
+            ]
+          },
+          "example": {
+            "lang": "bash",
+            "code": "cd ~\nmkdir -p code/base-camp\ncd code/base-camp\npwd\ntouch notes.txt\nmv notes.txt ideas.txt\nls",
+            "explain": "`cd ~` starts you at home. `mkdir -p` creates `code` and `base-camp` inside it. After `cd code/base-camp` (a relative path), `pwd` prints something like `/Users/ada/code/base-camp`. The file is created, renamed, and `ls` shows `ideas.txt`."
+          },
+          "tryit": "Using only the terminal, create `~/code/base-camp/scratch`, then create three empty files `a.txt`, `b.txt` and `c.txt` inside it. Rename `c.txt` to `notes.txt`, move `notes.txt` up one level into `base-camp`, and finally delete the `scratch` folder with what is left in it. Run `ls` after every step, and write the full list of commands you used in a file called `commands.txt`.",
+          "questions": [
+            {
+              "id": "s0m1l2q1",
+              "level": 1,
+              "type": "mcq",
+              "prompt": "Which command prints the folder you are currently in?",
+              "options": [
+                "ls",
+                "cd",
+                "pwd",
+                "mkdir"
+              ],
+              "answer": 2,
+              "explain": "`pwd` means print working directory. `ls` lists what is inside the folder but not where the folder is; `cd` moves you; `mkdir` creates a folder."
+            },
+            {
+              "id": "s0m1l2q2",
+              "level": 2,
+              "type": "mcq",
+              "prompt": "You are in `/Users/ada/code/base-camp`. You run `cd ../..` and then `pwd`. What is printed?",
+              "options": [
+                "/Users/ada/code",
+                "/Users/ada",
+                "/Users",
+                "/Users/ada/code/base-camp/../.."
+              ],
+              "answer": 1,
+              "explain": "Each `..` goes up one level: from `base-camp` to `code`, then from `code` to `ada`. The shell prints the resolved location, so you see `/Users/ada`, not the literal dots. `/Users/ada/code` would be only one step up."
+            },
+            {
+              "id": "s0m1l2q3",
+              "level": 2,
+              "type": "parsons",
+              "prompt": "Arrange the commands to create a folder called `project`, enter it, create an empty `main.py` inside it, and finally confirm the file is there.",
+              "lines": [
+                "mkdir project",
+                "cd project",
+                "touch main.py",
+                "ls"
+              ],
+              "explain": "The folder must exist before you can `cd` into it, and you must be inside it before `touch` so the file lands in `project` rather than its parent. `ls` comes last to confirm the result."
+            },
+            {
+              "id": "s0m1l2q4",
+              "level": 3,
+              "type": "mcq",
+              "prompt": "In your home folder you meant to type `rm -r code/scratch` but typed `rm -r code` and pressed Return. What is true?",
+              "options": [
+                "The files are in the Trash and can be dragged back",
+                "Nothing happened, because `rm` asks for confirmation on folders",
+                "The whole `code` folder is permanently deleted; only a backup or a copy pushed to GitHub can bring it back",
+                "Only empty folders inside `code` were removed"
+              ],
+              "answer": 2,
+              "explain": "`rm` bypasses the Trash and does not ask before deleting with `-r`. Your only recovery options are copies that exist elsewhere, such as Time Machine or a remote Git repository. That is one reason you will push your work to GitHub in module 2."
+            }
+          ],
+          "resource": {
+            "title": "MIT Missing Semester: Course overview + the shell",
+            "url": "https://missing.csail.mit.edu/2020/course-shell/"
+          }
+        },
+        {
+          "id": "s0m1l3",
+          "title": "VS Code: write and run a Python file",
+          "minutes": 75,
+          "objective": "By the end you can open a project folder in VS Code, write a Python file that uses variables and `print`, save it, and run it from the integrated terminal.",
+          "concept": [
+            "A code editor is a text editor built for programs. Download **VS Code** from code.visualstudio.com and drag it into Applications. Open it, click the Extensions icon, and install the **Python** extension published by Microsoft. Then open the Command Palette with **Cmd+Shift+P**, type `shell command`, and choose *Install 'code' command in PATH*. Now typing `code .` in the terminal opens the current folder in VS Code. Always open a **folder**, not a single file, so the editor and terminal agree on where you are.",
+            "The daily loop: open your folder, create `facts.py`, type code, **save with Cmd+S**, and run it. An unsaved file shows a white dot on its tab, and running it runs the *old* saved version. Open the built-in terminal with **Ctrl+`** (the backtick key, left of 1). It starts in the folder you opened, so `python3 facts.py` finds the file. Keep the editor on top and the terminal underneath: edit, save, run, read, repeat.",
+            "Two tools make a fact sheet. A **variable** stores a value under a name: `name = \"Ada\"` puts the text `Ada` in `name`, and `born = 1815` stores a number. Text needs quotes; numbers do not, and that difference matters: `2026 - \"1815\"` is a `TypeError` because you cannot subtract text. `print(\"Name:\", name)` prints values separated by a space. An **f-string** inserts values into text: `f\"Born {born}\"` becomes `Born 1815`, and anything inside the braces is calculated first."
+          ],
+          "visual": {
+            "type": "trace",
+            "title": "Step through a tiny fact sheet",
+            "code": "name = \"Ada\"\nborn = 2004\nage = 2026 - born\nprint(f\"{name} is about {age}\")",
+            "steps": [
+              {
+                "line": 1,
+                "vars": {
+                  "name": "'Ada'"
+                },
+                "out": ""
+              },
+              {
+                "line": 2,
+                "vars": {
+                  "name": "'Ada'",
+                  "born": "2004"
+                },
+                "out": ""
+              },
+              {
+                "line": 3,
+                "vars": {
+                  "name": "'Ada'",
+                  "born": "2004",
+                  "age": "22"
+                },
+                "out": ""
+              },
+              {
+                "line": 4,
+                "vars": {
+                  "name": "'Ada'",
+                  "born": "2004",
+                  "age": "22"
+                },
+                "out": "Ada is about 22"
+              }
+            ]
+          },
+          "example": {
+            "lang": "python",
+            "code": "name = \"Ada Lovelace\"\ncity = \"London\"\nborn = 1815\nprint(\"=== Fact sheet ===\")\nprint(\"Name:\", name)\nprint(\"City:\", city)\nprint(f\"Born: {born} ({2026 - born} years ago)\")",
+            "explain": "Three variables hold the facts, then four `print` calls format them. The last line calculates `2026 - born` inside the f-string braces, so it prints `Born: 1815 (211 years ago)`."
+          },
+          "tryit": "Create `~/code/base-camp/facts.py` and write a fact sheet about yourself with at least four variables and one calculated value; run it until the output looks the way you want. Then break it on purpose three ways: delete a closing quote, misspell `print` as `pritn`, and put quotes around your birth year. Run each broken version and copy the last line of each error into a comment at the bottom of the file.",
+          "questions": [
+            {
+              "id": "s0m1l3q1",
+              "level": 1,
+              "type": "mcq",
+              "prompt": "In VS Code on a Mac, which shortcut opens the Command Palette?",
+              "options": [
+                "Cmd+Shift+P",
+                "Ctrl+`",
+                "Cmd+S",
+                "Cmd+Space"
+              ],
+              "answer": 0,
+              "explain": "Cmd+Shift+P opens the Command Palette, where you type the name of any command. Ctrl+` toggles the integrated terminal, Cmd+S saves, and Cmd+Space opens macOS Spotlight, not VS Code."
+            },
+            {
+              "id": "s0m1l3q2",
+              "level": 2,
+              "type": "predict",
+              "prompt": "What exactly does this print?",
+              "code": "born = 2000\nprint(f\"Age: {2026 - born}\")",
+              "answer": "Age: 26",
+              "accept": [],
+              "explain": "Python evaluates the expression inside the braces, `2026 - 2000`, which is 26, and puts it into the text. Without the `f` before the quote you would see the braces literally."
+            },
+            {
+              "id": "s0m1l3q3",
+              "level": 2,
+              "type": "mcq",
+              "prompt": "What happens when you run this file?",
+              "options": [
+                "It prints 22",
+                "It prints 2026 - 2004",
+                "It stops with a TypeError",
+                "It prints nothing and gives no error"
+              ],
+              "answer": 2,
+              "explain": "`born` holds the text `\"2004\"`, not the number 2004, because of the quotes. Python will not subtract text from a number, so it stops with `TypeError: unsupported operand type(s) for -: 'int' and 'str'`. Remove the quotes to fix it.",
+              "code": "born = \"2004\"\nprint(2026 - born)"
+            },
+            {
+              "id": "s0m1l3q4",
+              "level": 3,
+              "type": "mcq",
+              "prompt": "You add a new `print` line to `facts.py`, run `python3 facts.py`, and the new line does not appear. There is no error. The file's tab shows a white dot. What is the most likely cause?",
+              "options": [
+                "The Python extension is not installed",
+                "The file has not been saved, so Python ran the previous version",
+                "The terminal is in the wrong folder",
+                "`print` only works in the interactive interpreter"
+              ],
+              "answer": 1,
+              "explain": "The white dot means unsaved changes. Python reads the file from disk, so it ran the last saved version. A wrong folder would give a `can't open file` error rather than old output, and the Python extension is not needed to run code from the terminal."
+            }
+          ],
+          "resource": {
+            "title": "VS Code: Getting started with Python",
+            "url": "https://code.visualstudio.com/docs/python/python-tutorial"
+          }
+        },
+        {
+          "id": "s0m1l4",
+          "title": "Files, folders, and plain text",
+          "minutes": 60,
+          "objective": "By the end you can tell plain-text files from rich documents, show file extensions and hidden files, and lay out a project folder with a Markdown README.",
+          "concept": [
+            "Every file is a named sequence of bytes. In a **plain-text** file those bytes are just characters, so any editor can open it and Git can show exactly which lines changed. Code is always plain text: `.py`, `.md`, `.txt`, `.csv`, `.json`. A Word `.docx` or Pages file is different: a compressed bundle with fonts and formatting. Never write code in Word, Pages, or TextEdit's rich-text mode; they swap straight quotes `\"` for curly quotes, which Python rejects as an invalid character.",
+            "A file's **extension** is a naming convention, not magic. Renaming `facts.py` to `facts.txt` changes nothing inside it; `python3 facts.txt` would still run it, but VS Code stops colouring it as Python. Finder hides extensions by default, so turn them on in Finder > Settings > Advanced > *Show all filename extensions*. Files whose names start with a dot, such as `.zshrc` or `.gitignore`, are **hidden**: `ls -a` shows them, and Cmd+Shift+. toggles them in Finder.",
+            "Give every project its own folder under `~/code`, with lowercase names joined by dashes: `~/code/fact-sheet`. Put a `README.md` at the top explaining what the project is and how to run it. Markdown is plain text with light conventions: `#` starts a heading, `-` starts a bullet, and backticks mark code. GitHub renders it as a formatted page. VS Code saves files as **UTF-8** text by default; the encoding is shown in the status bar at the bottom right."
+          ],
+          "visual": {
+            "type": "compare",
+            "title": "Plain text vs rich documents",
+            "left": {
+              "title": "Plain text (.py, .md, .txt)",
+              "points": [
+                "Opens in any editor",
+                "Exactly the characters you typed",
+                "Git shows line-by-line changes",
+                "What the Python interpreter reads"
+              ]
+            },
+            "right": {
+              "title": "Rich document (.docx, .pages)",
+              "points": [
+                "Needs a specific app",
+                "Hidden formatting and smart quotes",
+                "Git sees an opaque blob",
+                "Python cannot run it"
+              ]
+            }
+          },
+          "example": {
+            "lang": "markdown",
+            "code": "# fact-sheet\n\nA Python script that prints a short fact sheet about me.\n\n## Run it\n\n- Install Python 3\n- From this folder, run `python3 facts.py`\n\n## Files\n\n- `facts.py`: the script\n- `README.md`: this page",
+            "explain": "The `#` lines become headings, `-` lines become bullets, and the backticks show `python3 facts.py` as code. Anyone who lands on the project knows what it is and how to run it in ten seconds."
+          },
+          "tryit": "Turn on filename extensions in Finder. In the terminal, run `ls -a ~` and write down three hidden files you find. Create `~/code/base-camp/README.md` that describes the folder, lists each file in it with one line about what it does, and includes the command to run `facts.py`. Preview it in VS Code with Cmd+Shift+V.",
+          "questions": [
+            {
+              "id": "s0m1l4q1",
+              "level": 1,
+              "type": "mcq",
+              "prompt": "What makes `ls` (without `-a`) leave a file out of its listing on a Mac?",
+              "options": [
+                "Its name starts with a dot",
+                "It has no extension",
+                "It is larger than 1 MB",
+                "It is a plain-text file"
+              ],
+              "answer": 0,
+              "explain": "By convention on macOS and Linux, names beginning with `.` are hidden, and `ls` skips them unless you add `-a`. Extensions, size and file type have nothing to do with it."
+            },
+            {
+              "id": "s0m1l4q2",
+              "level": 2,
+              "type": "mcq",
+              "prompt": "You copied `print(“hello”)` from a Pages document into `hi.py`. Running it gives `SyntaxError: invalid character`. Why?",
+              "options": [
+                "`print` must be capitalised",
+                "The quotes are curly typographic quotes, not the straight `\"` Python requires",
+                "The file needs a `.txt` extension",
+                "Python cannot print the word hello"
+              ],
+              "answer": 1,
+              "explain": "Rich-text apps replace straight quotes with curly ones for appearance. To Python those are different characters that mean nothing. Retype the quotes in VS Code; `print` is lowercase and the extension is irrelevant to the error."
+            },
+            {
+              "id": "s0m1l4q3",
+              "level": 3,
+              "type": "mcq",
+              "prompt": "You run `mv facts.py facts.txt` and then `python3 facts.txt`. What happens?",
+              "options": [
+                "Python refuses because the file is not `.py`",
+                "The contents are converted into a text document and lose their code",
+                "The script runs exactly as before, because the contents did not change",
+                "Python runs it but prints the source code instead of the output"
+              ],
+              "answer": 2,
+              "explain": "`mv` only changes the name. Python reads and runs whatever file you give it regardless of extension. The extension mainly helps tools like VS Code and Finder guess what the file is."
+            }
+          ],
+          "resource": {
+            "title": "Markdown Guide: Basic syntax",
+            "url": "https://www.markdownguide.org/basic-syntax/"
+          }
+        },
+        {
+          "id": "s0m1l5",
+          "title": "Installing things: Homebrew, python3, pip",
+          "minutes": 90,
+          "objective": "By the end you can install a tool with Homebrew, find which `python3` your shell runs with `which`, and install a Python library inside a virtual environment.",
+          "concept": [
+            "A **package manager** installs, updates and removes software from the command line. On a Mac the standard one is **Homebrew**. Install it by pasting the one-line command shown on brew.sh, and only from there. It asks for your Mac login password; the characters do not appear as you type, which is normal. On Apple Silicon Macs it then prints *Next steps*, two commands that add `/opt/homebrew/bin` to your shell setup. Run them, open a new terminal, and check with `brew --version`.",
+            "When you type `python3`, the shell searches the folders listed in the **PATH** variable, in order, and runs the first `python3` it finds. `which python3` tells you which one won. macOS ships a `/usr/bin/python3` that relies on Apple's command line tools; `brew install python` adds a newer one at `/opt/homebrew/bin/python3`. If `which` still shows `/usr/bin/python3` after installing, Homebrew's folder is not early enough in your PATH, usually because the *Next steps* were skipped.",
+            "**pip** installs Python libraries from PyPI. Homebrew's Python refuses `pip3 install` at the global level with an `externally-managed-environment` error, to stop projects from breaking each other and the system. The fix is a **virtual environment** per project: `python3 -m venv .venv` creates a private Python inside the folder, `source .venv/bin/activate` switches to it (your prompt shows `(.venv)`), and `pip install requests` installs there. `deactivate` switches back. Never use `sudo pip`."
+          ],
+          "visual": {
+            "type": "steps",
+            "title": "From bare Mac to working Python project",
+            "steps": [
+              {
+                "label": "Homebrew",
+                "detail": "install from brew.sh, run the Next steps"
+              },
+              {
+                "label": "brew install python",
+                "detail": "a current python3 in /opt/homebrew/bin"
+              },
+              {
+                "label": "python3 -m venv .venv",
+                "detail": "a private environment inside the project"
+              },
+              {
+                "label": "source .venv/bin/activate",
+                "detail": "prompt shows (.venv); python now means this one"
+              },
+              {
+                "label": "pip install requests",
+                "detail": "library lands in .venv only"
+              }
+            ]
+          },
+          "example": {
+            "lang": "bash",
+            "code": "brew --version\nbrew install python\nwhich python3\npython3 --version\ncd ~/code/base-camp\npython3 -m venv .venv\nsource .venv/bin/activate\nwhich python3\npip install requests\npython -c \"import requests; print(requests.__version__)\"\ndeactivate",
+            "explain": "The first `which python3` should print `/opt/homebrew/bin/python3`. After activation the same command prints the path inside `.venv`, which is why `pip` installs into the project. The last line imports the library and prints its version to prove it worked."
+          },
+          "tryit": "Install Homebrew and Python on your Mac, then create a virtual environment in `~/code/base-camp` and install `requests` into it. Record the output of `which python3` before activating, after activating, and after `deactivate`. In two sentences, explain to a friend why the path changes and why that is what makes `pip install` safe.",
+          "questions": [
+            {
+              "id": "s0m1l5q1",
+              "level": 1,
+              "type": "mcq",
+              "prompt": "What is `PATH`?",
+              "options": [
+                "The folder where Python saves your files",
+                "An ordered list of folders the shell searches when you type a command name",
+                "The address of your GitHub repository",
+                "A Homebrew setting that lists installed packages"
+              ],
+              "answer": 1,
+              "explain": "PATH is an environment variable holding folders separated by colons. The shell checks them in order and runs the first match, which is why order decides which `python3` you get."
+            },
+            {
+              "id": "s0m1l5q2",
+              "level": 2,
+              "type": "mcq",
+              "prompt": "Your project is `/Users/ada/code/base-camp`. After `source .venv/bin/activate`, what does `which python3` print?",
+              "options": [
+                "/usr/bin/python3",
+                "/opt/homebrew/bin/python3",
+                "/Users/ada/code/base-camp/.venv/bin/python3",
+                "(.venv)"
+              ],
+              "answer": 2,
+              "explain": "Activation puts `.venv/bin` at the front of PATH, so the environment's own `python3` is found first. `(.venv)` is just the prompt marker, and the other two are found only when the environment is not active."
+            },
+            {
+              "id": "s0m1l5q3",
+              "level": 3,
+              "type": "mcq",
+              "prompt": "You ran `brew install python` with no errors, but a new terminal's `which python3` still prints `/usr/bin/python3`. What is the most likely cause and fix?",
+              "options": [
+                "Homebrew failed silently; reinstall macOS",
+                "`/opt/homebrew/bin` is not in your PATH; run the Next steps commands Homebrew printed, then open a new terminal",
+                "Python must be installed with `pip` instead",
+                "The terminal caches commands forever; restart the Mac twice"
+              ],
+              "answer": 1,
+              "explain": "The install worked, but the shell searches PATH in order and never reaches Homebrew's folder. The Next steps lines add it to your shell's startup file. Reinstalling anything does not fix PATH, and pip installs libraries, not Python itself."
+            }
+          ],
+          "resource": {
+            "title": "Homebrew",
+            "url": "https://brew.sh/"
+          }
+        }
+      ],
+      "project": {
+        "title": "Personal fact sheet script",
+        "brief": "Write `facts.py`, a script that prints a neat fact sheet about you, in a project folder you build entirely from the terminal. It exercises every lesson: paths and commands, variables and f-strings, plain-text files and a README.",
+        "milestones": [
+          "Using only the terminal, create `~/code/fact-sheet` and `cd` into it; `pwd` shows the right path",
+          "Write `facts.py` with at least six variables, including one calculated value such as your age or days until a birthday",
+          "Format the output with a title line, aligned labels and one f-string; it runs cleanly with `python3 facts.py`",
+          "Add a `README.md` that explains the project, shows how to run it and pastes a sample of the output in a code block",
+          "Run `ls -a` and confirm the folder contains exactly the files you intend, with no stray drafts"
+        ],
+        "stretch": "Use `input()` to ask the person running the script for their name and greet them by name before the fact sheet."
+      },
+      "exam": [
+        {
+          "id": "s0m1e1",
+          "level": 2,
+          "type": "mcq",
+          "prompt": "You are in `~/code` and run `mv facts.py fact-sheet/`. `fact-sheet` is an existing folder. What happens?",
+          "options": [
+            "`facts.py` is renamed to `fact-sheet`",
+            "`facts.py` is moved into the `fact-sheet` folder",
+            "A copy of `facts.py` is placed in `fact-sheet` and the original stays",
+            "An error, because `mv` cannot touch folders"
+          ],
+          "answer": 1,
+          "explain": "When the destination is an existing folder, `mv` moves the file into it and keeps its name. It does not copy; the original location no longer has the file. Renaming only happens when the destination is not an existing folder."
+        },
+        {
+          "id": "s0m1e2",
+          "level": 2,
+          "type": "predict",
+          "prompt": "What exactly does this print?",
+          "code": "name = \"Ada\"\nprint(\"Hi\", name + \"!\")",
+          "answer": "Hi Ada!",
+          "accept": [],
+          "explain": "`name + \"!\"` joins the text into `Ada!` with no space. `print` then puts one space between `Hi` and `Ada!`. A common wrong guess is `Hi Ada !`, which would need the `!` passed as a separate value."
+        },
+        {
+          "id": "s0m1e3",
+          "level": 3,
+          "type": "mcq",
+          "prompt": "In a new terminal you type `python3 facts.py` and get `can't open file '/Users/ada/facts.py': [Errno 2] No such file or directory`. The file is in `~/code/fact-sheet`. What is wrong?",
+          "options": [
+            "Python is not installed",
+            "The file has a syntax error",
+            "The working directory is your home folder, so the relative name `facts.py` points to the wrong place; `cd ~/code/fact-sheet` first",
+            "The file must be renamed `facts.txt`"
+          ],
+          "answer": 2,
+          "explain": "The error shows the path Python tried: your home folder plus `facts.py`. A new terminal starts at home. Either `cd` into the project or use the full path. A syntax error would produce a different message after the file was found."
+        },
+        {
+          "id": "s0m1e4",
+          "level": 3,
+          "type": "mcq",
+          "prompt": "A file has five lines. Lines 1 to 4 are valid `print` calls. Line 5 is `print(\"done\"` with no closing parenthesis. What does `python3` show?",
+          "options": [
+            "The output of lines 1 to 4, then a SyntaxError",
+            "Only a SyntaxError; none of the prints run",
+            "The output of all five lines",
+            "Lines 1 to 4, and line 5 is silently skipped"
+          ],
+          "answer": 1,
+          "explain": "Python checks the syntax of the entire file before executing anything, so a broken line 5 stops the whole file from running. Runtime errors, like dividing by zero, are the ones that let earlier lines run first."
+        },
+        {
+          "id": "s0m1e5",
+          "level": 2,
+          "type": "parsons",
+          "prompt": "Arrange the lines so the script prints `22 years`. Each line uses a value created by the line before it.",
+          "lines": [
+            "born = 2004",
+            "age = 2026 - born",
+            "label = f\"{age} years\"",
+            "print(label)"
+          ],
+          "explain": "Each line depends on the variable created just above it: `age` needs `born`, `label` needs `age`, and `print` needs `label`. Any other order uses a name before it exists and causes a `NameError`."
+        },
+        {
+          "id": "s0m1e6",
+          "level": 3,
+          "type": "mcq",
+          "prompt": "`pip3 install requests` fails with `externally-managed-environment`. What is the right fix?",
+          "options": [
+            "Run it again with `sudo`",
+            "Add `--break-system-packages` every time",
+            "Create a virtual environment in the project with `python3 -m venv .venv`, activate it, then `pip install requests`",
+            "Uninstall Homebrew's Python"
+          ],
+          "answer": 2,
+          "explain": "The error protects the shared Python install. A virtual environment gives the project its own place for libraries. `sudo` and `--break-system-packages` override the protection and can break other tools; uninstalling Python removes the tool you need."
+        },
+        {
+          "id": "s0m1e7",
+          "level": 2,
+          "type": "mcq",
+          "prompt": "Which of these paths points to the same file no matter what your working directory is?",
+          "options": [
+            "code/fact-sheet/facts.py",
+            "../fact-sheet/facts.py",
+            "/Users/ada/code/fact-sheet/facts.py",
+            "./facts.py"
+          ],
+          "answer": 2,
+          "explain": "Only a path starting with `/` is absolute. The others are relative: they are combined with your current folder, so they point somewhere different, or nowhere, depending on where you are."
+        },
+        {
+          "id": "s0m1e8",
+          "level": 3,
+          "type": "mcq",
+          "prompt": "A classmate keeps their script in `facts.docx` and pastes it into the terminal when they want to run it. Why is that a bad workflow?",
+          "options": [
+            "Word files are too large for the terminal",
+            "Rich documents add hidden formatting and curly quotes, Python cannot run the file directly, and Git cannot show meaningful line changes",
+            "The terminal only accepts files ending in `.txt`",
+            "Word files cannot contain the word print"
+          ],
+          "answer": 1,
+          "explain": "Code belongs in plain-text files that Python can run and Git can diff. A `.docx` is a formatted bundle; the copy-paste step adds smart quotes and other characters Python rejects. Size and the word `print` are not the issue."
+        }
+      ]
+    },
+    {
+      "id": "s0m2",
+      "title": "Git and how to learn",
+      "summary": "You can version your work with Git, publish it on GitHub, and run a daily learning routine built on retrieval and spacing.",
+      "lessons": [
+        {
+          "id": "s0m2l1",
+          "title": "Git's mental model: three areas",
+          "minutes": 75,
+          "objective": "By the end you can turn a folder into a Git repository, explain where a file version lives after editing, `git add` and `git commit`, and read `git status`.",
+          "concept": [
+            "**Git** records snapshots of a project folder over time, so you can see what changed, when, and why, and go back if you break something. `git init` turns a folder into a **repository** by creating a hidden `.git` folder that holds the entire history. Your files stay where they are. Delete `.git` and the history is gone, but the current files remain. Git only tracks files you tell it about.",
+            "Git has **three areas**. The **working directory** is the files you edit. The **staging area** (also called the index) is the next snapshot you are assembling. The **repository** is the permanent list of **commits**. `git add facts.py` copies the current version of the file into staging. `git commit -m \"message\"` turns everything staged into a commit with your message, name, time and a unique ID like `a1b2c3d`. If you edit a file after `git add`, staging still holds the older version until you add it again.",
+            "Do the one-time setup first: `git config --global user.name \"Ada Lovelace\"`, `git config --global user.email \"ada@example.com\"` and `git config --global init.defaultBranch main`. After that, **`git status`** is your dashboard. It lists untracked files, changes not staged and changes to be committed, and usually suggests the next command. Run it before and after every Git command until reading it is automatic."
+          ],
+          "visual": {
+            "type": "steps",
+            "title": "Where your changes travel",
+            "steps": [
+              {
+                "label": "Working directory",
+                "detail": "the files you edit in VS Code"
+              },
+              {
+                "label": "git add",
+                "detail": "copies the current version of a file into staging"
+              },
+              {
+                "label": "Staging area",
+                "detail": "the exact snapshot the next commit will contain"
+              },
+              {
+                "label": "git commit",
+                "detail": "saves staging as a permanent commit with a message and ID"
+              },
+              {
+                "label": "Repository",
+                "detail": "the history, stored in the hidden .git folder"
+              }
+            ]
+          },
+          "example": {
+            "lang": "bash",
+            "code": "cd ~/code/fact-sheet\ngit init\ngit status        # facts.py and README.md are untracked\ngit add facts.py README.md\ngit status        # both under \"Changes to be committed\"\ngit commit -m \"Add fact sheet script\"\ngit status        # nothing to commit, working tree clean",
+            "explain": "`git init` creates the repository. The first `status` shows the files as untracked. After `add` they are staged, and after `commit` the working directory, staging and the latest commit all match, which Git reports as a clean working tree."
+          },
+          "tryit": "Do the setup and make a first commit in `~/code/fact-sheet`. Then edit `facts.py`, run `git add facts.py`, edit it again and run `git status`: the file now appears under both staged and not-staged changes. On paper, draw the three areas and write which version of `facts.py` sits in each, then explain in two sentences why Git shows the file twice.",
+          "questions": [
+            {
+              "id": "s0m2l1q1",
+              "level": 1,
+              "type": "mcq",
+              "prompt": "What does `git add facts.py` do?",
+              "options": [
+                "Uploads `facts.py` to GitHub",
+                "Copies the current version of `facts.py` into the staging area for the next commit",
+                "Creates a new empty file called `facts.py`",
+                "Permanently saves `facts.py` in the history"
+              ],
+              "answer": 1,
+              "explain": "`add` stages a snapshot of the file as it is right now. Nothing is in the history until you `commit`, and nothing reaches GitHub until you `push`."
+            },
+            {
+              "id": "s0m2l1q2",
+              "level": 2,
+              "type": "mcq",
+              "prompt": "You edit `facts.py` (version A), run `git add facts.py`, edit it again (version B) and run `git commit -m \"Update facts\"`. What does the commit contain?",
+              "options": [
+                "Version B, because it is the newest",
+                "Version A, because that is what was staged",
+                "Both versions",
+                "Nothing, because the file changed after staging"
+              ],
+              "answer": 1,
+              "explain": "A commit records the staging area, not the working directory. Version B is still only in your working directory and will appear as a change not staged. Run `git add` again to include it."
+            },
+            {
+              "id": "s0m2l1q3",
+              "level": 2,
+              "type": "parsons",
+              "prompt": "Arrange the commands to start tracking a new project, record a first snapshot of `facts.py`, and then view the history.",
+              "lines": [
+                "git init",
+                "git add facts.py",
+                "git commit -m \"First commit\"",
+                "git log --oneline"
+              ],
+              "explain": "There must be a repository before anything can be staged, something must be staged before a commit, and there must be a commit before the log has anything to show."
+            },
+            {
+              "id": "s0m2l1q4",
+              "level": 3,
+              "type": "mcq",
+              "prompt": "A friend deletes the hidden `.git` folder in their project to tidy up. What have they lost?",
+              "options": [
+                "Their current files",
+                "Nothing, because Git keeps a copy elsewhere",
+                "The entire history of commits, but their current files are untouched",
+                "Only the most recent commit"
+              ],
+              "answer": 2,
+              "explain": "The `.git` folder is the repository: every commit lives there. The working files are separate, so they remain. Unless the history was pushed to a remote like GitHub, it is gone."
+            }
+          ],
+          "resource": {
+            "title": "Pro Git 1.3: What is Git?",
+            "url": "https://git-scm.com/book/en/v2/Getting-Started-What-is-Git%3F"
+          }
+        },
+        {
+          "id": "s0m2l2",
+          "title": "Commit, log, diff",
+          "minutes": 75,
+          "objective": "By the end you can make small commits with clear messages, read history with `git log --oneline` and `git show`, and read the output of `git diff` and `git diff --staged`.",
+          "concept": [
+            "A good **commit** is one logical change with a message that says what it does, written as a command: `Add age calculation`, not `stuff` or `fixed things`. Keep the first line under about 50 characters. Commit small and often: each commit is a save point you can inspect or return to, and a commit mixing three unrelated changes is hard to understand later. If you changed two unrelated things, `git add` one file, commit, then add the other and commit again.",
+            "To read history, `git log` shows every commit in full and `git log --oneline` shows one line each: the short ID and the message, newest first. `git show a1b2c3d` shows what one commit changed. Long output opens in a pager; press **q** to quit. History is how you answer questions like when the age calculation broke and what else changed that day.",
+            "`git diff` shows changes you have **not staged yet**: working directory compared with staging. `git diff --staged` shows what **is staged**: staging compared with the last commit. Lines starting with `-` were removed and `+` were added. `git restore --staged facts.py` unstages a file but keeps your edits. `git restore facts.py` throws away your unstaged edits and brings back the staged version, so check `git diff` first; those edits cannot be recovered."
+          ],
+          "visual": {
+            "type": "table",
+            "title": "Looking at changes",
+            "headers": [
+              "Command",
+              "Shows"
+            ],
+            "rows": [
+              [
+                "git status",
+                "which files are untracked, modified or staged"
+              ],
+              [
+                "git diff",
+                "unstaged changes (working directory vs staging)"
+              ],
+              [
+                "git diff --staged",
+                "staged changes (staging vs last commit)"
+              ],
+              [
+                "git log --oneline",
+                "one line per commit, newest first"
+              ],
+              [
+                "git show <id>",
+                "the full change made by one commit"
+              ],
+              [
+                "git restore --staged <file>",
+                "unstage a file, keeping your edits"
+              ]
+            ]
+          },
+          "example": {
+            "lang": "diff",
+            "code": "$ git diff\ndiff --git a/facts.py b/facts.py\nindex 3f2a1c4..9b7e0d2 100644\n--- a/facts.py\n+++ b/facts.py\n@@ -1,3 +1,4 @@\n name = \"Ada Lovelace\"\n-city = \"London\"\n+city = \"Marylebone, London\"\n+born = 1815\n print(\"Name:\", name)",
+            "explain": "The `@@` line says this chunk was 3 lines starting at line 1 and is now 4. Lines with a space in front are unchanged context. The `city` line was replaced and a `born` line was added."
+          },
+          "tryit": "In `fact-sheet`, make three separate changes and commit each one on its own with a clear message, running `git diff` before each `git add` and `git diff --staged` before each commit. Then run `git log --oneline`, copy the ID of the middle commit and run `git show` on it. Write one sentence for each of your three commits describing what someone would learn from its message alone.",
+          "questions": [
+            {
+              "id": "s0m2l2q1",
+              "level": 1,
+              "type": "mcq",
+              "prompt": "Which command shows the changes that are already staged and will go into the next commit?",
+              "options": [
+                "git diff",
+                "git diff --staged",
+                "git log --oneline",
+                "git status --short"
+              ],
+              "answer": 1,
+              "explain": "`git diff --staged` compares staging with the last commit. Plain `git diff` shows the opposite set: edits you have not staged yet. `git log` shows past commits, and `status` lists files without showing line changes."
+            },
+            {
+              "id": "s0m2l2q2",
+              "level": 2,
+              "type": "mcq",
+              "prompt": "`git status` lists `facts.py` under *Changes to be committed*, but `git diff` prints nothing. Why?",
+              "options": [
+                "Git is broken and needs reinstalling",
+                "All the changes to `facts.py` are staged, and plain `git diff` only shows unstaged changes",
+                "The file was deleted",
+                "`git diff` only works after a push"
+              ],
+              "answer": 1,
+              "explain": "Once everything is staged, the working directory and staging match, so plain `git diff` has nothing to show. Use `git diff --staged` to see the staged lines."
+            },
+            {
+              "id": "s0m2l2q3",
+              "level": 2,
+              "type": "mcq",
+              "prompt": "What changed according to this diff?",
+              "options": [
+                "The `age` line was deleted",
+                "`age` was changed from 21 to 22",
+                "A new line `age = 22` was added after the old one",
+                "The file was renamed"
+              ],
+              "answer": 1,
+              "explain": "One `-` line and one `+` line at the same spot means the line was replaced: the old value 21 went and the new value 22 came in. Nothing was renamed, and the old line no longer exists.",
+              "code": "-age = 21\n+age = 22"
+            },
+            {
+              "id": "s0m2l2q4",
+              "level": 3,
+              "type": "mcq",
+              "prompt": "You fixed a typo in `README.md` and, separately, added a new feature to `facts.py`. Both are unstaged. What gives the most useful history?",
+              "options": [
+                "`git add .` then `git commit -m \"updates\"`",
+                "`git add README.md`, commit `Fix typo in README`; then `git add facts.py`, commit `Add birthday countdown`",
+                "Wait until you have ten changes, then commit them together",
+                "Commit only `facts.py` and delete the README fix"
+              ],
+              "answer": 1,
+              "explain": "Two unrelated changes deserve two commits with specific messages, so each can be understood, reviewed or undone on its own. A single `updates` commit hides what happened, and waiting makes the mix worse."
+            }
+          ],
+          "resource": {
+            "title": "Pro Git 2.2: Recording changes to the repository",
+            "url": "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository"
+          }
+        },
+        {
+          "id": "s0m2l3",
+          "title": "GitHub and git push",
+          "minutes": 90,
+          "objective": "By the end you can authenticate with GitHub, connect a local repository to a GitHub repository, push commits, and keep secrets and junk files out with `.gitignore`.",
+          "concept": [
+            "Everything so far lives only on your Mac. A **remote** is a copy of the repository somewhere else; **GitHub** is the most common host. `git push` uploads commits you have that the remote lacks; `git clone` downloads a whole repository; `git pull` fetches new commits and combines them with yours. Commits only reach GitHub when you push, so a commit you made but did not push is invisible on the website.",
+            "GitHub does not accept your account password for Git over HTTPS. The simplest setup: `brew install gh`, then `gh auth login`. Choose GitHub.com and HTTPS, and say yes to authenticating Git with your GitHub credentials; it finishes in the browser. Then create an **empty** repository on github.com, without a README, so its history does not clash with yours. Never paste tokens into chats or commit them to files.",
+            "Connect and push: `git remote add origin https://github.com/<you>/fact-sheet.git`, then `git push -u origin main`. The `-u` remembers the link, so afterwards plain `git push` works. Check with `git remote -v`. A public repository is readable by anyone, forever. A **`.gitignore`** file lists paths Git should ignore, such as `.venv/` and `.DS_Store`. If a password or API key is ever pushed, **revoke it first**: deleting the file in a new commit leaves it in the history."
+          ],
+          "visual": {
+            "type": "steps",
+            "title": "Local to remote and back",
+            "steps": [
+              {
+                "label": "Local commits",
+                "detail": "history in your .git folder"
+              },
+              {
+                "label": "git push",
+                "detail": "upload commits the remote does not have"
+              },
+              {
+                "label": "origin on GitHub",
+                "detail": "the shared copy anyone with access can see"
+              },
+              {
+                "label": "git clone / git pull",
+                "detail": "download history on another machine"
+              }
+            ]
+          },
+          "example": {
+            "lang": "bash",
+            "code": "cd ~/code/fact-sheet\nprintf \".venv/\\n.DS_Store\\n\" > .gitignore\ngit add .gitignore\ngit commit -m \"Ignore venv and Finder files\"\ngit remote add origin https://github.com/ada-codes/fact-sheet.git\ngit push -u origin main\ngit remote -v",
+            "explain": "`printf` writes two lines into `.gitignore`, which is committed like any file. `remote add` names the GitHub URL `origin`, and `push -u` uploads `main` and remembers the link. `git remote -v` prints the fetch and push URLs so you can check them."
+          },
+          "tryit": "Set up `gh auth login`, create an empty `fact-sheet` repository on GitHub, add a `.gitignore`, and push. Open the repository page and check that the README renders. Then edit the README locally, commit and push with plain `git push`, and refresh the page. Finally, `git clone` the repository into `~/Desktop/clone-test`, confirm the files are there, and delete that test folder with `rm -r`.",
+          "questions": [
+            {
+              "id": "s0m2l3q1",
+              "level": 1,
+              "type": "mcq",
+              "prompt": "What does `git push` do?",
+              "options": [
+                "Saves your edits into staging",
+                "Uploads your local commits that the remote does not have yet",
+                "Downloads new commits from GitHub",
+                "Creates a new repository on GitHub"
+              ],
+              "answer": 1,
+              "explain": "`push` sends commits from your repository to the remote. Staging is `add`, downloading is `pull` or `fetch`, and creating the GitHub repository happens on the website or with `gh repo create`."
+            },
+            {
+              "id": "s0m2l3q2",
+              "level": 2,
+              "type": "mcq",
+              "prompt": "You committed a change to `facts.py` an hour ago, but the GitHub page still shows the old file. `git status` says *Your branch is ahead of 'origin/main' by 1 commit*. What is going on?",
+              "options": [
+                "GitHub takes an hour to update",
+                "The commit exists only locally; run `git push`",
+                "The commit failed and must be redone",
+                "You need to run `git add` again"
+              ],
+              "answer": 1,
+              "explain": "Ahead by 1 commit means you have a commit the remote lacks. Committing is local; pushing is the separate step that uploads it. The commit itself is fine, and nothing needs re-staging."
+            },
+            {
+              "id": "s0m2l3q3",
+              "level": 2,
+              "type": "mcq",
+              "prompt": "Your `.gitignore` contains the line `.venv/`. What is the effect?",
+              "options": [
+                "The `.venv` folder is deleted",
+                "Git does not offer the untracked `.venv` folder or its contents for staging",
+                "The virtual environment stops working",
+                "GitHub hides the folder but Git still commits it"
+              ],
+              "answer": 1,
+              "explain": "`.gitignore` only tells Git to ignore those untracked paths in `status` and `add`. The folder stays on disk and keeps working; it simply never enters a commit, which is what you want for large, machine-specific files."
+            },
+            {
+              "id": "s0m2l3q4",
+              "level": 3,
+              "type": "mcq",
+              "prompt": "You pushed a file `.env` containing a real API key to a public repository. What should you do first?",
+              "options": [
+                "Delete `.env`, commit and push",
+                "Make the repository private",
+                "Revoke the key with the service that issued it and create a new one, then remove the file and add it to `.gitignore`",
+                "Rename the file to `.env.old`"
+              ],
+              "answer": 2,
+              "explain": "Public pushes can be copied by bots within minutes, and a deleting commit leaves the key in history. The only safe first move is to make the leaked key useless by revoking it. Cleanup and `.gitignore` come after."
+            }
+          ],
+          "resource": {
+            "title": "Pro Git 2.5: Working with remotes",
+            "url": "https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes"
+          }
+        },
+        {
+          "id": "s0m2l4",
+          "title": "How learning actually works",
+          "minutes": 60,
+          "objective": "By the end you can name and apply four evidence-based habits: retrieval practice, spacing, the 20-minute struggle rule, and using AI as a tutor rather than a ghostwriter.",
+          "concept": [
+            "**Retrieval practice** means pulling knowledge out of your memory, for example by answering questions with your notes closed. Decades of experiments show it builds longer-lasting memory than re-reading or highlighting, a result called the testing effect. Re-reading feels productive because the page looks familiar, but recognising something is not the same as recalling it. That is why every lesson here ends with questions: answer them before looking anything up, and treat a wrong answer as useful data.",
+            "**Spacing** means reviewing at growing intervals, such as one day, three days, a week and a month, instead of cramming. Letting yourself forget a little makes the next retrieval harder, and that effort is what strengthens the memory. **Interleaving**, mixing different kinds of problems in one session, helps you learn to choose the right tool rather than repeat the last one. Both feel slower than cramming and both produce more learning.",
+            "**The 20-minute struggle rule**: when stuck, give it 20 focused minutes. Read the whole error, shrink the problem to the smallest example that still fails, search the exact message, and write down what you tried. Then ask for help and include those notes. **AI as a tutor, not a ghostwriter**: ask it to explain an error, give a hint, quiz you or review code you wrote. Do not ask for the finished exercise, and never keep code you cannot explain line by line. Type it yourself."
+          ],
+          "visual": {
+            "type": "compare",
+            "title": "What feels productive vs what builds skill",
+            "left": {
+              "title": "Feels productive",
+              "points": [
+                "Re-reading notes",
+                "Watching another tutorial",
+                "Cramming the night before",
+                "Asking AI for the full solution"
+              ]
+            },
+            "right": {
+              "title": "Builds skill",
+              "points": [
+                "Answering from memory, then checking",
+                "Spaced review across weeks",
+                "Struggling 20 minutes, then asking with notes",
+                "Asking AI for a hint or a question"
+              ]
+            }
+          },
+          "example": {
+            "lang": "text",
+            "code": "I am learning Python. Do not give me the corrected code.\nMy script prints Born: 1815 but I expected the age too.\nHere is my code: <paste>\nAsk me one question at a time that helps me find the bug myself.",
+            "explain": "This prompt keeps the thinking on your side: the AI is told the goal, what you expected, and not to solve it. Each question it asks is a small retrieval exercise instead of an answer to copy."
+          },
+          "tryit": "With all notes closed, spend 5 minutes writing everything you remember about the terminal commands and Git's three areas on a blank page. Then check it against the lessons and mark each gap or mistake. For your biggest gap, write a tutor-style prompt like the example, use it with an AI assistant, and record whether the questions helped you fix the gap without being given the answer.",
+          "questions": [
+            {
+              "id": "s0m2l4q1",
+              "level": 1,
+              "type": "mcq",
+              "prompt": "What is retrieval practice?",
+              "options": [
+                "Re-reading notes until they feel familiar",
+                "Recalling information from memory, for example by answering questions without looking",
+                "Copying a solution so you have it for later",
+                "Watching the same video at faster speed"
+              ],
+              "answer": 1,
+              "explain": "Retrieval means pulling the knowledge out yourself. Re-reading and watching put information in front of you again, which feels familiar but trains recognition, not recall."
+            },
+            {
+              "id": "s0m2l4q2",
+              "level": 2,
+              "type": "mcq",
+              "prompt": "You want to still remember 20 terminal and Git commands in two months. Which plan works best?",
+              "options": [
+                "Read the list 20 times tonight",
+                "Quiz yourself from memory today, in 3 days, in a week, then monthly, re-checking the ones you miss",
+                "Print the list and keep it on your desk",
+                "Ask an AI to remember them for you"
+              ],
+              "answer": 1,
+              "explain": "That plan combines retrieval with spacing. One long session of reading is massed and passive, and a printed list lets you look things up without ever recalling them."
+            },
+            {
+              "id": "s0m2l4q3",
+              "level": 3,
+              "type": "mcq",
+              "prompt": "You have been stuck on an error for 25 minutes. You read the whole message, made a three-line version that still fails, and searched it. What should you do next?",
+              "options": [
+                "Keep going alone for another two hours",
+                "Delete the project and start over",
+                "Ask a person or an AI for a hint, sharing the error, your small example and what you already tried",
+                "Ask an AI to write the whole script and submit that"
+              ],
+              "answer": 2,
+              "explain": "You have passed the 20-minute mark and done the groundwork, so now is the right time to ask, with your notes, which makes help fast and precise. Spinning for hours wastes time, and taking a full solution skips the learning."
+            },
+            {
+              "id": "s0m2l4q4",
+              "level": 2,
+              "type": "mcq",
+              "prompt": "Which request to an AI assistant follows the tutor-not-ghostwriter rule?",
+              "options": [
+                "Write my fact sheet script for me",
+                "Here is my script and its error. Explain what a TypeError means and give me one hint, not the fix",
+                "Rewrite my code so it is better",
+                "Give me the answers to this lesson's questions"
+              ],
+              "answer": 1,
+              "explain": "Asking for an explanation and a hint keeps the problem solving with you. The other three hand the thinking to the AI, so you end up with code or answers you cannot reproduce."
+            }
+          ],
+          "resource": {
+            "title": "Learning How to Learn (Coursera, free to audit)",
+            "url": "https://www.coursera.org/learn/learning-how-to-learn"
+          }
+        },
+        {
+          "id": "s0m2l5",
+          "title": "Your learning log and weekly routine",
+          "minutes": 60,
+          "objective": "By the end you have a `learning-log` repository with a daily entry template, a shell alias to open it, and a written weekly review routine.",
+          "concept": [
+            "A **learning log** is a Git repository with one Markdown file per day, such as `log/2026-07-15.md`. Each entry has four headings: *Did* (what you worked on), *Learned* (in your own words), *Stuck on* (errors and open questions), and *Questions for future me*, two questions you will answer from memory tomorrow. Commit each entry, for example `Log 2026-07-15`, and push it. The log is your retrieval material, your evidence of progress, and Git practice every single day.",
+            "Shape each 60 to 90 minute session the same way: 5 minutes answering yesterday's questions with notes closed, 45 to 70 minutes on the lesson and its try-it task, and 10 minutes writing the entry, committing and pushing. Same time, same place, phone in another room. Record honest focused minutes, since that is how you will track your progress towards 10,000 hours. Missing a day is fine; just shorten the next session rather than skipping again.",
+            "Once a week, spend 30 minutes on a review: re-answer every question from that week's entries without looking, mark the ones you missed, and copy those into next week's warm-ups. Write `weekly/2026-W29.md` with hours, what stuck and one change for next week. Your shell's settings live in **dotfiles** like `~/.zshrc`; add `alias log='code ~/code/learning-log'` there, keep a copy in the repository, and never put passwords or keys in it."
+          ],
+          "visual": {
+            "type": "table",
+            "title": "The routine",
+            "headers": [
+              "When",
+              "What",
+              "Minutes"
+            ],
+            "rows": [
+              [
+                "Daily, start",
+                "Answer yesterday's questions from memory",
+                "5"
+              ],
+              [
+                "Daily, middle",
+                "Lesson and try-it task",
+                "45 to 70"
+              ],
+              [
+                "Daily, end",
+                "Write entry, commit, push",
+                "10"
+              ],
+              [
+                "Weekly",
+                "Re-answer the week's questions, write weekly summary",
+                "30"
+              ],
+              [
+                "Monthly",
+                "Re-answer the starred misses from all weeks",
+                "30"
+              ]
+            ]
+          },
+          "example": {
+            "lang": "bash",
+            "code": "cd ~/code/learning-log\nmkdir -p log\ntoday=$(date +%F)\ncat > \"log/$today.md\" <<EOF\n# $today\n\n## Did\n- \n\n## Learned\n- \n\n## Stuck on\n- \n\n## Questions for future me\n1. \n2. \nEOF\ncode \"log/$today.md\"",
+            "explain": "`date +%F` prints today's date as YYYY-MM-DD and stores it in `today`. The `cat > ... <<EOF` block writes every line up to `EOF` into the new file, filling in the date. The last line opens the entry in VS Code."
+          },
+          "tryit": "Create `~/code/learning-log` with a README explaining the format, `git init` it, and push it to a new public GitHub repository. Write today's entry with two real questions about this module, commit and push. Add the `log` alias to `~/.zshrc`, run `source ~/.zshrc`, test it, and copy the file into `dotfiles/zshrc` in the repository after checking it contains no secrets.",
+          "questions": [
+            {
+              "id": "s0m2l5q1",
+              "level": 1,
+              "type": "mcq",
+              "prompt": "What is the purpose of the *Questions for future me* section in each entry?",
+              "options": [
+                "To list questions for your teacher",
+                "To give you material for retrieval practice in the next session",
+                "To make the entry look longer",
+                "To record questions you have already answered"
+              ],
+              "answer": 1,
+              "explain": "Answering those questions from memory the next day is retrieval practice, spaced by one day. It turns the log from a diary into a study tool."
+            },
+            {
+              "id": "s0m2l5q2",
+              "level": 2,
+              "type": "mcq",
+              "prompt": "On 20 October 2026, what does `date +%F` print?",
+              "options": [
+                "10/20/2026",
+                "20-10-2026",
+                "2026-10-20",
+                "Tue Oct 20 2026"
+              ],
+              "answer": 2,
+              "explain": "`%F` is the ISO format year-month-day with dashes. It also sorts correctly as text, which is why it is a good choice for file names: `ls log` lists entries in date order."
+            },
+            {
+              "id": "s0m2l5q3",
+              "level": 3,
+              "type": "mcq",
+              "prompt": "You missed three days of your routine. What is the best response?",
+              "options": [
+                "Create three back-dated entries so the record looks continuous",
+                "Wait until next Monday to restart cleanly",
+                "Do a short session today, write today's entry honestly, and keep tomorrow's session normal",
+                "Double tomorrow's session length to catch up"
+              ],
+              "answer": 2,
+              "explain": "A short session today restarts the habit, and an honest entry keeps the log useful as evidence. Fake entries remove the log's value, waiting extends the gap, and doubling a session makes the next skip more likely."
+            }
+          ],
+          "resource": {
+            "title": "GitHub Docs: Basic writing and formatting syntax",
+            "url": "https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax"
+          }
+        }
+      ],
+      "project": {
+        "title": "Public learning-log repository, 7 days",
+        "brief": "Build a public `learning-log` repository on GitHub and fill it with seven real daily entries, each its own commit. It puts the terminal, Git, GitHub and the learning habits of this module into daily use.",
+        "milestones": [
+          "Create the repository locally with a README that explains the entry format and the weekly routine, and push it to GitHub",
+          "Add a `.gitignore` with `.DS_Store` and `.venv/`, and a `dotfiles/` folder with a copy of your `~/.zshrc` that contains the `log` alias and no secrets",
+          "Write seven daily entries in `log/YYYY-MM-DD.md`, each with all four headings and two questions, each committed separately with a `Log YYYY-MM-DD` message and pushed",
+          "Start each session by answering the previous entry's questions from memory and note your score in the new entry",
+          "Write `weekly/YYYY-Www.md` re-answering all 14 questions from memory, with your score and one change for next week"
+        ],
+        "stretch": "Write `new-entry.sh`, a script that creates today's entry from the template and refuses to overwrite a file that already exists."
+      },
+      "exam": [
+        {
+          "id": "s0m2e1",
+          "level": 2,
+          "type": "mcq",
+          "prompt": "You edit `log/2026-07-15.md`, run `git add` on it, then fix one more typo in the same file and run `git status`. How is the file listed?",
+          "options": [
+            "Only under Changes to be committed",
+            "Only under Changes not staged for commit",
+            "Under both, because staging holds the earlier version and the working directory has a newer one",
+            "As untracked"
+          ],
+          "answer": 2,
+          "explain": "Staging keeps the version from when you ran `git add`. The typo fix is a newer change on top, so the same file appears in both sections until you add it again."
+        },
+        {
+          "id": "s0m2e2",
+          "level": 3,
+          "type": "mcq",
+          "prompt": "You accidentally ran `rm log/2026-07-16.md`. That entry had been committed earlier, and you have not run anything since. How do you get it back?",
+          "options": [
+            "It is gone forever because `rm` is permanent",
+            "`git restore log/2026-07-16.md`",
+            "`git push` to upload it again",
+            "`git add log/2026-07-16.md`"
+          ],
+          "answer": 1,
+          "explain": "`rm` deleted only the working copy. Git still has the committed version in the repository and in staging, and `git restore` writes it back to disk. This is exactly the safety net that the terminal lesson's warning about `rm` was missing."
+        },
+        {
+          "id": "s0m2e3",
+          "level": 2,
+          "type": "parsons",
+          "prompt": "Arrange the end-of-session commands for an entry you have already written and saved as `log/2026-07-17.md`.",
+          "lines": [
+            "cd ~/code/learning-log",
+            "git add log/2026-07-17.md",
+            "git commit -m \"Log 2026-07-17\"",
+            "git push"
+          ],
+          "explain": "You must be inside the repository for Git commands to find it, the file must be staged before it can be committed, and only committed work can be pushed."
+        },
+        {
+          "id": "s0m2e4",
+          "level": 3,
+          "type": "mcq",
+          "prompt": "You edited the README on github.com, and also made a local commit. Now `git push` is rejected because the remote contains work you do not have locally. What should you do?",
+          "options": [
+            "`git push --force`",
+            "Delete the GitHub repository and push again",
+            "`git pull --rebase`, check the result, then `git push`",
+            "Run `git commit` again"
+          ],
+          "answer": 2,
+          "explain": "The remote has a commit you lack, so you must bring it in first. `pull --rebase` downloads it and replays your local commit on top, then the push succeeds. `--force` would overwrite and destroy the web edit, and committing again changes nothing."
+        },
+        {
+          "id": "s0m2e5",
+          "level": 3,
+          "type": "mcq",
+          "prompt": "An AI assistant wrote `new-entry.sh` for you. It works, but you cannot explain what `<<EOF` does. Following this module's rule, what should you do?",
+          "options": [
+            "Commit it; working code is all that matters",
+            "Delete it and never use AI again",
+            "Before committing, ask the AI or the docs to explain each line, then retype the script yourself and add a comment explaining `<<EOF` in your own words",
+            "Ask the AI for a longer script"
+          ],
+          "answer": 2,
+          "explain": "The rule is to never keep code you cannot explain line by line. AI is fine as a tutor: use it to understand the code, then make it yours. Avoiding AI entirely throws away a useful tutor."
+        },
+        {
+          "id": "s0m2e6",
+          "level": 2,
+          "type": "mcq",
+          "prompt": "Which schedule applies spacing to the 14 questions in your first week of entries?",
+          "options": [
+            "Answer all 14 every day for a week, then never again",
+            "Answer each the day after it was written, again in the weekly review, and again in the monthly review",
+            "Answer them only once, the night before a test",
+            "Read the answers every morning"
+          ],
+          "answer": 1,
+          "explain": "Spacing means retrieving at growing intervals: one day, about a week, about a month. Daily repetition then stopping is massed practice, and reading answers is not retrieval."
+        },
+        {
+          "id": "s0m2e7",
+          "level": 2,
+          "type": "mcq",
+          "prompt": "`git log --oneline` shows three commits. Which command shows exactly what the middle one changed?",
+          "options": [
+            "git diff",
+            "git show <id of the middle commit>",
+            "git status",
+            "git diff --staged"
+          ],
+          "answer": 1,
+          "explain": "`git show` with a commit ID displays that commit's message and changes. The diff commands compare your current working directory or staging, not a past commit, and `status` shows only the present."
+        },
+        {
+          "id": "s0m2e8",
+          "level": 3,
+          "type": "mcq",
+          "prompt": "You open a new terminal and run `git status`. It prints `fatal: not a git repository (or any of the parent directories): .git`. Your log repository is `~/code/learning-log`. What is the cause?",
+          "options": [
+            "Git is not installed",
+            "Your repository was deleted",
+            "The new terminal started in your home folder, which is not inside the repository; `cd ~/code/learning-log` and try again",
+            "You need to push first"
+          ],
+          "answer": 2,
+          "explain": "Git looks for `.git` in the working directory and its parents. A new terminal starts at `~`, which contains no `.git`. Check with `pwd`, then `cd` into the project, exactly as in module 1."
+        }
+      ]
+    }
+  ]
+}
