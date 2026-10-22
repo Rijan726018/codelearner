@@ -1,6 +1,6 @@
 "use strict";
 /* ---------- code runners: Python + SQL in a Pyodide worker, JavaScript in a throwaway worker ---------- */
-const LANGNAME = {python:"Python 3.12", js:"JavaScript", sql:"SQL (SQLite)"};
+const LANGNAME = {python:"Python 3.12", js:"JavaScript", sql:"SQL (SQLite)", html:"HTML & CSS"};
 const RUNNABLE = new Set(["python","js","sql"]);
 const normLang = l => ({py:"python", python:"python", javascript:"js", js:"js", node:"js", sql:"sql"})[String(l||"").toLowerCase()] || null;
 function detectLang(code, fallback){
@@ -27,19 +27,20 @@ const Runner = (() => {
       if(m.type==="fatal"){ k.failed=m.error; note(); return; }
       if(!active || m.id!==active.id) return;
       if(m.type==="out") active.onOut(m.s, m.text);
+      if(m.type==="rows") active.onRows?.(m);
       if(m.type==="done"){ const a=active; active=null; clearTimeout(a.timer); a.resolve({ms:m.ms}); note(); } };
     k.w.onerror = e => { e.preventDefault?.(); k.failed = e.message || ("the "+k.name+" worker failed to load");
       if(active && active.kind===kind){ active.onOut("e", k.name+" could not start: "+k.failed+"\n"); const a=active; active=null; clearTimeout(a.timer); a.resolve({ms:0}); } note(); };
     k.w.postMessage({kind:"warm"}); return k.w;
   }
   function kill(msg){ if(!active) return; const a=active; active=null; clearTimeout(a.timer); a.kill?.(); a.onOut("e", msg); a.resolve({ms:null, stopped:true}); note(); }
-  function runIn(kind, code, stdin, onOut, limit){
+  function runIn(kind, code, stdin, onOut, limit, onRows){
     const k=W[kind], wk=get(kind); if(!wk){ onOut("e",k.name+" can't run in this browser.\n"); return Promise.resolve({ms:0}); }
     return new Promise(resolve=>{
       const id=++seq;
-      active={id, kind, onOut, resolve, kill:()=>{ k.w.terminate(); k.w=null; k.ready=false; setTimeout(()=>get(kind), 50); }};
+      active={id, kind, onOut, onRows, resolve, kill:()=>{ k.w.terminate(); k.w=null; k.ready=false; setTimeout(()=>get(kind), 50); }};
       active.timer=setTimeout(()=>kill(`\nStopped after ${limit/1000} s. Check for a loop that never ends.\n`), limit + (k.ready?0:25000));
-      wk.postMessage({id, kind, code, stdin}); note();
+      wk.postMessage({id, kind, code, stdin, json:!!onRows}); note();
     });
   }
   const JS_HARNESS = `const __post=(s,text)=>postMessage({type:"out",s,text});
@@ -103,11 +104,12 @@ self.fetch=()=>Promise.reject(new TypeError("fetch is blocked in this sandbox. R
     get busy(){ return !!active; },
     on(f){ subs.add(f); return ()=>subs.delete(f); },
     stop(){ kill("\nStopped.\n"); },
-    run(lang, code, stdin, onOut){
+    run(lang, code, stdin, onOut, opt={}){
       if(active) kill("\nStopped (a new run started).\n");
-      if(lang==="js") return runJS(code, onOut, 5000);
-      return runIn(lang==="sql"?"sql":"python", code, stdin, onOut, 10000);
-    }
+      if(lang==="js") return runJS(code, onOut, opt.limit||5000);
+      return runIn(lang==="sql"?"sql":"python", code, stdin, onOut, opt.limit||10000, opt.onRows);
+    },
+    JS_HARNESS
   };
 })();
 
@@ -129,14 +131,14 @@ const Drafts = {
 };
 
 /* ---------- editor widget ---------- */
-const CM_MODE = {python:"python", js:"javascript", sql:"text/x-sqlite"};
-function mountEditor(host, {lang, code, draftKey=null, resetTo=code, compact=false, label=""}){
+const CM_MODE = {python:"python", js:"javascript", sql:"text/x-sqlite", html:"htmlmixed"};
+function mountEditor(host, {lang, code, draftKey=null, resetTo=code, compact=false, label="", onRun=null, runLabel="Run ▶", onChange=null, tall=false}){
   const isMac=/Mac|iPhone|iPad/.test(navigator.platform||""), kb=isMac?"⌘↵":"Ctrl+↵";
-  host.classList.add("ed");
+  host.classList.add("ed"); host.classList.toggle("tall", !!tall);
   host.innerHTML = `<div class="edbar"><span class="pill acc">${esc(LANGNAME[lang])}</span>${label?`<span class="edlabel">${esc(label)}</span>`:""}<span class="edsp"></span>
     ${lang==="python"?`<button type="button" class="btn ghost sm" data-in aria-expanded="false">Input</button>`:""}
     <button type="button" class="btn ghost sm" data-reset title="Restore the original code">Reset</button>
-    <button type="button" class="btn primary sm" data-run title="Run (${kb})">Run ▶</button></div>
+    <button type="button" class="btn primary sm" data-run title="Run (${kb})">${esc(runLabel)}</button></div>
     <div class="edwrap"></div>
     <div class="edin" hidden><label class="eyebrow" for="">Input · one line per input() call</label><textarea rows="3" spellcheck="false" placeholder="Ada&#10;1815"></textarea></div>
     <div class="edout" hidden><div class="edouthead"><span class="eyebrow">Output</span><span class="edms"></span></div><pre class="edpre" aria-live="polite"></pre></div>
@@ -145,9 +147,9 @@ function mountEditor(host, {lang, code, draftKey=null, resetTo=code, compact=fal
         ms=host.querySelector(".edms"), stat=host.querySelector(".edstat"), inBox=host.querySelector(".edin"), inTa=inBox.querySelector("textarea"), inB=host.querySelector("[data-in]");
   const uid="ed"+Math.random().toString(36).slice(2,8); inTa.id=uid+"-in"; inBox.querySelector("label").setAttribute("for",inTa.id);
   let cm=null, ta=null;
-  const run=()=>doRun();
+  const run=()=>onRun?onRun():doRun();
   if(window.CodeMirror){
-    cm=CodeMirror(wrap,{value:code, mode:CM_MODE[lang], lineNumbers:true, indentUnit:lang==="python"?4:2, tabSize:4, matchBrackets:true, viewportMargin:Infinity, lineWrapping:false,
+    cm=CodeMirror(wrap,{value:code, mode:CM_MODE[lang], lineNumbers:true, indentUnit:lang==="python"?4:2, autoCloseTags:lang==="html", tabSize:4, matchBrackets:true, viewportMargin:Infinity, lineWrapping:false,
       extraKeys:{"Cmd-Enter":run,"Ctrl-Enter":run,
         Tab:c=>c.somethingSelected()?c.indentSelection("add"):c.replaceSelection(" ".repeat(c.getOption("indentUnit")),"end"),
         "Shift-Tab":c=>c.indentSelection("subtract"), Esc:c=>c.getInputField().blur()}});
@@ -157,17 +159,19 @@ function mountEditor(host, {lang, code, draftKey=null, resetTo=code, compact=fal
     ta.addEventListener("keydown",e=>{ if(e.key==="Enter"&&(e.metaKey||e.ctrlKey)){ e.preventDefault(); run(); } else if(e.key==="Tab"&&!e.shiftKey){ e.preventDefault(); const s=ta.selectionStart; ta.setRangeText(" ".repeat(lang==="python"?4:2),s,ta.selectionEnd,"end"); } });
   }
   const getV=()=>cm?cm.getValue():ta.value, setV=v=>cm?cm.setValue(v):(ta.value=v);
-  if(draftKey){ Drafts.get(draftKey).then(v=>{ if(v!=null && v!==getV()) setV(v); });
+  if(draftKey){ Drafts.get(draftKey).then(v=>{ if(v!=null && v!==getV()){ setV(v); onChange?.(v); } });
     const onCh=()=>Drafts.set(draftKey,getV()); cm?cm.on("change",onCh):ta.addEventListener("input",onCh); }
+  if(onChange){ let t; const f=()=>{ clearTimeout(t); t=setTimeout(()=>onChange(getV()),250); }; cm?cm.on("change",f):ta.addEventListener("input",f); }
   const usesInput=()=>lang==="python"&&/\binput\s*\(/.test(getV());
   if(inB){ const toggle=(open)=>{ inBox.hidden=!open; inB.setAttribute("aria-expanded",open); }; inB.onclick=()=>toggle(inBox.hidden); if(usesInput()) toggle(true); }
-  host.querySelector("[data-reset]").onclick=()=>{ setV(resetTo); out.hidden=true; if(draftKey) Drafts.set(draftKey,resetTo); };
+  host.querySelector("[data-reset]").onclick=()=>{ setV(resetTo); out.hidden=true; if(draftKey) Drafts.set(draftKey,resetTo); onChange?.(resetTo); };
   const status=()=>{
+    if(lang==="html"){ stat.textContent=`The preview updates as you type · ${kb} checks your code`; return; }
     if(Runner.busy && host.dataset.running) { stat.textContent=!Runner.ready(lang)?`Starting ${lang==="sql"?"SQLite":"Python"} (the first run takes a few seconds)…`:"Running…"; return; }
     if(Runner.failed(lang)){ stat.textContent=(lang==="sql"?"SQLite":"Python")+" couldn't load here: "+Runner.failed(lang); return; }
     stat.textContent = !Runner.ready(lang) ? `Loading ${lang==="sql"?"SQLite":"Python"} in the background… you can start typing. ${kb} runs.` : `${kb} to run · Tab indents · Esc leaves the editor`;
   };
-  const unsub=Runner.on(()=>{ if(!host.isConnected){ unsub(); return; } status(); runB.textContent = host.dataset.running ? "Stop ■" : "Run ▶"; });
+  const unsub=Runner.on(()=>{ if(!host.isConnected){ unsub(); return; } status(); if(!onRun) runB.textContent = host.dataset.running ? "Stop ■" : runLabel; });
   async function doRun(){
     if(host.dataset.running){ Runner.stop(); return; }
     document.querySelectorAll(".ed[data-running]").forEach(x=>delete x.dataset.running);
@@ -179,8 +183,8 @@ function mountEditor(host, {lang, code, draftKey=null, resetTo=code, compact=fal
     ms.textContent = res.ms!=null ? `${res.ms} ms` : ""; status();
   }
   runB.onclick=run;
-  status(); if(lang!=="js") Runner.warm(lang);
-  return {get value(){ return getV(); }, run:doRun, refresh:()=>cm&&cm.refresh()};
+  status(); if(lang==="python"||lang==="sql") Runner.warm(lang);
+  return {get value(){ return getV(); }, set value(v){ setV(v); }, run:doRun, refresh:()=>cm&&cm.refresh(), focus:()=>cm?cm.focus():ta.focus(), host};
 }
 
 /* ---------- run the code shown in a question, after answering ---------- */

@@ -19,9 +19,12 @@ let INTERVALS = [1,3,7,16,35,90,180];
 
 /* ---------- state ---------- */
 const D = {stages:[], research:null, q:{}, mods:[], lessons:{}, modById:{}};
-let P = {lessons:{}, notes:{}, ms:{}, exams:{}, log:{}};   // progress doc
+const P0 = () => ({lessons:{}, notes:{}, ms:{}, exams:{}, log:{}, solved:{}, tried:{}, steps:{}, nodes:{}, badges:{}, xpSeen:null});
+const normP = d => { const z=P0(); Object.keys(z).forEach(k=>{ if(d && d[k]!=null) z[k]=d[k]; }); return z; };
+let P = P0();   // progress doc: core lessons, notes, milestones, exams, activity log, problems, bootcamp steps, roadmap nodes, badges
 let S = {cards:{}};                                        // spaced-repetition doc
-let route = {v:"today"};
+let route = {v:"home"};
+const EXTRA_LOADERS = [];   // other modules push async loaders (problems, bootcamp, paths) that boot awaits
 let mapStage = null;
 let practiceStage = null;
 const stores = {p:null, s:null}; const timers = {};
@@ -38,10 +41,12 @@ const fmtDay = n => new Date(n*86400000).toLocaleDateString(undefined,{timeZone:
 
 /* ---------- persistence ---------- */
 const LKEY = {p:"tenk2-progress", s:"tenk2-srs"};
-function loadLocal(){ try{ const p=JSON.parse(localStorage.getItem(LKEY.p)||"null"); if(p) P={...P,...p}; const s=JSON.parse(localStorage.getItem(LKEY.s)||"null"); if(s) S={...S,...s}; }catch(e){} }
+function loadLocal(){ try{ const p=JSON.parse(localStorage.getItem(LKEY.p)||"null"); if(p) P=normP(p); const s=JSON.parse(localStorage.getItem(LKEY.s)||"null"); if(s) S={...S,...s}; }catch(e){} }
 function setSync(t,ok){ const el=$("#sync"); el.textContent=t; el.classList.toggle("ok",!!ok); }
-function save(which){
+let gameT=null;
+function save(which, quiet){
   const data = which==="p"?P:S;
+  if(!quiet){ clearTimeout(gameT); gameT=setTimeout(()=>Game.sync(), 60); }
   try{ localStorage.setItem(LKEY[which], JSON.stringify(data)); }catch(e){}
   if(!stores[which]){ setSync("Saved in this browser"); return; }
   setSync("Saving…"); clearTimeout(timers[which]);
@@ -102,14 +107,22 @@ document.addEventListener("pointerover",e=>{ const t=e.target.closest("[data-tip
 document.addEventListener("pointermove",e=>{ if(tip.hidden) return; const x=Math.min(e.clientX+12, window.innerWidth-tip.offsetWidth-8); tip.style.left=x+"px"; tip.style.top=(e.clientY-34)+"px"; });
 
 /* ---------- navigation ---------- */
-function go(r){ route=r; tip.hidden=true; render(); window.scrollTo({top:0}); try{ if(["today","map","review","practice","projects","playground","method"].includes(r.v)) history.replaceState(null,"","#"+r.v); }catch(e){} }
+const routeHash = r => "#/"+r.v+(r.id?"/"+encodeURIComponent(r.id):"");
+function parseHash(){ const h=(location.hash||"").replace(/^#\/?/,""); if(!h) return null; const [v,id]=h.split("/"); return VIEWS[v]?{v, ...(id?{id:decodeURIComponent(id)}:{})}:null; }
+function go(r){ route=r; tip.hidden=true; Palette.close?.();
+  try{ if(location.hash!==routeHash(r)) history.pushState(null,"",routeHash(r)); }catch(e){}
+  const swap=()=>{ render(); window.scrollTo({top:0}); };
+  if(document.startViewTransition && !matchMedia("(prefers-reduced-motion: reduce)").matches) document.startViewTransition(swap); else swap(); }
+window.addEventListener("popstate",()=>{ const r=parseHash(); route=r||{v:"home"}; render(); });
 $("#tabs").addEventListener("click",e=>{ const b=e.target.closest("[data-v]"); if(b) go({v:b.dataset.v}); });
-function updateBadge(){ const n=dueCards().length, bd=$("#duebadge"); bd.hidden=!n; bd.textContent=n; }
+function updateBadge(){ const n=dueCards().length, bd=$("#duebadge"); if(!bd) return; bd.hidden=!n; bd.textContent=n; }
+const TAB_OF = {lesson:"map", exam:"map", path:"paths", problem:"problems", course:"bootcamp"};
+const currentTab = () => TAB_OF[route.v] || route.v;
 function render(){
-  const tabV = {lesson:"map", exam:"map"}[route.v] || route.v;
-  document.querySelectorAll("#tabs [data-v]").forEach(b=>b.setAttribute("aria-current", b.dataset.v===tabV?"page":"false"));
+  UI.syncNav(currentTab());
   updateBadge();
-  const v = VIEWS[route.v] || VIEWS.today; v($("#main"));
+  const v = VIEWS[route.v] || VIEWS.home; v($("#main"));
+  document.title = (route.v==="home"?"CodeLearner · Learn to code, from zero to world-class":(document.querySelector("#main .h1, #main h1")?.textContent?.trim()||"CodeLearner")+" · CodeLearner");
 }
 
 /* ================= TODAY ================= */
@@ -131,18 +144,29 @@ function viewToday(el){
   if(projM && nextMs>=0) items.push(`<li><div><h4>Project: ${esc(projM.project.title)}</h4><p>Next milestone: ${esc(projM.project.milestones[nextMs])}</p></div><button class="btn" data-act="projects">Open projects</button></li>`);
   if(nl && deep) items.push(`<li><div><h4>Then, if time is left: ${esc(nl.title)}</h4><p>Day ${nl.li+1} of ${esc(D.modById[nl.mid].title)}</p></div><button class="btn" data-lesson="${nl.id}">Open lesson</button></li>`);
 
+  const g=Game.stats();
+  const cont=[];
+  if(nl) cont.push({i:"map", k:"Core curriculum", t:nl.title, s:`${D.modById[nl.mid].title} · day ${nl.li+1}`, a:`data-lesson="${nl.id}"`});
+  const ns=BC.nextStep?.(); if(ns) cont.push({i:"cap", k:"Bootcamp", t:ns.step.title, s:`${ns.course.title} · step ${ns.idx+1} of ${ns.course.steps.length}`, a:`data-course="${ns.course.id}" data-step="${ns.idx}"`});
+  const cp=PATHS.current?.(); if(cp) cont.push({i:cp.icon, k:"Career path", t:cp.title, s:`${cp.done} of ${cp.total} topics done`, a:`data-path="${cp.id}"`});
+  const dp=PB.daily?.(); if(dp) cont.push({i:"braces", k:"Problem of the day", t:dp.title, s:`${dp.difficulty} · ${dp.tags.slice(0,2).join(", ")}${P.solved?.[dp.id]?" · solved ✓":""}`, a:`data-problem="${dp.id}"`});
   el.innerHTML = `
-  <section style="display:grid;gap:10px">
+  <section class="head">
     <span class="eyebrow">${new Date().toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"})}</span>
-    <h1 class="h1">${lessonsN?`Stage ${cm?cm.si:0}: ${esc(META[cm?cm.si:0].name)}`:"Start your climb"}</h1>
-    <p class="lede">${greeting} ${lessonsN?"":"Already know some programming? Open the Map and test out of any module you can pass, so you only spend time on what's new to you."}</p>
+    <h1 class="h1">${lessonsN?`Stage ${cm?cm.si:0}: <span class="gt">${esc(META[cm?cm.si:0].name)}</span>`:`Welcome, <span class="gt">${esc(Game.rank(g.level))}</span>`}</h1>
+    <p class="lede">${greeting} ${lessonsN?"":"Already know some programming? Open Learn and test out of any module you can pass, so you only spend time on what's new to you."}</p>
   </section>
+  <section class="panel glow" style="background:linear-gradient(135deg,var(--surface),var(--surface2))"><div class="lvcardx">${Game.ringSVG(g,128)}<div style="display:grid;gap:8px;min-width:0">
+    <span class="eyebrow">${esc(Game.rank(g.level))}</span><b class="h2"><span class="gt">${g.xp.toLocaleString()}</span> XP</b>
+    <div class="bar"><i style="width:${100*(g.xp-g.cur)/Math.max(1,g.next-g.cur)}%"></i></div>
+    <span class="muted" style="font-size:.88rem">${(g.next-g.xp).toLocaleString()} XP to level ${g.level+1} · ${Object.keys(P.badges||{}).length} badges · <button class="btn ghost sm" data-act="profile">View profile</button></span></div></div></section>
   <div class="stats">
-    <div class="stat"><b>${streak()}</b><span>day streak</span></div>
-    <div class="stat"><b>${due}</b><span>reviews due</span></div>
-    <div class="stat"><b>${lessonsN}<small class="muted" style="font-size:.9rem"> / ${lessonsTotal}</small></b><span>lessons done</span></div>
-    <div class="stat"><b>${examsN}<small class="muted" style="font-size:.9rem"> / ${D.mods.length}</small></b><span>exams passed</span></div>
+    <div class="stat">${icon("flame")}<b>${streak()}</b><span>day streak</span></div>
+    <div class="stat">${icon("refresh")}<b>${due}</b><span>reviews due</span></div>
+    <div class="stat">${icon("book")}<b>${lessonsN}<small class="muted" style="font-size:.9rem"> / ${lessonsTotal}</small></b><span>lessons done</span></div>
+    <div class="stat">${icon("braces")}<b>${g.solved}<small class="muted" style="font-size:.9rem"> / ${PB.list.length||0}</small></b><span>problems solved</span></div>
   </div>
+  ${cont.length?`<section style="display:grid;gap:12px"><h2 class="h2">Pick up where you left off</h2><div class="cont">${cont.map(c=>`<button type="button" class="ccard glow" ${c.a}><span class="row" style="gap:8px;color:var(--accent)">${icon(c.i)}<span class="eyebrow" style="color:inherit">${esc(c.k)}</span></span><b>${esc(c.t)}</b><span>${esc(c.s)}</span></button>`).join("")}</div></section>`:""}
   <div class="grid2">
     <section class="panel" style="grid-column:1/-1">
       <div class="row" style="justify-content:space-between"><h2 class="h2">Today's session</h2><span class="pill ${doneToday?"ok":""}">${doneToday?`${doneToday} reps logged today`:"Nothing logged yet today"}</span></div>
@@ -387,7 +411,7 @@ function viewExam(el){
   el.innerHTML = `<nav class="crumbs"><span>${esc(m.title)}</span><span>›</span><span>Exam</span></nav><div id="ex" style="max-width:820px"></div>`;
   quiz($("#ex"), examQuestions(m), {mode:"exam", onAnswer:(q,ok)=>srs(q.id,ok), onFinish:(sc,res)=>{
     const prev=P.exams[m.id]; P.exams[m.id]={best:Math.max(sc,prev?.best||0), last:today(), n:(prev?.n||0)+1}; logActivity(3); save("p");
-    const pass=sc>=PASS; let nm=D.mods[m.gi+1]; if(isTrack(m)) nm=D.mods.find(x=>x.sid==="s8");
+    const pass=sc>=PASS; let nm=D.mods[m.gi+1]; if(pass) UI.confetti(); if(isTrack(m)) nm=D.mods.find(x=>x.sid==="s8");
     $("#ex").innerHTML=`<div class="result"><div class="row" style="gap:24px">${ring(sc,pass)}<div style="display:grid;gap:6px"><span class="eyebrow">${pass?"Passed":"Not yet"}</span><h2 class="h2">${pass?(nm?`Unlocked: ${esc(nm.title)}`:"You've passed the final module."):`You need ${PASS*100}%. Study the misses below, then retake.`}</h2><p class="muted" style="margin:0">${res.filter(r=>r.ok).length} of ${res.length} correct. Every question is now in your review deck.</p></div></div>
       <div class="row">${pass&&nm?`<button class="btn primary" data-act="map" data-stage-go="${nm.si}">Go to ${esc(nm.title)}</button>`:`<button class="btn exam" data-exam="${m.id}">Retake exam</button>`}<button class="btn ghost" data-act="map" data-stage-go="${m.si}">Back to map</button></div>
       ${resultList(res)}</div>`;
@@ -492,32 +516,40 @@ const STARTER = {
   sql: l=>`-- ${l.title}: try it yourself\n-- Create a table, insert a few rows, then query them.\n\n`
 };
 function qLang(q){ const l=q.lid&&D.lessons[q.lid]; const base=l&&l.example?normLang(l.example.lang):null; const g=detectLang(q.code, base || (q.sid==="s4"?"js":["s3"].includes(q.sid)?null:"python")); return g&&RUNNABLE.has(g)?g:null; }
-const VIEWS = {today:viewToday, map:viewMap, lesson:viewLesson, exam:viewExam, review:viewReview, practice:viewPractice, projects:viewProjects, method:viewMethod};
+const VIEWS = {home:viewHome, profile:viewProfile, today:viewToday, map:viewMap, lesson:viewLesson, exam:viewExam, review:viewReview, practice:viewPractice, projects:viewProjects, method:viewMethod};
 
 /* ---------- global clicks ---------- */
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-lesson],[data-exam],[data-act],[data-stage]"); if(!t || t.closest("#tabs")) return;
+  const t=e.target.closest("[data-lesson],[data-exam],[data-act],[data-stage],[data-path],[data-problem],[data-course]"); if(!t || t.closest("#tabs,#moreMenu")) return;
   if(t.dataset.lesson){ go({v:"lesson", id:t.dataset.lesson}); return; }
   if(t.dataset.exam){ go({v:"exam", id:t.dataset.exam}); return; }
+  if(t.dataset.path){ go({v:"path", id:t.dataset.path}); return; }
+  if(t.dataset.problem){ go({v:"problem", id:t.dataset.problem}); return; }
+  if(t.dataset.course){ go({v:"course", id:t.dataset.course, ...(t.dataset.step!=null?{step:+t.dataset.step}:{})}); return; }
   if(t.dataset.stage!=null && !t.dataset.act){ mapStage=+t.dataset.stage; render(); return; }
-  if(t.dataset.act){ if(t.dataset.stageGo!=null) mapStage=+t.dataset.stageGo; go({v:t.dataset.act}); }
+  if(t.dataset.act){ if(t.dataset.stageGo!=null) mapStage=+t.dataset.stageGo; else if(t.dataset.stage!=null) mapStage=+t.dataset.stage; go({v:t.dataset.act}); }
 });
+document.addEventListener("keydown",e=>{ if((e.key==="Enter"||e.key===" ") && e.target.matches?.('[role="button"][tabindex]')){ e.preventDefault(); e.target.dispatchEvent(new MouseEvent("click",{bubbles:true})); } });
 const RESET=`<button type="button" id="reset">Clear all progress</button>`;
 document.addEventListener("click",e=>{
   const t=e.target.closest("#reset,#rs-yes,#rs-no"); if(!t) return; const w=$("#resetwrap");
   if(t.id==="reset") w.innerHTML=`<span class="confirm">Erase all lessons, exams and your review deck? <button type="button" id="rs-yes">Yes, erase</button><button type="button" id="rs-no">Keep</button></span>`;
-  else { if(t.id==="rs-yes"){ P={lessons:{},notes:{},ms:{},exams:{},log:{}}; S={cards:{}}; save("p"); save("s"); go({v:"today"}); } w.innerHTML=RESET; }
+  else { if(t.id==="rs-yes"){ P=P0(); S={cards:{}}; Game.ready=false; save("p"); save("s"); go({v:"home"}); } w.innerHTML=RESET; }
 });
 
 /* ---------- boot ---------- */
 (async function boot(){
-  loadLocal();
-  const h=(location.hash||"").slice(1); if(!["lesson","exam"].includes(h)) route={v:h||"today"};
+  if(document.readyState==="loading") await new Promise(r=>document.addEventListener("DOMContentLoaded",r,{once:true}));
+  loadLocal(); UI.buildNav();
   const files=META.map(s=>`data/${s.id}.json`).concat(["data/research.json"]);
-  const got=await Promise.all(files.map(f=>fetch(f).then(r=>r.ok?r.json():null).catch(()=>null)));
+  const [got]=await Promise.all([Promise.all(files.map(f=>fetch(f).then(r=>r.ok?r.json():null).catch(()=>null))), ...EXTRA_LOADERS.map(f=>f().catch(()=>null))]);
   D.stages=got.slice(0,META.length); D.research=got[META.length];
   if(D.research?.spacing?.intervalsDays?.length>=4) INTERVALS=D.research.spacing.intervalsDays.map(Number).filter(n=>n>0);
-  indexContent(); render();
+  indexContent();
+  const legacy=(location.hash||"").slice(1);
+  route = parseHash() || (VIEWS[legacy]&&!["lesson","exam"].includes(legacy)?{v:legacy}:null) || {v: Object.keys(P.lessons).length||Object.keys(P.solved).length||Object.keys(P.steps).length ? "today" : "home"};
+  try{ history.replaceState(null,"",routeHash(route)); }catch(e){}
+  Game.sync(true); render();
   try{
     const [db,user]=await Promise.all([window.claude?.use?.("db"), window.claude?.use?.("user")]);
     const uid=user?await user.id():null;
@@ -525,10 +557,11 @@ document.addEventListener("click",e=>{
     const col=db.collection("data/users/"+uid);
     stores.p=col.doc("v2progress"); stores.s=col.doc("v2srs"); Drafts.col=col;
     const [sp,ss]=await Promise.all([stores.p.get(), stores.s.get()]);
-    if(sp.exists){ const d=sp.data()||{}; P={lessons:d.lessons||{},notes:d.notes||{},ms:d.ms||{},exams:d.exams||{},log:d.log||{}}; } else if(Object.keys(P.lessons).length) await stores.p.set(P);
+    if(sp.exists){ P=normP(sp.data()||{}); } else if(Object.keys(P.lessons).length||Object.keys(P.steps).length||Object.keys(P.solved).length) await stores.p.set(P);
     if(ss.exists){ S={cards:(ss.data()||{}).cards||{}}; } else if(Object.keys(S.cards).length) await stores.s.set(S);
     try{ localStorage.setItem(LKEY.p,JSON.stringify(P)); localStorage.setItem(LKEY.s,JSON.stringify(S)); }catch(e){}
     setSync("Saved to your account",true);
-    if(!["lesson","exam","review","practice"].includes(route.v) || !route.started) render();
+    Game.sync(true);
+    if(!["lesson","exam","review","practice","problem","course"].includes(route.v) && !route.started) render();
   }catch(e){ stores.p=stores.s=null; setSync("Saved in this browser"); }
 })();

@@ -20,7 +20,7 @@ function table(cols, rows) {
 }
 
 self.onmessage = async (e) => {
-  const { id, kind, code } = e.data;
+  const { id, kind, code, json } = e.data;
   if (kind === "warm") { try { await boot(); } catch (err) { postMessage({ type: "fatal", error: String(err && err.message || err) }); } return; }
   const out = (s, text) => postMessage({ id, type: "out", s, text });
   try { await boot(); }
@@ -31,7 +31,7 @@ self.onmessage = async (e) => {
       const sql = stmt.getSQL().trim(), cols = stmt.getColumnNames(), rows = [];
       while (stmt.step()) rows.push(stmt.get());
       const verb = (sql.replace(/^(--[^\n]*\n|\s)+/g, "").split(/\s+/)[0] || "").toUpperCase();
-      if (cols.length) out("o", table(cols, rows));
+      if (cols.length) { out("o", table(cols, rows)); if (json) postMessage({ id, type: "rows", cols, rows: rows.map(r => r.map(v => v instanceof Uint8Array ? `<blob ${v.length} bytes>` : v)) }); }
       else if (["INSERT", "UPDATE", "DELETE"].includes(verb)) { const n = db.getRowsModified(); out("o", `${n} row${n === 1 ? "" : "s"} affected\n`); }
       stmt.free(); stmt = null;
     }
