@@ -340,7 +340,7 @@ function viewHome(el){
     <div style="display:grid;gap:22px;align-content:center">
       <span class="badge-line"><b>FREE</b> Everything runs in your browser. No sign-up, no paywall.</span>
       <h1>From your first line of code to <span class="gt">world-class engineer.</span></h1>
-      <p class="lede">CodeLearner, the free coding school from CodeBay, is one place to learn programming end to end: an interactive bootcamp for total beginners, guided projects you build step by step, a 10,000-hour core curriculum, career roadmaps for every specialty and a problem judge to sharpen your skills. Built on the science of how people actually learn.</p>
+      <p class="lede">CodeLearner, the free coding school from <a href="https://codebay.org/" target="_blank" rel="noopener">CodeBay</a>, is one place to learn programming end to end: an interactive bootcamp for total beginners, guided projects you build step by step, a 10,000-hour core curriculum, career roadmaps for every specialty and a problem judge to sharpen your skills. Built on the science of how people actually learn.</p>
       <div class="row" style="gap:12px">
         ${started?`<button class="btn grad lg" data-act="today">${icon("dash")}Continue learning</button>`:`<button class="btn grad lg" ${firstCourse?`data-course="${firstCourse.id}"`:`data-act="bootcamp"`}>${icon("play")}Start from zero</button>`}
         <button class="btn lg" data-act="paths">${icon("route")}Choose a career</button>
