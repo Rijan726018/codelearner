@@ -830,7 +830,7 @@ add(id="daily-temperatures", title="Daily Temperatures", difficulty="Medium", ca
 }''')
 
 add(id="min-stack", title="Min Stack", difficulty="Medium", cat="design", tags=["Stack","Design"],
- kind="design", cls={"py":"MinStack","js":"MinStack"},
+ kind="design", cls={"py":"MinStack","js":"MinStack"}, jsmap={"get_min":"getMin"},
  desc=["Design a stack that supports `push(val)`, `pop()`, `top()` and `get_min()` (JavaScript: `getMin()`), each in O(1) time.","The tests call your methods in sequence. `pop`, `top` and `get_min` are only called on a non-empty stack."],
  constraints=["-2^31 <= val <= 2^31 - 1","At most 3 × 10^4 calls"], params=[],
  examples=[], design_examples=[[["MinStack","push","push","push","get_min","pop","top","get_min"],[[],[-2],[0],[-3],[],[],[],[]]]],
@@ -867,7 +867,6 @@ add(id="min-stack", title="Min Stack", difficulty="Medium", cat="design", tags=[
   pop() { this.items.pop(); }
   top() { return this.items[this.items.length - 1][0]; }
   getMin() { return this.items[this.items.length - 1][1]; }
-  get_min() { return this.getMin(); }
 }''')
 
 add(id="largest-rectangle", title="Largest Rectangle in Histogram", difficulty="Hard", cat="stack", tags=["Array","Monotonic Stack"],

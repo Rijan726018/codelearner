@@ -2,6 +2,7 @@
 import json, os, sys, sqlite3
 sys.path.insert(0, os.path.dirname(__file__))
 from bootcamp_src import C
+import bootcamp_more  # noqa: F401 (appends more courses to C)
 
 def sql_rows(seed, ref):
     db = sqlite3.connect(":memory:"); db.executescript(seed); cur = db.cursor(); last = None

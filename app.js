@@ -31,7 +31,7 @@ const stores = {p:null, s:null}; const timers = {};
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const md = s => esc(s).replace(/`([^`]+)`/g,"<code>$1</code>").replace(/\*\*([^*]+)\*\*/g,"<b>$1</b>");
+const md = s => esc(s).replace(/`([^`]+)`/g,"<code>$1</code>").replace(/\*\*([^*]+)\*\*/g,"<b>$1</b>").replace(/(^|[\s(])\*([^\s*](?:[^*]*?[^\s*])?)\*(?=[\s.,;:!?)]|$)/g,"$1<em>$2</em>");
 const shuffle = a => { a=[...a]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]} return a; };
 const pick = (a,n) => shuffle(a).slice(0,n);
 const dayNum = (d=new Date()) => Math.floor((d.getTime() - d.getTimezoneOffset()*60000)/86400000);
@@ -116,7 +116,7 @@ function go(r){ route=r; tip.hidden=true; Palette.close?.();
 window.addEventListener("popstate",()=>{ const r=parseHash(); route=r||{v:"home"}; render(); });
 $("#tabs").addEventListener("click",e=>{ const b=e.target.closest("[data-v]"); if(b) go({v:b.dataset.v}); });
 function updateBadge(){ const n=dueCards().length, bd=$("#duebadge"); if(!bd) return; bd.hidden=!n; bd.textContent=n; }
-const TAB_OF = {lesson:"map", exam:"map", path:"paths", problem:"problems", course:"bootcamp"};
+const TAB_OF = {lesson:"map", exam:"map", path:"paths", problem:"problems", course:"bootcamp", project:"build", make:"build"};
 const currentTab = () => TAB_OF[route.v] || route.v;
 function render(){
   UI.syncNav(currentTab());
@@ -148,6 +148,7 @@ function viewToday(el){
   const cont=[];
   if(nl) cont.push({i:"map", k:"Core curriculum", t:nl.title, s:`${D.modById[nl.mid].title} · day ${nl.li+1}`, a:`data-lesson="${nl.id}"`});
   const ns=BC.nextStep?.(); if(ns) cont.push({i:"cap", k:"Bootcamp", t:ns.step.title, s:`${ns.course.title} · step ${ns.idx+1} of ${ns.course.steps.length}`, a:`data-course="${ns.course.id}" data-step="${ns.idx}"`});
+  const np=PJ.next?.(); if(np) cont.push({i:"rocket", k:"Build & Learn", t:np.project.title, s:`Step ${np.idx+1} of ${np.project.steps.length}: ${np.step.title}`, a:`data-project="${np.project.id}"`});
   const cp=PATHS.current?.(); if(cp) cont.push({i:cp.icon, k:"Career path", t:cp.title, s:`${cp.done} of ${cp.total} topics done`, a:`data-path="${cp.id}"`});
   const dp=PB.daily?.(); if(dp) cont.push({i:"braces", k:"Problem of the day", t:dp.title, s:`${dp.difficulty} · ${dp.tags.slice(0,2).join(", ")}${P.solved?.[dp.id]?" · solved ✓":""}`, a:`data-problem="${dp.id}"`});
   el.innerHTML = `
@@ -520,11 +521,12 @@ const VIEWS = {home:viewHome, profile:viewProfile, today:viewToday, map:viewMap,
 
 /* ---------- global clicks ---------- */
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-lesson],[data-exam],[data-act],[data-stage],[data-path],[data-problem],[data-course]"); if(!t || t.closest("#tabs,#moreMenu")) return;
+  const t=e.target.closest("[data-lesson],[data-exam],[data-act],[data-stage],[data-path],[data-problem],[data-course],[data-project]"); if(!t || t.closest("#tabs,#moreMenu")) return;
   if(t.dataset.lesson){ go({v:"lesson", id:t.dataset.lesson}); return; }
   if(t.dataset.exam){ go({v:"exam", id:t.dataset.exam}); return; }
   if(t.dataset.path){ go({v:"path", id:t.dataset.path}); return; }
   if(t.dataset.problem){ go({v:"problem", id:t.dataset.problem}); return; }
+  if(t.dataset.project){ go({v:"project", id:t.dataset.project}); return; }
   if(t.dataset.course){ go({v:"course", id:t.dataset.course, ...(t.dataset.step!=null?{step:+t.dataset.step}:{})}); return; }
   if(t.dataset.stage!=null && !t.dataset.act){ mapStage=+t.dataset.stage; render(); return; }
   if(t.dataset.act){ if(t.dataset.stageGo!=null) mapStage=+t.dataset.stageGo; else if(t.dataset.stage!=null) mapStage=+t.dataset.stage; go({v:t.dataset.act}); }
@@ -562,6 +564,6 @@ document.addEventListener("click",e=>{
     try{ localStorage.setItem(LKEY.p,JSON.stringify(P)); localStorage.setItem(LKEY.s,JSON.stringify(S)); }catch(e){}
     setSync("Saved to your account",true);
     Game.sync(true);
-    if(!["lesson","exam","review","practice","problem","course"].includes(route.v) && !route.started) render();
+    if(!["lesson","exam","review","practice","problem","course","make"].includes(route.v) && !route.started) render();
   }catch(e){ stores.p=stores.s=null; setSync("Saved in this browser"); }
 })();

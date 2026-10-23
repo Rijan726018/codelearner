@@ -1,6 +1,6 @@
 "use strict";
 /* ---------- code runners: Python + SQL in a Pyodide worker, JavaScript in a throwaway worker ---------- */
-const LANGNAME = {python:"Python 3.12", js:"JavaScript", sql:"SQL (SQLite)", html:"HTML & CSS"};
+const LANGNAME = {python:"Python 3.12", js:"JavaScript", sql:"SQL (SQLite)", html:"HTML & CSS", web:"HTML, CSS & JS"};
 const RUNNABLE = new Set(["python","js","sql"]);
 const normLang = l => ({py:"python", python:"python", javascript:"js", js:"js", node:"js", sql:"sql"})[String(l||"").toLowerCase()] || null;
 function detectLang(code, fallback){
@@ -131,7 +131,7 @@ const Drafts = {
 };
 
 /* ---------- editor widget ---------- */
-const CM_MODE = {python:"python", js:"javascript", sql:"text/x-sqlite", html:"htmlmixed"};
+const CM_MODE = {python:"python", js:"javascript", sql:"text/x-sqlite", html:"htmlmixed", web:"htmlmixed"};
 function mountEditor(host, {lang, code, draftKey=null, resetTo=code, compact=false, label="", onRun=null, runLabel="Run ▶", onChange=null, tall=false}){
   const isMac=/Mac|iPhone|iPad/.test(navigator.platform||""), kb=isMac?"⌘↵":"Ctrl+↵";
   host.classList.add("ed"); host.classList.toggle("tall", !!tall);
@@ -149,7 +149,7 @@ function mountEditor(host, {lang, code, draftKey=null, resetTo=code, compact=fal
   let cm=null, ta=null;
   const run=()=>onRun?onRun():doRun();
   if(window.CodeMirror){
-    cm=CodeMirror(wrap,{value:code, mode:CM_MODE[lang], lineNumbers:true, indentUnit:lang==="python"?4:2, autoCloseTags:lang==="html", tabSize:4, matchBrackets:true, viewportMargin:Infinity, lineWrapping:false,
+    cm=CodeMirror(wrap,{value:code, mode:CM_MODE[lang], lineNumbers:true, indentUnit:lang==="python"?4:2, tabSize:4, matchBrackets:true, viewportMargin:Infinity, lineWrapping:false,
       extraKeys:{"Cmd-Enter":run,"Ctrl-Enter":run,
         Tab:c=>c.somethingSelected()?c.indentSelection("add"):c.replaceSelection(" ".repeat(c.getOption("indentUnit")),"end"),
         "Shift-Tab":c=>c.indentSelection("subtract"), Esc:c=>c.getInputField().blur()}});
@@ -166,7 +166,7 @@ function mountEditor(host, {lang, code, draftKey=null, resetTo=code, compact=fal
   if(inB){ const toggle=(open)=>{ inBox.hidden=!open; inB.setAttribute("aria-expanded",open); }; inB.onclick=()=>toggle(inBox.hidden); if(usesInput()) toggle(true); }
   host.querySelector("[data-reset]").onclick=()=>{ setV(resetTo); out.hidden=true; if(draftKey) Drafts.set(draftKey,resetTo); onChange?.(resetTo); };
   const status=()=>{
-    if(lang==="html"){ stat.textContent=`The preview updates as you type · ${kb} checks your code`; return; }
+    if(lang==="html"||lang==="web"){ stat.textContent=`The preview updates as you type · ${kb} checks your code`; return; }
     if(Runner.busy && host.dataset.running) { stat.textContent=!Runner.ready(lang)?`Starting ${lang==="sql"?"SQLite":"Python"} (the first run takes a few seconds)…`:"Running…"; return; }
     if(Runner.failed(lang)){ stat.textContent=(lang==="sql"?"SQLite":"Python")+" couldn't load here: "+Runner.failed(lang); return; }
     stat.textContent = !Runner.ready(lang) ? `Loading ${lang==="sql"?"SQLite":"Python"} in the background… you can start typing. ${kb} runs.` : `${kb} to run · Tab indents · Esc leaves the editor`;

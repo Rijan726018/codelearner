@@ -129,7 +129,7 @@ const JS_HARNESS_J = (spec, tests) => `
     const C=${spec.kind==="design"?`(typeof ${spec.cls}!=="undefined"?${spec.cls}:undefined)`:"undefined"};
     if(typeof C!=="function"){ done({fatal:"Define a class named "+__S.cls+"."}); return; }
     for(const t of __T){ const outs=[]; let obj=null; const t0=performance.now();
-      try{ t.ops.forEach((op,i)=>{ if(op===__S.cls){ obj=new C(...t.args[i]); outs.push(null); } else outs.push(cout(obj[op](...t.args[i]),null)); });
+      try{ t.ops.forEach((op,i)=>{ if(op===__S.cls){ obj=new C(...t.args[i]); outs.push(null); } else outs.push(cout(obj[(__S.opmap||{})[op]||op](...t.args[i]),null)); });
         res.push({ok:key(outs)===key(t.exp), got:outs, ms:+(performance.now()-t0).toFixed(2)}); }
       catch(e){ res.push({ok:false, err:(e&&e.name?e.name+": "+e.message:String(e)), got:outs}); } }
     done({res}); return;
@@ -151,10 +151,48 @@ function splitSentinel(out){
 }
 const fixLines = (s, lang) => lang==="python" ? s.replace(/File "main\.py", line (\d+)/g,(m,n)=>`File "main.py", line ${Math.max(1,n-1)}`) : s.replace(/\(line (\d+)\)/g,(m,n)=>`(line ${Math.max(1,n-1)})`);
 
+/* ---------- Web apps (HTML + CSS + JS): run in a sandboxed iframe (scripts on, opaque origin).
+   A prelude adds an in-memory localStorage (opaque origins can't use the real one) and forwards console output and errors
+   to the parent; for checks, a harness appended to the page drives it (click, type, submit) and posts back the results. ---------- */
+const WEB = {
+  handlers:{},
+  token(){ return "w"+Math.random().toString(36).slice(2,10); },
+  prelude(token, seed={}){
+    return `<script>(function(){var T=${JSON.stringify(token)};
+var m=new Map(Object.entries(${JSON.stringify(seed)}));
+try{window.localStorage.getItem("__cl")}catch(e){var s={getItem:function(k){k=String(k);return m.has(k)?m.get(k):null},setItem:function(k,v){m.set(String(k),String(v))},removeItem:function(k){m.delete(String(k))},clear:function(){m.clear()},key:function(i){return Array.from(m.keys())[i]||null},get length(){return m.size}};
+try{Object.defineProperty(window,"localStorage",{value:s,configurable:true})}catch(_){}}
+window.__cl_logs=[];
+var post=function(level,args){var text=Array.prototype.map.call(args,function(a){if(typeof a==="string")return a;try{return JSON.stringify(a)}catch(_){return String(a)}}).join(" ");window.__cl_logs.push(text);try{parent.postMessage({__cl:T,type:"log",level:level,text:Array.prototype.map.call(args,function(a){if(typeof a==="string")return a;try{return JSON.stringify(a)}catch(_){return String(a)}}).join(" ")},"*")}catch(_){}};
+["log","info","warn","error"].forEach(function(k){var o=console[k];console[k]=function(){post(k,arguments);o&&o.apply(console,arguments)}});
+window.addEventListener("error",function(e){post("error",[(e.message||"Error")+(e.lineno?" (line "+e.lineno+")":"")])});
+window.addEventListener("unhandledrejection",function(e){post("error",["Uncaught (in promise) "+(e.reason&&e.reason.message||e.reason)])});
+window.alert=function(x){post("info",["alert: "+x])};})();<\/script>`;
+  },
+  inject(code, head, tail=""){
+    let out = /<head[^>]*>/i.test(code) ? code.replace(/<head[^>]*>/i, m=>m+head) : /<html[^>]*>/i.test(code) ? code.replace(/<html[^>]*>/i, m=>m+head) : head+code;
+    if(tail){ const i=out.toLowerCase().lastIndexOf("</body>"); out = i>=0 ? out.slice(0,i)+tail+out.slice(i) : out+tail; }
+    return out;
+  },
+  harness(token, tests){
+    const body = tests.map((t,i)=> t.js ? `try{ R[${i}] = await (async()=>{ ${t.do||""}\n; await _wait(${t.wait??40}); return !!(${t.js}); })(); }catch(e){ R[${i}]=false; E[${i}]=String(e&&e.message||e); }` : "").join("\n");
+    return `<script>window.addEventListener("load",function(){ setTimeout(async function(){ const R={}, E={};
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s)), _wait=ms=>new Promise(r=>setTimeout(r,ms)), _el=s=>{ const e=typeof s==="string"?$(s):s; if(!e) throw new Error("No element matches "+s); return e; },
+  _text=s=>((typeof s==="string"?$(s):s)?.textContent||"").replace(/\\s+/g," ").trim(),
+  _click=s=>_el(s).click(), _type=(s,v)=>{ const e=_el(s); e.focus(); e.value=v; e.dispatchEvent(new Event("input",{bubbles:true})); e.dispatchEvent(new Event("change",{bubbles:true})); },
+  _press=(s,key="Enter")=>{ const e=_el(s); e.dispatchEvent(new KeyboardEvent("keydown",{key,bubbles:true})); e.dispatchEvent(new KeyboardEvent("keyup",{key,bubbles:true})); },
+  _submit=s=>_el(s).dispatchEvent(new Event("submit",{bubbles:true,cancelable:true})),
+  _logs=()=>window.__cl_logs.join("\\n"), _visible=s=>{ const e=typeof s==="string"?$(s):s; if(!e) return false; const cs=getComputedStyle(e); return cs.display!=="none"&&cs.visibility!=="hidden"&&e.getClientRects().length>0; };
+${body}
+parent.postMessage({__cl:${JSON.stringify(token)},type:"result",R,E},"*"); }, 60); });<\/script>`;
+  }
+};
+if(typeof addEventListener==="function") addEventListener("message", e=>{ const d=e.data; if(d && typeof d==="object" && d.__cl && WEB.handlers[d.__cl]) WEB.handlers[d.__cl](d); });
+
 const Judge = {
   /* Run a problem's tests. lang: "python" | "js". Returns {status, res, stdout, stderr, ms, fatal} */
   async problem(p, lang, code, tests){
-    const spec={fn:p.fn?.[lang==="python"?"py":"js"], cls:p.cls?.[lang==="python"?"py":"js"], kind:p.kind, cmp:p.cmp, inplace:p.inplace, types:p.types};
+    const spec={fn:p.fn?.[lang==="python"?"py":"js"], cls:p.cls?.[lang==="python"?"py":"js"], kind:p.kind, cmp:p.cmp, inplace:p.inplace, types:p.types, opmap:lang==="js"?p.jsmap:undefined};
     const src = lang==="python" ? PY_PRELUDE + code + PY_HARNESS(spec, tests) : JS_PRELUDE + code + "\n" + JS_HARNESS_J(spec, tests);
     let out="", err=""; const t0=performance.now();
     const r = await Runner.run(lang, src, [], (s,text)=>{ if(s==="e") err+=text; else out+=text; }, {limit: lang==="python"?12000:6000});
@@ -172,7 +210,7 @@ const Judge = {
     if(lang==="python"||lang==="js"){
       const exprs=tests.map((t,i)=>({i, e:t.py||t.js})).filter(x=>x.e);
       let harness="";
-      if(lang==="python") harness = `\n\ndef _cl_step():\n    import json, sys\n    _src = ${JSON.stringify(code)}\n    G = dict(globals()); G["_src"] = _src\n    G["_out"] = "".join(getattr(sys.stdout, "buf", []))\n    sys.stdout = getattr(sys.stdout, "_cl_real", sys.stdout)\n    R = {}\n${exprs.map(x=>`    try:\n        R[${x.i}] = bool(eval(${JSON.stringify(x.e)}, G))\n    except Exception as e:\n        R[${x.i}] = False\n`).join("")}    print("\x1eJUDGE" + json.dumps(R))\n_cl_step()\n`;
+      if(lang==="python") harness = `\n\ndef _cl_step():\n    import json, sys\n    _src = ${JSON.stringify(code)}\n    G = dict(globals()); G["_src"] = _src\n    G["_out"] = "".join(getattr(sys.stdout, "buf", []))\n    def _raises(f, exc=Exception):\n        try:\n            f()\n        except exc:\n            return True\n        except Exception:\n            return False\n        return False\n    G["_raises"] = _raises\n    sys.stdout = getattr(sys.stdout, "_cl_real", sys.stdout)\n    R = {}\n${exprs.map(x=>`    try:\n        R[${x.i}] = bool(eval(${JSON.stringify(x.e)}, G))\n    except Exception as e:\n        R[${x.i}] = False\n`).join("")}    print("\x1eJUDGE" + json.dumps(R))\n_cl_step()\n`;
       if(lang==="js" && exprs.length) harness = `\n;(function(){ const R={}; const _src=${JSON.stringify(code)}; const _out=__cl_out.join("");\n${exprs.map(x=>`try{ R[${x.i}]=!!(${x.e}); }catch(e){ R[${x.i}]=false; }`).join("\n")}\n__post("o","\x1eJUDGE"+JSON.stringify(R)+"\\n"); })();\n`;
       let out="";
       const jsPre = `const __cl_out=[]; { const _l=console.log; console.log=(...a)=>{ __cl_out.push(a.map(x=>typeof x==="string"?x:JSON.stringify(x)).join(" ")+"\\n"); _l(...a); }; }\n`;
@@ -224,6 +262,25 @@ const Judge = {
         }catch(e){ ok=false; }
         checks.push({ok, msg:t.msg}); });
       return {checks};
+    }
+    if(lang==="web"){
+      // Each check gets a fresh copy of the page, so one check's clicks can't affect another's.
+      const logs=[]; let timedOut=false;
+      const runOne = t => new Promise(resolve=>{
+        const token=WEB.token(), f=document.createElement("iframe");
+        f.setAttribute("sandbox","allow-scripts"); f.setAttribute("aria-hidden","true"); f.tabIndex=-1;
+        f.style.cssText="position:fixed;left:-10000px;top:0;width:1024px;height:768px;border:0;visibility:hidden";
+        const done=r=>{ clearTimeout(timer); delete WEB.handlers[token]; f.remove(); resolve(r); };
+        const timer=setTimeout(()=>{ timedOut=true; done(null); }, 8000);
+        WEB.handlers[token]=d=>{ if(d.type==="log") logs.push(d); else if(d.type==="result") done(d); };
+        document.body.appendChild(f); f.srcdoc=WEB.inject(code, WEB.prelude(token, t.storage||step.storage||{}), WEB.harness(token, [t]));
+      });
+      const results = await Promise.all(tests.map(t => t.src!=null ? Promise.resolve(null) : runOne(t)));
+      const errs=[...new Set(logs.filter(l=>l.level==="error").map(l=>l.text))];
+      tests.forEach((t,i)=>{ const ok = t.src!=null ? new RegExp(t.src,"m").test(code) : !!results[i]?.R?.[0];
+        checks.push({ok, msg:t.msg, err:results[i]?.E?.[0]}); });
+      checks.forEach(c=>{ if(c.ok) return; c.hint = timedOut ? "Your page didn't finish loading within 8 seconds. Look for a loop that never ends." : errs.length ? "Your page logged an error: "+errs[0] : c.err ? "While checking: "+c.err : ""; });
+      return {checks, stdout:[...new Set(logs.filter(l=>l.level!=="error").map(l=>l.text))].join("\n"), stderr:errs.join("\n")};
     }
     return {checks:[]};
   }
