@@ -132,11 +132,11 @@ new MutationObserver(()=>UI.scan(document.getElementById("main"))).observe(docum
 
 /* ---------- navigation ---------- */
 const NAV = [
-  {v:"home", t:"Home", i:"home"}, {v:"today", t:"Dashboard", i:"dash"}, {v:"map", t:"Learn", i:"map"},
+  {v:"today", t:"Dashboard", i:"dash"}, {v:"map", t:"Learn", i:"map"},
   {v:"paths", t:"Paths", i:"route"}, {v:"problems", t:"Problems", i:"braces"}, {v:"bootcamp", t:"Bootcamp", i:"cap"},
   {v:"review", t:"Review", i:"refresh", badge:true}
 ];
-const NAV_MORE = [{v:"practice", t:"Practice by level", i:"target"}, {v:"projects", t:"Projects", i:"rocket"}, {v:"playground", t:"Playground", i:"terminal"}, {v:"method", t:"The Method", i:"book"}, {v:"profile", t:"Profile & badges", i:"award"}];
+const NAV_MORE = [{v:"home", t:"Home", i:"home"}, {v:"practice", t:"Practice by level", i:"target"}, {v:"projects", t:"Projects", i:"rocket"}, {v:"playground", t:"Playground", i:"terminal"}, {v:"method", t:"The Method", i:"book"}, {v:"profile", t:"Profile & badges", i:"award"}];
 UI.buildNav = () => {
   document.getElementById("tabs").innerHTML = NAV.map(n=>`<button type="button" data-v="${n.v}">${icon(n.i)}<span>${n.t}</span>${n.badge?`<span class="badge" id="duebadge" hidden>0</span>`:""}</button>`).join("");
   const r=document.querySelector(".top-r"); const m=document.createElement("div"); m.className="more";
@@ -149,12 +149,19 @@ UI.buildNav = () => {
   document.getElementById("themeBtn").onclick=UI.toggleTheme;
   document.getElementById("searchBtn").onclick=()=>Palette.open();
   UI.applyTheme(); matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change",UI.applyTheme);
+  UI.fitNav(); addEventListener("resize", UI.fitNav); document.fonts?.ready.then(UI.fitNav);
+};
+/* Icon-only tabs when the labels don't fit beside the logo and controls (desktop widths only; phones scroll the tab row). */
+UI.fitNav = () => {
+  const t=document.getElementById("tabs"); if(!t) return; t.classList.remove("compact");
+  if(innerWidth>980 && t.scrollWidth>t.clientWidth+1) t.classList.add("compact");
 };
 UI.syncNav = tabV => {
   document.querySelectorAll("#tabs [data-v], #moreMenu [data-v]").forEach(b=>b.setAttribute("aria-current", b.dataset.v===tabV?"page":"false"));
   const g=Game.stats(); const sc=document.getElementById("streakChip"), xc=document.getElementById("xpChip");
   if(sc) sc.innerHTML=`${icon("flame","sm")}${g.streak}`;
   if(xc) xc.innerHTML=`<span class="lv">Lv ${g.level}</span>${g.xp.toLocaleString()} XP`;
+  UI.fitNav();
 };
 
 /* ================= GAME: XP, levels, badges (all derived from progress, so nothing double-counts) ================= */
