@@ -1,13 +1,15 @@
-# CodeLearner: The 10,000-Hour Map
+# CodeLearner
 
-A self-paced programming curriculum that takes you from your first line of code to world-class engineering, built on the learning-science evidence for retrieval practice, spacing, mastery learning and worked examples.
+Learn to code from your first line to world-class engineering, in one place, entirely in the browser. CodeLearner combines four ways of learning:
 
-- **9 stages, 215 daily lessons, 1,171 questions**, from Base Camp (terminal, Git) through Python, algorithms, systems, full-stack, engineering craft and distributed systems, then a deep-specialty track, up to Summit.
-- **Every lesson:** an objective, a short explanation, a diagram or step-through code trace, a worked example, a try-it task, an "explain it back" box and 3–4 check-yourself questions at three levels (Recall, Apply, Analyze).
-- **Runnable code in the browser:** Python 3.12 (Pyodide), JavaScript (sandboxed worker) and SQL (SQLite via sql.js), in worked examples, a per-lesson scratchpad, after questions, and in a Playground.
-- **Module exams** you need 80% to pass, mixing in questions from earlier modules, plus **Test out** to skip what you already know.
-- **Spaced repetition:** every question you answer becomes a review card on a 1 → 3 → 7 → 14 → 30 → 60 → 120 day schedule.
-- **Projects** with milestones for every module, a **level-based practice** mode, and a **Method** page summarising the research, with sources.
+| Section | Inspired by | What's in it |
+|---|---|---|
+| **Bootcamp** | freeCodeCamp | 5 step-by-step courses, 75 auto-checked steps: *Build Your First Web Page* (HTML/CSS with live preview), *Python from Zero*, *JavaScript from Zero*, *SQL from Zero*, *CSS Layout Lab* |
+| **Learn: the 10,000-Hour Map** | university curricula | 9 stages, 215 daily lessons and 1,171 questions, from Base Camp to distributed systems, with module exams, test-outs and spaced repetition |
+| **Career Paths** | roadmap.sh | 26 phased roadmaps (468 topics) for Frontend, Backend, Full-Stack, Design, AI, ML, Data Science/Engineering/Analysis, Security, DevOps, Cloud, SRE, iOS, Android, Games, Systems, Embedded, Robotics, Blockchain, Graphics/XR, Quantum, QA, Databases and Architecture, plus a path-finder quiz |
+| **Problems** | LeetCode | 83 problems across 15 patterns, judged in the browser in Python or JavaScript against hidden tests, with hints, pattern guides and editorials |
+
+Around them: a dashboard with "continue" cards and a problem of the day, XP, levels, ranks and 22 badges, a Ctrl/⌘ K search across everything, light and dark themes, a playground, and backup/restore of progress.
 
 ## Run it locally
 
@@ -17,7 +19,7 @@ No build step. Serve the folder over HTTP; web workers and WebAssembly don't run
 python3 -m http.server 8000
 ```
 
-Then open http://localhost:8000. Progress saves in your browser's localStorage.
+Then open http://localhost:8000. Progress saves in your browser's localStorage. URLs are hash routes (`#/problem/two-sum`, `#/path/ai-engineer`), so the back button and deep links work.
 
 ## Where it runs
 
@@ -29,17 +31,30 @@ To republish it as an artifact, remove the first three lines of `index.html` (do
 
 | Path | What it is |
 |---|---|
-| `index.html` | Page shell and all styles |
-| `app.js` | Views: Today, Map, Lesson, Exam, Review, Practice, Projects, Method; quiz engine; spaced repetition; persistence |
+| `index.html` | Page shell and the whole design system (CSS) |
+| `ui.js` | Icons, theme, toasts, confetti, search palette, XP/levels/badges, Home and Profile views |
+| `app.js` | Routing, persistence, Dashboard, Learn map, lessons, exams, review, practice, projects, method; quiz engine; spaced repetition |
 | `runner.js` | Code editor (CodeMirror 5), runners, drafts, Playground |
-| `py-worker.js` | Runs Python in Pyodide off the main thread |
-| `sql-worker.js` | Runs SQL in sql.js off the main thread |
-| `data/s0.json` … `data/s8.json` | Stage content: modules, lessons, questions, projects, exams |
-| `data/research.json` | Learning-science principles, protocol, review intervals, sources |
-| `tools/SCHEMA.md` | Content schema the stage files follow |
-| `tools/validate.py` | Schema checker: `python3 tools/validate.py data/s*.json` |
-| `pyodide/` | Pyodide 0.26.4 runtime. The standard library is stored base64-encoded in `python_stdlib.b64.txt`, because artifact hosting doesn't serve `.zip` files. |
-| `sqljs/` | sql.js 1.10.3 (SQLite compiled to WebAssembly) |
+| `judge.js` | Test harnesses for problems (Python and JavaScript) and checkers for bootcamp steps (stdout, source, DOM/CSS, SQL results) |
+| `problems.js`, `bootcamp.js`, `paths.js` | The Problems, Bootcamp and Career Paths views |
+| `py-worker.js`, `sql-worker.js` | Run Python (Pyodide) and SQL (sql.js) off the main thread |
+| `data/s0.json` … `data/s8.json`, `data/research.json` | Core curriculum content and the learning-science summary |
+| `data/problems.json`, `data/bootcamp.json`, `data/paths/` | Generated content (see below) |
+| `tools/` | Content sources, builders and validators |
+| `pyodide/`, `sqljs/` | Pyodide 0.26.4 and sql.js 1.10.3 runtimes |
+
+## Editing content
+
+Problems, bootcamp courses and career paths are written as Python source in `tools/` and built into JSON. Every expected output is computed from reference solutions, and the checkers run every reference solution through the real judge code.
+
+```bash
+python3 tools/build_problems.py && node tools/check_problems.mjs     # 83 problems × Python + JavaScript
+python3 tools/build_bootcamp.py && node tools/check_bootcamp.mjs     # Python/JS steps; HTML/SQL steps are checked in a browser
+python3 tools/build_paths.py                                         # validates ids, icons, links and core-module references
+python3 tools/validate.py data/s*.json                               # core curriculum schema
+```
+
+Core curriculum content follows `tools/SCHEMA.md`.
 
 ## Third-party code
 

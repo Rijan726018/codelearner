@@ -1,0 +1,192 @@
+from _lib import *
+
+PATH(id="blockchain", title="Blockchain Developer", icon="chain", hue="#fbbf24", cat="Specialist Tracks", duration="10–14 months",
+ tagline="Build smart contracts and decentralised applications, carefully.",
+ about=["Blockchain developers write smart contracts (programs that run on networks like Ethereum) and the applications around them. Because deployed contracts often hold value and can't easily be changed, the job is unusually focused on correctness, testing and security.","Learn the fundamentals of cryptography and distributed systems first; they outlast any particular chain or trend."],
+ day=["Write and test smart contracts in Solidity", "Build web frontends that interact with contracts", "Review code for security issues", "Optimise gas costs", "Integrate with wallets and indexers"],
+ tools=["Solidity", "Foundry", "Hardhat", "TypeScript", "ethers.js / viem", "Git"],
+ roles=["Smart Contract Engineer", "Blockchain Developer", "Protocol Engineer"],
+ core=["s4m1", "s4m5", "s6m3", "s7m4"],
+ phases=[
+  foundations("JavaScript"),
+  PH("Blockchain fundamentals", "Weeks 9–16", "How decentralised ledgers actually work.", [
+   N("Cryptography basics", "Hashes, public-key cryptography and digital signatures.", ["hash functions", "public/private keys", "signatures", "Merkle trees"], ["cs50sec", "cryptopals"]),
+   N("How blockchains work", "Blocks, transactions, consensus and why they're hard to change.", ["blocks & chains", "proof of work vs proof of stake", "finality"], ["btc-paper", "eth"], core="s6m3"),
+   N("Ethereum & the EVM", "Accounts, gas, transactions and the virtual machine.", ["accounts", "gas", "EVM", "nodes & clients"], ["eth"]),
+  ]),
+  PH("Smart contracts", "Weeks 17–30", "Write, test and ship contracts.", [
+   N("Solidity", "The main smart-contract language.", ["types & storage", "functions & modifiers", "events", "inheritance"], ["solidity", "cryptozombies"]),
+   N("Testing contracts", "Unit, fuzz and invariant tests are mandatory.", ["Foundry tests", "fuzzing", "invariants", "forking"], ["foundry"], core="s4m5"),
+   N("Token standards", "Fungible and non-fungible token interfaces.", ["ERC-20", "ERC-721", "ERC-1155"], ["eth"]),
+   N("Contract security", "Well-known defensive patterns and checklists for contract code.", ["checks-effects-interactions", "access control", "reentrancy guards", "audits"], ["swc"]),
+   N("Gas optimisation", "Write efficient contracts.", ["storage costs", "calldata", "packing"], ["solidity"]),
+  ], ("Tested contract suite", "A token or escrow contract with full unit, fuzz and invariant tests, a security checklist review and deployment to a public test network.")),
+  PH("Decentralised apps", "Months 8–14", "Connect contracts to users.", [
+   N("Frontend integration", "Wallet connections and contract calls from a web app.", ["wallets", "viem/ethers", "transaction UX"], ["react", "eth"]),
+   N("Indexing & data", "Read on-chain data efficiently.", ["events", "indexers", "RPC providers"], ["eth"]),
+   N("Layer 2 & scaling", "Rollups and why they exist.", ["optimistic rollups", "zk rollups", "bridges"], ["eth"]),
+   N("Upgradability & governance", "Manage contract changes safely.", ["proxy patterns", "timelocks", "multisigs"], ["solidity"], opt=True),
+  ], ("Full dApp", "A web app backed by your tested contracts on a test network, with wallet login, clear transaction states and an event indexer.")),
+ ],
+ interview=["Explain how a transaction is executed on Ethereum.", "Review a contract snippet and identify the safety issue.", "Solidity storage, gas and visibility questions.", "Testing strategy for a contract."],
+ related=["backend", "appsec", "fullstack"])
+
+PATH(id="xr-graphics", title="Graphics & XR Engineer", icon="vr", hue="#8b7dff", cat="Specialist Tracks", duration="14–20 months",
+ tagline="Render worlds in real time: shaders, GPUs, AR and VR.",
+ about=["Graphics engineers write the code that turns geometry, light and materials into pixels in milliseconds, for games, film tools, maps, design software and augmented/virtual reality. XR engineers apply that to headsets and phones, where comfort and frame rate are critical.","It's maths-heavy (linear algebra above all) and visually rewarding."],
+ day=["Write shaders and rendering features", "Optimise GPU performance", "Build AR/VR interactions", "Integrate 3D assets and pipelines", "Debug visual artefacts frame by frame"],
+ tools=["C++", "GLSL/HLSL", "OpenGL/Vulkan/WebGPU", "three.js", "Unity/Unreal", "RenderDoc", "Blender"],
+ roles=["Graphics Engineer", "Rendering Engineer", "XR Developer", "Technical Artist"],
+ core=["s3m1", "s3m3", "s5m5"],
+ phases=[
+  PH("Maths & first renders", "Weeks 1–12", "The geometry of light.", [
+   N("Linear algebra for graphics", "Vectors, matrices and transforms are how 3D works.", ["vectors", "matrices", "homogeneous coordinates", "projection"], ["3b1b-la", "learnopengl"]),
+   N("Ray tracing from scratch", "Build a ray tracer: the clearest way to learn how images are formed.", ["rays & intersections", "materials", "anti-aliasing"], ["rtow"]),
+   N("The rasterisation pipeline", "How GPUs draw triangles: vertex and fragment stages.", ["vertices & triangles", "depth buffer", "rasterisation"], ["learnopengl"]),
+  ], ("Ray tracer", "A CPU ray tracer rendering spheres with diffuse, metal and glass materials and soft shadows.")),
+  PH("Real-time graphics", "Weeks 13–28", "Program the GPU.", [
+   N("OpenGL or WebGL", "Buffers, shaders, textures and the draw loop.", ["buffers", "shaders", "textures", "cameras"], ["learnopengl", "mdn-webgl"]),
+   N("Shaders", "Programs that run on the GPU for every vertex and pixel.", ["GLSL", "lighting", "normal mapping", "post-processing"], ["learnopengl"]),
+   N("Lighting & materials", "Physically based rendering.", ["PBR", "shadows", "image-based lighting"], ["pbr", "learnopengl"]),
+   N("three.js", "High-level 3D on the web.", ["scenes", "materials", "loaders", "animation"], ["threejs"]),
+   N("GPU performance", "Find and fix rendering bottlenecks.", ["draw calls", "overdraw", "GPU profilers"], ["learnopengl"]),
+  ], ("Real-time scene", "An interactive scene with PBR materials, shadows and a post-processing effect, running at 60 fps in the browser or desktop.")),
+  PH("XR & modern APIs", "Months 8–20", "Headsets, phones and next-generation graphics APIs.", [
+   N("WebXR or a game engine for XR", "Build AR/VR experiences.", ["WebXR", "Unity XR", "controllers & hand tracking"], ["webxr", "unity"]),
+   N("XR comfort & design", "Frame rate, motion sickness and spatial interaction.", ["90+ fps budgets", "locomotion", "spatial UI"], ["webxr"]),
+   N("Modern GPU APIs", "Vulkan, Metal, DirectX 12 and WebGPU.", ["command buffers", "pipelines", "synchronisation"], [("WebGPU fundamentals", "https://webgpufundamentals.org/")], opt=True),
+   N("Rendering techniques", "Deferred shading, global illumination and more.", ["deferred rendering", "SSAO", "global illumination"], ["pbr"]),
+  ], ("XR experience", "A small AR or VR experience with comfortable interaction that holds its target frame rate on device.")),
+ ],
+ interview=["Linear algebra and transforms questions.", "Explain the graphics pipeline step by step.", "Write or debug a shader.", "Performance: why is this scene slow?"],
+ related=["game-dev", "ux-engineer", "systems"])
+
+PATH(id="quantum", title="Quantum Computing Developer", icon="atom", hue="#38d3f0", cat="Specialist Tracks", duration="12–18 months",
+ tagline="Program quantum computers and explore algorithms beyond classical limits.",
+ about=["Quantum software developers design and run quantum circuits, study quantum algorithms and build the tools around today's early quantum hardware. It's a frontier field: most roles are in research labs, hardware companies and teams exploring future applications.","Linear algebra is the entry ticket. The rest can be learned step by step with free SDKs that run real circuits."],
+ day=["Design and simulate quantum circuits", "Implement and benchmark quantum algorithms", "Mitigate noise on real hardware", "Build software tools and compilers for quantum devices", "Read and implement research papers"],
+ tools=["Python", "Qiskit", "Cirq", "NumPy", "Jupyter", "Linear algebra"],
+ roles=["Quantum Software Engineer", "Quantum Algorithm Researcher", "Quantum Applications Developer"],
+ core=["s1m4", "s2m1", "s7m1"],
+ phases=[
+  foundations("Python"),
+  PH("Mathematical foundations", "Weeks 9–20", "The language of quantum mechanics is linear algebra.", [
+   N("Linear algebra", "Complex vectors, matrices, inner products, eigenvalues and tensor products.", ["complex numbers", "vectors & matrices", "eigenvalues", "tensor products"], ["3b1b-la", "khan-la"]),
+   N("Probability", "Measurement outcomes are probabilistic.", ["distributions", "expectation", "sampling"], ["seeing"]),
+   N("Quantum mechanics essentials", "Qubits, superposition, measurement and entanglement.", ["qubits", "superposition", "measurement", "entanglement"], ["qcountry"]),
+  ]),
+  PH("Quantum programming", "Weeks 21–34", "Build and run circuits.", [
+   N("Gates & circuits", "Single- and multi-qubit gates and circuit diagrams.", ["Pauli & Hadamard gates", "CNOT", "circuit diagrams", "Bloch sphere"], ["qiskit", "qcountry"]),
+   N("A quantum SDK", "Write circuits in Qiskit or Cirq and run them on simulators and real devices.", ["Qiskit or Cirq", "simulators", "running on hardware"], ["qiskit", "cirq"]),
+   N("Foundational algorithms", "Deutsch–Jozsa, Grover's search, the quantum Fourier transform, Shor's algorithm.", ["Grover", "QFT", "phase estimation", "Shor"], ["qiskit"]),
+   N("Noise & error mitigation", "Today's hardware is noisy; work around it.", ["decoherence", "error mitigation", "error correction basics"], ["qiskit"]),
+  ], ("Algorithm notebook", "Implement Grover's algorithm and the QFT, run both on a simulator and a real device, and compare results with and without error mitigation.")),
+  PH("Applications & research", "Months 9–18", "Where quantum might help, and how to tell.", [
+   N("Variational algorithms", "Hybrid quantum-classical methods such as VQE and QAOA.", ["VQE", "QAOA", "classical optimisers"], ["qiskit"]),
+   N("Quantum machine learning", "Early-stage research at the intersection with ML.", ["feature maps", "quantum kernels"], ["qiskit"], opt=True),
+   N("Post-quantum cryptography", "Why classical crypto is being upgraded now.", ["PQC standards", "migration"], [("NIST post-quantum cryptography", "https://csrc.nist.gov/projects/post-quantum-cryptography")]),
+   N("Reading research", "Follow arXiv and reproduce results.", ["arXiv", "reproductions", "benchmarks"], [("arXiv: quantum physics", "https://arxiv.org/list/quant-ph/recent")], core="s7m1"),
+  ]),
+ ],
+ interview=["Linear algebra and qubit-state questions.", "Explain entanglement and measurement simply.", "Walk through an algorithm such as Grover's.", "Python coding and a research discussion."],
+ certs=["IBM Certified Associate Developer – Quantum Computation using Qiskit (optional)"],
+ related=["ml-engineer", "systems"])
+
+PATH(id="qa", title="QA Automation Engineer", icon="checkc", hue="#34d399", cat="Specialist Tracks", duration="8–12 months",
+ tagline="Make quality automatic: test strategies, frameworks and pipelines.",
+ about=["QA and test automation engineers make sure software works before users find out otherwise. You'll design test strategies, build automated test suites across the UI, API and performance layers, and wire them into CI so every change is checked.","It's a strong entry point into engineering with clear progression to SDET, platform or development roles."],
+ day=["Write automated UI and API tests", "Design test plans for new features", "Maintain test frameworks and CI pipelines", "Investigate flaky tests and production bugs", "Run performance and load tests"],
+ tools=["Playwright", "Selenium", "pytest", "Postman", "k6", "GitHub Actions", "SQL", "JavaScript/TypeScript"],
+ roles=["QA Automation Engineer", "SDET", "Test Engineer", "Quality Engineer"],
+ core=["s1m3", "s4m3", "s4m5"],
+ phases=[
+  foundations("JavaScript"),
+  PH("Testing fundamentals", "Weeks 9–14", "Think like a tester.", [
+   N("Testing principles", "What to test, how much, and at which level.", ["test pyramid", "equivalence classes", "boundary values", "risk-based testing"], ["istqb", "rm-qa"], core="s4m5"),
+   N("Writing good bug reports", "Clear, reproducible reports get fixed.", ["reproduction steps", "expected vs actual", "severity vs priority"], ["rm-qa"]),
+   N("Web & HTTP basics", "Know what you're testing.", ["HTTP", "DOM", "DevTools"], ["mdn-http"]),
+   N("SQL for testers", "Check data directly and set up test states.", ["SELECT", "joins", "test data"], ["sqlbolt"]),
+  ]),
+  PH("Automation", "Weeks 15–26", "Automate at every layer.", [
+   N("UI automation", "End-to-end tests with reliable locators and waits.", ["Playwright", "locators", "auto-waiting", "page objects"], ["playwright", "selenium"]),
+   N("API testing", "Fast, stable tests below the UI.", ["Postman", "schema validation", "auth flows"], ["postman", "pytest"]),
+   N("Unit & component tests", "Work with developers on tests closest to the code.", ["pytest", "Vitest", "mocks"], ["pytest", "vitest"]),
+   N("Test data & environments", "Fixtures, factories and isolated environments.", ["fixtures", "seeding", "containers for tests"], ["docker"]),
+   N("CI integration", "Run tests on every change with useful reports.", ["GitHub Actions", "parallel runs", "reports & artefacts"], ["gha"]),
+  ], ("Automation framework", "A Playwright + API test suite for a public demo app, with page objects, test data setup, CI runs on every push and an HTML report.")),
+  PH("Advanced quality", "Months 7–12", "Beyond functional tests.", [
+   N("Performance testing", "Load and stress tests with clear goals.", ["k6", "load profiles", "percentiles"], ["k6"]),
+   N("Flaky tests", "Find and fix nondeterminism.", ["timing issues", "test isolation", "quarantine"], ["playwright"]),
+   N("Accessibility testing", "Automated and manual accessibility checks.", ["axe", "keyboard testing", "screen readers"], ["mdn-a11y"]),
+   N("Contract testing", "Keep services compatible without full end-to-end runs.", ["consumer-driven contracts", "Pact"], ["pact"], opt=True),
+   N("Quality strategy", "Metrics and processes that improve quality team-wide.", ["shift-left", "release criteria", "quality metrics"], ["rm-qa"]),
+  ]),
+ ],
+ interview=["Design a test plan for a feature (for example a login page).", "Write a UI or API test live.", "Explain the test pyramid and flaky-test fixes.", "Basic coding and SQL questions."],
+ certs=["ISTQB Certified Tester Foundation Level (common in some regions)"],
+ related=["backend", "frontend", "devops"])
+
+PATH(id="dba", title="Database Engineer", icon="db", hue="#8b7dff", cat="Specialist Tracks", duration="10–14 months",
+ tagline="Design, tune and protect the databases every application depends on.",
+ about=["Database engineers and administrators keep data fast, safe and available. You'll design schemas, tune queries and indexes, plan backups and replication, and help developers use the database well.","Data outlives code; people who deeply understand databases are valued in every company."],
+ day=["Review schemas and migrations", "Tune slow queries and indexes", "Manage backups, replication and failover", "Plan capacity and upgrades", "Secure access and audit usage"],
+ tools=["PostgreSQL", "MySQL", "SQL", "Linux", "pgBouncer", "Monitoring tools", "Terraform", "Python"],
+ roles=["Database Engineer", "Database Administrator (DBA)", "Database Reliability Engineer"],
+ core=["s4m4", "s6m2", "s6m3", "s7m5"],
+ phases=[
+  PH("SQL & modelling", "Weeks 1–10", "Use relational databases expertly.", [
+   N("SQL in depth", "Queries, joins, aggregates, window functions and CTEs.", ["joins", "window functions", "CTEs", "set operations"], ["sqlbolt", "pg-tut"], core="s4m4"),
+   N("Schema design", "Normalisation, keys, constraints and data types.", ["normal forms", "keys & constraints", "data types"], ["pg"]),
+   N("Transactions", "ACID, isolation levels and locking.", ["ACID", "isolation levels", "deadlocks"], ["pg"], core="s6m3"),
+   N("Linux for databases", "The OS your database runs on.", ["file systems", "memory", "disk I/O"], ["linuxjourney"]),
+  ]),
+  PH("Performance", "Weeks 11–24", "Make queries fast and keep them fast.", [
+   N("Indexes", "B-trees and other index types, and when they help.", ["B-tree", "composite indexes", "covering indexes", "partial indexes"], ["index-luke"]),
+   N("Query plans", "Read EXPLAIN output and fix bad plans.", ["EXPLAIN ANALYZE", "statistics", "join algorithms"], ["pg", "index-luke"]),
+   N("Storage engine internals", "Pages, buffers, WAL and MVCC.", ["pages & buffers", "WAL", "MVCC & vacuum"], ["cmu-db"], core="s6m2"),
+   N("Connection management", "Pooling and limits.", ["connection pools", "pgBouncer"], ["pg"]),
+  ], ("Tuning case study", "Load a large dataset, find the slowest queries, fix them with indexes and rewrites, and document before/after timings with plans.")),
+  PH("Operations", "Months 7–14", "Reliability and safety.", [
+   N("Backup & recovery", "Backups you've actually tested restoring.", ["logical vs physical backups", "point-in-time recovery", "restore drills"], ["pg"]),
+   N("Replication & high availability", "Replicas, failover and read scaling.", ["streaming replication", "failover", "read replicas"], ["pg", "rm-pg"]),
+   N("Monitoring", "Track health and catch problems early.", ["key metrics", "slow-query logs", "alerting"], ["prometheus"]),
+   N("Security", "Access control, encryption and auditing.", ["roles & privileges", "encryption", "auditing"], ["owasp-cs"]),
+   N("Scaling out", "Partitioning and sharding when one machine isn't enough.", ["partitioning", "sharding", "distributed SQL"], ["sdp"], core="s6m1"),
+   N("Non-relational databases", "When document, key-value or time-series stores fit better.", ["document stores", "key-value", "time series"], ["mongo", "redis"], opt=True),
+  ], ("HA database setup", "A primary/replica PostgreSQL setup with automated backups, a tested point-in-time restore, monitoring and a failover runbook.")),
+ ],
+ interview=["Advanced SQL and query-plan reading.", "Index design for given queries.", "Explain isolation levels and MVCC.", "Scenario: the database is slow, what do you check first?"],
+ certs=["PostgreSQL or Oracle/MySQL professional certifications (optional)", "Cloud database specialty certifications (optional)"],
+ related=["backend", "data-engineer", "sre"])
+
+PATH(id="architect", title="Software Architect", icon="building", hue="#fbbf24", cat="Specialist Tracks", duration="Years of experience + 12 months",
+ tagline="Shape how large systems and teams fit together, and make the big trade-offs.",
+ about=["Software architects make the decisions that are expensive to change: system boundaries, data ownership, technology choices and how teams' work fits together. They write, draw and explain as much as they code.","It's a senior role you grow into after several years of building software. This path organises what to study along the way."],
+ day=["Write design documents and decision records", "Review designs across teams", "Model systems with diagrams", "Balance cost, reliability, speed and simplicity", "Mentor engineers and align stakeholders"],
+ tools=["C4 diagrams", "ADRs", "System design", "Cloud platforms", "Domain-driven design", "Observability"],
+ roles=["Software Architect", "Solutions Architect", "Staff/Principal Engineer", "Enterprise Architect"],
+ core=["s5m1", "s5m2", "s6m1", "s6m3", "s6m5"],
+ phases=[
+  PH("Engineering depth", "Prerequisite", "Strong hands-on experience comes first.", [
+   N("Build and ship real systems", "Several years shipping, operating and maintaining software is the foundation.", ["backend or full-stack experience", "on-call", "maintenance"], ["rm-backend"], core="s4m6"),
+   N("Code design", "Modularity, coupling, cohesion and managing complexity.", ["SOLID", "coupling & cohesion", "information hiding"], ["refactoring"], core="s5m1"),
+   N("Refactoring & legacy systems", "Change large codebases safely.", ["refactoring", "strangler fig", "characterisation tests"], ["refactoring"], core="s5m2"),
+  ]),
+  PH("Architecture fundamentals", "Months 1–6", "The concepts and vocabulary of architecture.", [
+   N("Architectural styles", "Monoliths, modular monoliths, microservices, event-driven and serverless.", ["monolith vs microservices", "event-driven", "layered & hexagonal"], ["fowler-arch", "rm-arch"]),
+   N("Quality attributes", "Performance, scalability, availability, security and their trade-offs.", ["trade-offs", "fitness functions", "non-functional requirements"], ["aws-wa"]),
+   N("Domain-driven design", "Model the business and draw boundaries around it.", ["bounded contexts", "ubiquitous language", "aggregates"], ["ddd"]),
+   N("Documenting architecture", "Diagrams and decision records others can understand.", ["C4 model", "ADRs", "design docs"], ["c4", "adr"]),
+   N("Distributed systems", "Consistency, replication, failure and the CAP trade-offs.", ["consistency models", "sagas", "idempotency"], ["sdp"], core="s6m3"),
+  ], ("Architecture portfolio", "Write a design document with C4 diagrams and three ADRs for a real or realistic system, including alternatives considered and why they were rejected.")),
+  PH("Leadership", "Months 6–12", "Influence without authority.", [
+   N("System design at scale", "Design large systems end to end.", ["capacity estimates", "data partitioning", "caching layers", "multi-region"], ["sdp", "rm-sd"], core="s6m5"),
+   N("Evolutionary architecture", "Change architecture incrementally as needs change.", ["incremental change", "fitness functions", "migration strategies"], ["fowler-arch"]),
+   N("Security & compliance architecture", "Security designed in, not bolted on.", ["threat modelling", "zero trust", "compliance requirements"], ["tm-manifesto"]),
+   N("Communication & influence", "Explain trade-offs to engineers and executives alike.", ["writing", "facilitation", "stakeholder management"], ["aosa"]),
+   N("Learning from real systems", "Study how successful open-source systems are designed.", ["case studies", "architecture reviews"], ["aosa"], core="s5m3"),
+  ]),
+ ],
+ interview=["Large-scale system design with trade-off discussion.", "Present a past architecture decision and its outcome.", "Review a flawed design and propose improvements.", "Behavioural: leading technical change across teams."],
+ certs=["Cloud professional architect certifications (optional)", "TOGAF (enterprise contexts, optional)"],
+ related=["backend", "sre", "cloud"])

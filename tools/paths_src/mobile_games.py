@@ -1,0 +1,101 @@
+from _lib import *
+
+PATH(id="ios", title="iOS Developer", icon="phone", hue="#ff8a3d", cat="Mobile & Games", duration="9–12 months",
+ tagline="Build native apps for iPhone and iPad with Swift and SwiftUI.",
+ about=["iOS developers build apps for Apple's platforms using Swift and SwiftUI. You'll design fluid interfaces that follow Apple's Human Interface Guidelines, handle data and networking on a device with limited battery and memory, and ship through the App Store.","You'll need a Mac to build iOS apps; Apple's own tutorials are excellent and free."],
+ day=["Build screens in SwiftUI from designs", "Fetch and cache data from APIs", "Persist data on device", "Profile performance and memory in Instruments", "Release builds through TestFlight and the App Store"],
+ tools=["Swift", "SwiftUI", "Xcode", "UIKit", "SwiftData", "Instruments", "TestFlight", "Git"],
+ roles=["iOS Developer", "Mobile Engineer", "Apple Platforms Engineer"],
+ core=["s1m3", "s1m6", "s4m3", "s4m5"],
+ phases=[
+  PH("Swift foundations", "Weeks 1–8", "Learn the language before the frameworks.", [
+   N("Swift basics", "Constants, variables, types, optionals, control flow and functions.", ["let vs var", "optionals", "control flow", "functions & closures"], ["swift"]),
+   N("Types in Swift", "Structs, classes, enums and protocols: Swift's building blocks.", ["value vs reference types", "enums with associated values", "protocols", "generics"], ["swift"], core="s1m6"),
+   N("Xcode", "Projects, the simulator, the debugger and previews.", ["simulator", "breakpoints", "SwiftUI previews"], ["swiftui"]),
+   N("Git", "Version your projects from day one.", ["commits", "branches", "GitHub"], ["git-book"], core="s0m2"),
+  ]),
+  PH("SwiftUI apps", "Weeks 9–20", "Build real interfaces and app structure.", [
+   N("SwiftUI views & layout", "Declarative UI with stacks, lists, grids and modifiers.", ["views & modifiers", "stacks & grids", "lists", "navigation"], ["swiftui"]),
+   N("State & data flow", "How data drives the UI.", ["@State", "@Binding", "@Observable", "environment"], ["swiftui"]),
+   N("Networking", "Fetch JSON with URLSession and async/await, and decode it with Codable.", ["URLSession", "async/await", "Codable", "error handling"], ["swift"]),
+   N("Persistence", "Store data on device.", ["SwiftData", "UserDefaults", "files"], ["swiftui"]),
+   N("Human Interface Guidelines", "Design apps that feel at home on Apple platforms.", ["navigation patterns", "typography & SF Symbols", "accessibility"], ["hig"]),
+  ], ("Native app", "A SwiftUI app (for example a recipe box or habit tracker) with navigation, a network API, local persistence, dark mode and VoiceOver support.")),
+  PH("Professional iOS", "Months 6–12", "Quality, architecture and shipping.", [
+   N("Architecture", "Keep apps testable as they grow.", ["MVVM", "dependency injection", "modularisation"], ["fowler-arch"]),
+   N("Testing", "Unit and UI tests with XCTest and Swift Testing.", ["unit tests", "UI tests", "mocks"], ["swift"], core="s4m5"),
+   N("Concurrency", "Swift's structured concurrency and actors.", ["tasks", "actors", "MainActor"], ["swift"]),
+   N("UIKit interop", "Many codebases still use UIKit; know how to read and bridge it.", ["UIKit basics", "UIViewRepresentable"], ["swiftui"], opt=True),
+   N("Performance", "Smooth scrolling, low memory and fast launch.", ["Instruments", "memory leaks", "launch time"], ["swiftui"]),
+   N("Shipping", "Signing, TestFlight, App Store review and analytics.", ["code signing", "TestFlight", "App Store Connect", "crash reporting"], [("App Store Connect help", "https://developer.apple.com/help/app-store-connect/")]),
+  ], ("App Store release", "Publish an app to the App Store (or TestFlight), with tests, crash reporting and a privacy-respecting analytics setup.")),
+ ],
+ interview=["Swift language: optionals, value vs reference types, protocols.", "SwiftUI state management questions.", "Build a small screen live, often a list fetched from an API.", "Memory management: retain cycles and weak references."],
+ related=["android", "frontend", "ux-engineer"])
+
+PATH(id="android", title="Android Developer", icon="android", hue="#a3e635", cat="Mobile & Games", duration="9–12 months",
+ tagline="Build apps for billions of Android devices with Kotlin and Jetpack Compose.",
+ about=["Android developers build apps for the world's most widely used mobile operating system. Modern Android development uses Kotlin and Jetpack Compose, with architecture components that make apps robust across thousands of device types.","Google's official Android Basics with Compose course is free and an excellent starting point; any computer can build Android apps."],
+ day=["Build UIs with Jetpack Compose", "Implement architecture with ViewModels and repositories", "Handle networking, storage and background work", "Test on many screen sizes and API levels", "Publish through Google Play"],
+ tools=["Kotlin", "Jetpack Compose", "Android Studio", "Coroutines", "Room", "Retrofit", "Gradle", "Firebase"],
+ roles=["Android Developer", "Mobile Engineer", "Kotlin Developer"],
+ core=["s1m3", "s1m6", "s4m3", "s4m5"],
+ phases=[
+  PH("Kotlin foundations", "Weeks 1–8", "A modern, concise language with null safety.", [
+   N("Kotlin basics", "Variables, types, null safety, control flow and functions.", ["val vs var", "null safety", "when expressions", "functions & lambdas"], ["kotlin"]),
+   N("Object-oriented & functional Kotlin", "Classes, data classes, interfaces and collection operations.", ["data classes", "interfaces", "sealed classes", "collections"], ["kotlin"], core="s1m6"),
+   N("Android Studio", "Projects, emulators, the debugger and Logcat.", ["emulator", "debugger", "Logcat"], ["android"]),
+  ]),
+  PH("Compose apps", "Weeks 9–20", "Build modern Android interfaces and app structure.", [
+   N("Jetpack Compose", "Declarative UI with composables, layouts and modifiers.", ["composables", "layouts", "lists (LazyColumn)", "theming"], ["android"]),
+   N("State in Compose", "State hoisting and unidirectional data flow.", ["remember & state", "state hoisting", "recomposition"], ["android"]),
+   N("App architecture", "ViewModels, repositories and the recommended layered architecture.", ["ViewModel", "repositories", "UI state", "navigation"], ["android-dev"]),
+   N("Coroutines & Flow", "Asynchronous work without blocking the UI.", ["coroutines", "scopes", "Flow"], ["kotlin"]),
+   N("Networking & storage", "Fetch data with Retrofit and store it with Room.", ["Retrofit", "JSON parsing", "Room", "DataStore"], ["android-dev"]),
+   N("Material Design", "Google's design system for consistent, accessible Android UI.", ["Material 3", "adaptive layouts", "accessibility"], ["material"]),
+  ], ("Offline-first app", "A Compose app that syncs data from an API into Room, works offline, supports dark mode and adapts to tablets.")),
+  PH("Professional Android", "Months 6–12", "Quality and release.", [
+   N("Dependency injection", "Hilt for testable, decoupled code.", ["Hilt", "scopes", "modules"], ["android-dev"]),
+   N("Testing", "Unit, integration and UI tests.", ["JUnit", "Compose UI tests", "fakes"], ["android-dev"], core="s4m5"),
+   N("Background work", "WorkManager for reliable deferred work.", ["WorkManager", "constraints", "notifications"], ["android-dev"]),
+   N("Performance", "Fast startup and smooth frames.", ["baseline profiles", "profiling", "memory leaks"], ["android-dev"]),
+   N("Cross-platform options", "When Flutter or React Native make sense.", ["Flutter", "React Native", "Kotlin Multiplatform"], ["flutter", "rn"], opt=True),
+   N("Publishing on Google Play", "Signing, release tracks and store listings.", ["app bundles", "release tracks", "Play Console"], [("Play Console help", "https://support.google.com/googleplay/android-developer/")]),
+  ], ("Published app", "Ship an app to Google Play's internal or open testing track with tests in CI, crash reporting and a clear store listing.")),
+ ],
+ interview=["Kotlin fundamentals and coroutines.", "Activity/composable lifecycle and state handling.", "Architecture discussion: how would you structure this app?", "Build a small list/detail screen live."],
+ certs=["Google Associate Android Developer (optional)"],
+ related=["ios", "game-dev", "backend"])
+
+PATH(id="game-dev", title="Game Developer", icon="game", hue="#ff5c93", cat="Mobile & Games", duration="12–18 months",
+ tagline="Make games: gameplay, physics, AI, graphics and the craft of fun.",
+ about=["Game developers combine programming, maths and design to build interactive worlds. Roles range from gameplay programming (how the game feels) to engine, graphics, tools and AI programming.","The best way in is a portfolio of small finished games. Finishing is the skill studios look for most."],
+ day=["Implement gameplay mechanics and player controls", "Tune feel, physics and difficulty", "Build tools for designers", "Optimise frame rate and memory", "Fix bugs found in playtesting"],
+ tools=["Unity (C#)", "Unreal Engine (C++)", "Godot", "Blender (basics)", "Git LFS", "Visual Studio / Rider"],
+ roles=["Gameplay Programmer", "Game Developer", "Engine Programmer", "Tools Programmer", "Technical Designer"],
+ core=["s1m6", "s2m4", "s2m5", "s3m1", "s3m3"],
+ phases=[
+  PH("Programming & maths", "Weeks 1–10", "The foundations every game sits on.", [
+   N("A first language", "C# for Unity or C++ for Unreal; start with C# if unsure.", ["variables & control flow", "classes & objects", "collections"], [("Microsoft: C# documentation", "https://learn.microsoft.com/en-us/dotnet/csharp/"), "learncpp"], core="s1m6"),
+   N("Vectors & trigonometry", "Positions, directions, angles and distances are everywhere in games.", ["vectors", "dot & cross products", "sin & cos", "normalisation"], ["3b1b-la", "redblob"]),
+   N("The game loop", "Input, update and render, many times per second, with frame-rate independence.", ["delta time", "fixed timestep", "input handling"], ["gpp"]),
+   N("Game programming patterns", "Proven patterns for structuring game code.", ["component pattern", "state machines", "observer", "object pools"], ["gpp"]),
+  ], ("Classic arcade clone", "Recreate Pong, Breakout or Snake from scratch with a score, game over and restart. Finish it completely.")),
+  PH("An engine", "Weeks 11–24", "Learn one engine deeply.", [
+   N("Engine fundamentals", "Scenes, game objects or nodes, components and the editor.", ["scenes", "components/nodes", "prefabs", "scripting"], ["unity", "godot"]),
+   N("Physics & collisions", "Rigid bodies, colliders and character movement that feels good.", ["rigid bodies", "colliders & triggers", "raycasts", "character controllers"], ["unity", "godot"]),
+   N("Animation & audio", "Bring characters and worlds to life.", ["animation state machines", "blend trees", "sound effects & music"], ["unity"]),
+   N("UI & menus", "HUDs, menus and settings screens.", ["HUD", "menus", "input remapping"], ["unity"]),
+   N("Game AI", "Enemies that seem smart: steering, pathfinding and decision-making.", ["A* pathfinding", "state machines", "behaviour trees"], ["redblob"], core="s2m5"),
+  ], ("Complete small game", "A polished 2D or 3D game with three levels, menus, sound, a save system and a build others can download from itch.io.")),
+  PH("Depth & specialisation", "Months 7–18", "Pick a direction and go deep.", [
+   N("Graphics programming", "Shaders, lighting and the rendering pipeline.", ["shaders", "lighting models", "render pipelines"], ["learnopengl"]),
+   N("Performance", "Profiling, memory and hitting a stable frame rate.", ["profilers", "draw calls", "garbage collection", "data-oriented design"], ["gpp"], core="s3m3"),
+   N("Multiplayer networking", "Synchronising game state over unreliable networks.", ["client-server", "prediction & reconciliation", "lag compensation"], ["redblob"], opt=True),
+   N("Procedural generation", "Generate levels and worlds algorithmically.", ["noise", "random seeds", "dungeon generation"], ["redblob"], opt=True),
+   N("Game design", "What makes games fun: loops, feedback and difficulty curves.", ["core loops", "playtesting", "game feel"], ["rm-game"]),
+   N("Game jams", "Finish a game in 48 hours; the fastest way to build a portfolio.", ["scoping", "team work", "shipping"], [("itch.io game jams", "https://itch.io/jams")]),
+  ], ("Portfolio of three", "Three finished games showing different skills (for example physics, AI and a shader-heavy piece), each with a short devlog.")),
+ ],
+ interview=["Portfolio review: show finished games and explain your code.", "Vector maths questions.", "C++ or C# fundamentals; memory and performance.", "Implement a gameplay system (inventory, state machine) live."],
+ related=["xr-graphics", "systems", "android"])
