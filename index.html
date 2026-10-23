@@ -92,7 +92,7 @@ p{text-wrap:pretty}
 .logo b{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
 .tabs{display:flex;gap:2px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
-.tabs button{all:unset;cursor:pointer;display:flex;align-items:center;gap:7px;padding:8px 11px;border-radius:10px;font:500 14px var(--body);color:var(--muted);position:relative;white-space:nowrap;transition:color .15s,background .15s}
+.tabs button{all:unset;cursor:pointer;display:flex;align-items:center;gap:7px;padding:8px 9px;border-radius:10px;font:500 14px var(--body);color:var(--muted);position:relative;white-space:nowrap;transition:color .15s,background .15s}
 .tabs button:hover{color:var(--ink);background:var(--sunk)}
 .tabs button[aria-current="page"]{color:var(--ink);background:var(--surface);box-shadow:inset 0 0 0 1px var(--line)}
 .tabs button[aria-current="page"]::after{content:"";position:absolute;left:12px;right:12px;bottom:-11px;height:2px;border-radius:2px;background:var(--grad)}
@@ -115,7 +115,8 @@ kbd{font:600 10.5px var(--mono);padding:2px 6px;border-radius:6px;border:1px sol
 .menu button{all:unset;cursor:pointer;display:flex;gap:10px;align-items:center;padding:9px 12px;border-radius:9px;font:500 14px var(--body)}
 .menu button:hover,.menu button[aria-current="page"]{background:var(--sunk)}
 @media (max-width:1420px){.kbtn span,.kbtn kbd{display:none}.kbtn{padding:8px}}
-@media (max-width:1240px) and (min-width:981px){.tabs button span:not(.badge){display:none}.tabs button{padding:8px 10px}}
+.tabs.compact button span:not(.badge){display:none}
+.tabs.compact button{padding:8px 10px}
 @media (max-width:980px){
   .top-in{flex-wrap:wrap;row-gap:6px}
   .tabs{order:3;flex-basis:100%;margin:0 -4px}
