@@ -90,7 +90,11 @@ p{text-wrap:pretty}
 .logo .mk{width:32px;height:32px;border-radius:10px;background:var(--grad);display:grid;place-items:center;box-shadow:var(--glow);color:#0a0b1a}
 .logo .mk svg{width:19px;height:19px;stroke:#0a0b1a;stroke-width:2.4}
 .logo .lt{display:grid;gap:3px}
-.logo small{font:600 9.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.brand{position:relative;display:flex;flex-shrink:0}
+.logo small,.brand .by{font:600 9.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.logo small{visibility:hidden}
+.brand .by{position:absolute;left:42px;bottom:0;text-decoration:none}
+.brand .by:hover{color:var(--ink);text-decoration:underline}
 .logo b{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
 .tabs{display:flex;gap:2px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
@@ -645,7 +649,7 @@ select.sel{border:1px solid var(--line);border-radius:11px;padding:8px 10px;font
 
 <header class="top">
   <div class="top-in">
-    <button type="button" class="logo" data-act="home" aria-label="CodeLearner, part of CodeBay: home"><span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M13.5 4l-3 16"/></svg></span><span class="lt"><span>Code<b>Learner</b></span><small>part of CodeBay</small></span></button>
+    <div class="brand"><button type="button" class="logo" data-act="home" aria-label="CodeLearner home"><span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M13.5 4l-3 16"/></svg></span><span class="lt"><span>Code<b>Learner</b></span><small aria-hidden="true">part of CodeBay</small></span></button><a class="by" href="https://codebay.org/" target="_blank" rel="noopener">part of CodeBay</a></div>
     <nav class="tabs" id="tabs" aria-label="Sections"></nav>
     <div class="top-r">
       <button type="button" class="kbtn" id="searchBtn" aria-label="Search everything"><svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span>Search</span><kbd>Ctrl K</kbd></button>
@@ -658,7 +662,7 @@ select.sel{border:1px solid var(--line);border-radius:11px;padding:8px 10px;font
 <div class="wrap">
   <main id="main"><div class="loading">Loading your curriculum…</div></main>
   <footer>
-    <span>CodeLearner, part of CodeBay · <span class="sync" id="sync">Loading…</span></span>
+    <span>CodeLearner, part of <a href="https://codebay.org/" target="_blank" rel="noopener">CodeBay</a> · <span class="sync" id="sync">Loading…</span></span>
     <span id="resetwrap"><button type="button" id="reset">Clear all progress</button></span>
   </footer>
 </div>

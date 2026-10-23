@@ -1,6 +1,6 @@
 # CodeLearner
 
-Learn to code from your first line to world-class engineering, in one place, entirely in the browser. CodeLearner is the free coding school that is part of [CodeBay](https://github.com/Rijan726018/codebay), and it is live at https://rijan726018.github.io/codelearner/. It combines five ways of learning:
+Learn to code from your first line to world-class engineering, in one place, entirely in the browser. CodeLearner is the free coding school that is part of [CodeBay](https://codebay.org/), and it is live at https://rijan726018.github.io/codelearner/. It combines five ways of learning:
 
 | Section | Inspired by | What's in it |
 |---|---|---|
