@@ -4,7 +4,7 @@ captured by running the finished program. Checks are verified by check_bootcamp.
 import json, os, sys, sqlite3, subprocess
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, os.path.join(HERE, "projects_src"))
 import _lib
-for m in ["web", "python_projects", "more"]:
+for m in ["web", "python_projects", "more", "more2", "more3"]:
     if os.path.exists(os.path.join(HERE, "projects_src", m + ".py")): __import__(m)
 
 def sql_rows(code):
