@@ -1,7 +1,7 @@
 <!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>CodeLearner</title>
+<title>CodeLearner · part of CodeBay</title>
 <meta name="description" content="Learn to code from zero to world-class: interactive lessons, career roadmaps, a coding-problem judge and step-by-step bootcamps, all in your browser.">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -89,6 +89,8 @@ p{text-wrap:pretty}
 .logo{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;font:800 1.18rem/1 var(--display);letter-spacing:-.02em;white-space:nowrap}
 .logo .mk{width:32px;height:32px;border-radius:10px;background:var(--grad);display:grid;place-items:center;box-shadow:var(--glow);color:#0a0b1a}
 .logo .mk svg{width:19px;height:19px;stroke:#0a0b1a;stroke-width:2.4}
+.logo .lt{display:grid;gap:3px}
+.logo small{font:600 9.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .logo b{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
 .tabs{display:flex;gap:2px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
@@ -114,7 +116,9 @@ kbd{font:600 10.5px var(--mono);padding:2px 6px;border-radius:6px;border:1px sol
 .menu{position:absolute;right:0;top:calc(100% + 8px);min-width:220px;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:6px;display:grid;z-index:40}
 .menu button{all:unset;cursor:pointer;display:flex;gap:10px;align-items:center;padding:9px 12px;border-radius:9px;font:500 14px var(--body)}
 .menu button:hover,.menu button[aria-current="page"]{background:var(--sunk)}
-@media (max-width:1420px){.kbtn span,.kbtn kbd{display:none}.kbtn{padding:8px}}
+.top-in.tight .kbtn span,.top-in.tight .kbtn kbd{display:none}
+.top-in.tight .kbtn{padding:8px}
+@media (max-width:980px){.kbtn span,.kbtn kbd{display:none}.kbtn{padding:8px}}
 .tabs.compact button span:not(.badge){display:none}
 .tabs.compact button{padding:8px 10px}
 @media (max-width:980px){
@@ -123,7 +127,7 @@ kbd{font:600 10.5px var(--mono);padding:2px 6px;border-radius:6px;border:1px sol
   .tabs button[aria-current="page"]::after{bottom:-7px}
   .top-r{margin-left:auto}
 }
-@media (max-width:420px){.chipx.fire{display:none}.logo span{font-size:1.05rem}}
+@media (max-width:420px){.chipx.fire{display:none}.logo .lt>span{font-size:1.05rem}}
 
 main{padding-top:30px;display:grid;grid-template-columns:minmax(0,1fr);gap:30px;min-width:0}
 main>*{min-width:0}
@@ -192,8 +196,8 @@ main>*{min-width:0}
 .term .k{color:#d39bff}.term .s{color:#7ee2a8}.term .n{color:#ffb36b}.term .c{color:#6f7aa6}.term .f{color:#6fd3ee}.term .o{color:#a3e635}
 .caret{display:inline-block;width:8px;height:1.1em;background:#a3e635;vertical-align:-3px;animation:blink 1s steps(1) infinite}
 @keyframes blink{50%{opacity:0}}
-.counters{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
-@media (max-width:900px){.counters{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.counters{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+@media (max-width:1100px){.counters{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:520px){.counters{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .counter{padding:18px;border-radius:16px;border:1px solid var(--line);background:var(--surface);display:grid;gap:2px}
 .counter b{font:800 clamp(1.7rem,3.2vw,2.3rem)/1 var(--display);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
@@ -329,6 +333,17 @@ main>*{min-width:0}
 .stepper button.done{background:color-mix(in oklab,var(--ok) 22%,var(--surface));color:var(--ok);border-color:color-mix(in oklab,var(--ok) 40%,transparent)}
 .stepper button[aria-current="true"]{outline:2px solid var(--accent);outline-offset:1px;color:var(--ink)}
 .stepper button[disabled]{opacity:.4;cursor:default}
+.msteps{display:flex;flex-wrap:wrap;gap:14px 22px}
+.mgroup{display:grid;gap:6px;padding:10px 12px;border-radius:14px;border:1px solid transparent}
+.mgroup.cur{border-color:var(--line);background:var(--surface)}
+.mgroup .eyebrow{font-size:10.5px}
+.console{border-top:1px solid var(--line);background:#0a0d1c;color:#dfe4ff}
+.console .chead{display:flex;justify-content:space-between;align-items:center;padding:6px 10px 0 12px}
+.console .chead .eyebrow{color:#7c86b8}
+.console .chead .btn{color:#dfe4ff;border-color:#2a3460;padding:3px 9px}
+.console pre{margin:0;padding:6px 12px 10px;font:12.5px/1.55 var(--mono);max-height:160px;min-height:2.6em;overflow:auto;white-space:pre-wrap}
+.console .err{color:#ff7a7a} .console .warn{color:#fbbf24}
+.grid3.pj{align-items:stretch}
 .task{border-radius:14px;padding:16px 18px;background:var(--grad-soft);border:1px solid var(--line);display:grid;gap:8px}
 .checks{display:grid;gap:6px;list-style:none;margin:0;padding:0}
 .checks li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px;align-items:start;font-size:.92rem;padding:8px 10px;border-radius:10px;background:var(--surface2);border:1px solid var(--line)}
@@ -630,7 +645,7 @@ select.sel{border:1px solid var(--line);border-radius:11px;padding:8px 10px;font
 
 <header class="top">
   <div class="top-in">
-    <button type="button" class="logo" data-act="home" aria-label="CodeLearner home"><span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M13.5 4l-3 16"/></svg></span><span>Code<b>Learner</b></span></button>
+    <button type="button" class="logo" data-act="home" aria-label="CodeLearner, part of CodeBay: home"><span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M13.5 4l-3 16"/></svg></span><span class="lt"><span>Code<b>Learner</b></span><small>part of CodeBay</small></span></button>
     <nav class="tabs" id="tabs" aria-label="Sections"></nav>
     <div class="top-r">
       <button type="button" class="kbtn" id="searchBtn" aria-label="Search everything"><svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span>Search</span><kbd>Ctrl K</kbd></button>
@@ -643,7 +658,7 @@ select.sel{border:1px solid var(--line);border-radius:11px;padding:8px 10px;font
 <div class="wrap">
   <main id="main"><div class="loading">Loading your curriculum…</div></main>
   <footer>
-    <span>CodeLearner · <span class="sync" id="sync">Loading…</span></span>
+    <span>CodeLearner, part of CodeBay · <span class="sync" id="sync">Loading…</span></span>
     <span id="resetwrap"><button type="button" id="reset">Clear all progress</button></span>
   </footer>
 </div>

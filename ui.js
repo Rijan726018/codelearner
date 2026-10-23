@@ -132,8 +132,8 @@ new MutationObserver(()=>UI.scan(document.getElementById("main"))).observe(docum
 
 /* ---------- navigation ---------- */
 const NAV = [
-  {v:"today", t:"Dashboard", i:"dash"}, {v:"map", t:"Learn", i:"map"},
-  {v:"paths", t:"Paths", i:"route"}, {v:"problems", t:"Problems", i:"braces"}, {v:"bootcamp", t:"Bootcamp", i:"cap"},
+  {v:"today", t:"Today", i:"dash"}, {v:"map", t:"Learn", i:"map"},
+  {v:"paths", t:"Paths", i:"route"}, {v:"problems", t:"Problems", i:"braces"}, {v:"bootcamp", t:"Bootcamp", i:"cap"}, {v:"build", t:"Build", i:"rocket"},
   {v:"review", t:"Review", i:"refresh", badge:true}
 ];
 const NAV_MORE = [{v:"home", t:"Home", i:"home"}, {v:"practice", t:"Practice by level", i:"target"}, {v:"projects", t:"Projects", i:"rocket"}, {v:"playground", t:"Playground", i:"terminal"}, {v:"method", t:"The Method", i:"book"}, {v:"profile", t:"Profile & badges", i:"award"}];
@@ -153,8 +153,11 @@ UI.buildNav = () => {
 };
 /* Icon-only tabs when the labels don't fit beside the logo and controls (desktop widths only; phones scroll the tab row). */
 UI.fitNav = () => {
-  const t=document.getElementById("tabs"); if(!t) return; t.classList.remove("compact");
-  if(innerWidth>980 && t.scrollWidth>t.clientWidth+1) t.classList.add("compact");
+  const t=document.getElementById("tabs"), top=document.querySelector(".top-in"); if(!t||!top) return;
+  t.classList.remove("compact"); top.classList.remove("tight");
+  const over=()=>innerWidth>980 && t.scrollWidth>t.clientWidth+1;
+  if(over()) top.classList.add("tight");   // first drop the "Search" label, then the tab labels
+  if(over()) t.classList.add("compact");
 };
 UI.syncNav = tabV => {
   document.querySelectorAll("#tabs [data-v], #moreMenu [data-v]").forEach(b=>b.setAttribute("aria-current", b.dataset.v===tabV?"page":"false"));
@@ -185,6 +188,8 @@ const BADGES = [
   {id:"step-1", n:"Bootcamper", d:"Pass your first bootcamp step", i:"cap", t:s=>s.steps>=1},
   {id:"course-1", n:"Graduate", d:"Finish a whole bootcamp course", i:"award", t:s=>s.courses>=1},
   {id:"courses-all", n:"Polyglot", d:"Finish every bootcamp course", i:"globe", t:s=>s.courses>=s.coursesTotal&&s.coursesTotal>0},
+  {id:"build-1", n:"Builder", d:"Finish a guided Build & Learn project", i:"rocket", t:s=>s.built>=1},
+  {id:"build-5", n:"Maker", d:"Finish 5 guided projects", i:"cube", t:s=>s.built>=5},
   {id:"node-1", n:"Pathfinder", d:"Check off your first career-path topic", i:"route", t:s=>s.nodes>=1},
   {id:"phase-1", n:"Phase Clear", d:"Complete a full phase of a career path", i:"layers", t:s=>s.phases>=1},
   {id:"path-1", n:"Job Ready", d:"Complete an entire career path", i:"brief", t:s=>s.paths>=1},
@@ -205,6 +210,7 @@ const Game = {
     const pb=PB.byId||{}; let solved=0, easy=0, medium=0, hard=0, pxp=0;
     Object.keys(P.solved||{}).forEach(id=>{ const p=pb[id]; if(!p) return; solved++; pxp+=XPV[p.difficulty]||0; if(p.difficulty==="Easy") easy++; else if(p.difficulty==="Medium") medium++; else hard++; });
     const steps=Object.keys(P.steps||{}).length;
+    const built=PJ.list.filter(p=>p.steps.length&&p.steps.every(s=>P.steps?.[s.id])).length;
     const bc=BC.courses||[]; const courses=bc.filter(c=>c.steps.every(s=>P.steps?.[s.id])).length;
     const pidx=PATHS.index||[]; let phases=0, paths=0;
     pidx.forEach(p=>{ let all=true; (p.phases||[]).forEach(ph=>{ const ok=ph.nodes.length&&ph.nodes.every(n=>P.nodes?.[p.id+":"+n]==="done"); if(ok) phases++; else all=false; }); if(all&&p.phases?.length) paths++; });
@@ -212,7 +218,7 @@ const Game = {
     const parts={lessons:lessons*XPV.lesson, exams:exams*XPV.exam, projects:ms*XPV.milestone, reviews:strongCards*XPV.card, problems:pxp, bootcamp:steps*XPV.step, paths:nodes*XPV.node};
     const xp=Object.values(parts).reduce((a,b)=>a+b,0), level=this.levelOf(xp);
     return {lessons, lessonsTotal:Object.keys(D.lessons).length, exams, examsTotal:D.mods.length, ms, strongCards, solved, easy, medium, hard, steps, courses, coursesTotal:bc.length,
-      nodes, phases, paths, streak:streak(), bestStreak:Math.max(this.bestStreak(), streak()), xp, level, parts,
+      nodes, phases, paths, built, projectsTotal:PJ.list.length, streak:streak(), bestStreak:Math.max(this.bestStreak(), streak()), xp, level, parts,
       next:this.xpFor(level+1), cur:this.xpFor(level)};
   },
   ready:false,
@@ -315,7 +321,7 @@ function placeJourney(root){
       <text class="k" x="${pt.x}" y="${pt.y+ty-14}" text-anchor="middle">STAGE ${i}</text><text x="${pt.x}" y="${pt.y+ty}" text-anchor="middle">${esc(META[i].name)}</text>`; });
 }
 function viewHome(el){
-  const nL=Object.keys(D.lessons).length, nQ=Object.keys(D.q).length, nP=PB.list.length||0, nC=PATHS.index.length||0, nS=(BC.courses||[]).reduce((a,c)=>a+c.steps.length,0);
+  const nL=Object.keys(D.lessons).length, nQ=Object.keys(D.q).length, nP=PB.list.length||0, nC=PATHS.index.length||0, nS=(BC.courses||[]).reduce((a,c)=>a+c.steps.length,0), nB=PJ.list.length;
   const g=Game.stats(); const started=g.xp>0;
   const firstCourse=BC.courses?.[0];
   const feats=[
@@ -324,7 +330,7 @@ function viewHome(el){
     {i:"route", t:"Career Paths", d:"roadmap.sh-style roadmaps for every job in software: AI, security, cloud, games, mobile and more. Each one is a phased curriculum with projects.", v:"paths", c:`${nC} careers`},
     {i:"braces", t:"Problems", d:"LeetCode-style challenges judged right in your browser in Python or JavaScript, with hints, editorials and the patterns behind them.", v:"problems", c:`${nP} problems`},
     {i:"refresh", t:"Spaced review", d:"Every question you answer comes back right before you'd forget it, on a 1 → 3 → 7 → 16 → 35-day schedule. Memory that compounds.", v:"review", c:"Leitner system"},
-    {i:"terminal", t:"Playground", d:"Real Python 3.12, JavaScript and SQLite running locally in your browser. No installs, no accounts, nothing to configure.", v:"playground", c:"3 runtimes"}
+    {i:"rocket", t:"Build & Learn", d:"Pick a real project (a to-do app, a game, a bank system, a database) and build it step by step, learning each concept the moment you need it.", v:"build", c:`${nB} guided projects`}
   ];
   const featured=(PATHS.index||[]).slice(0,8);
   el.innerHTML = `
@@ -334,7 +340,7 @@ function viewHome(el){
     <div style="display:grid;gap:22px;align-content:center">
       <span class="badge-line"><b>FREE</b> Everything runs in your browser. No sign-up, no paywall.</span>
       <h1>From your first line of code to <span class="gt">world-class engineer.</span></h1>
-      <p class="lede">CodeLearner is one place to learn programming end to end: an interactive bootcamp for total beginners, a 10,000-hour core curriculum, career roadmaps for every specialty and a problem judge to sharpen your skills. Built on the science of how people actually learn.</p>
+      <p class="lede">CodeLearner, the free coding school from CodeBay, is one place to learn programming end to end: an interactive bootcamp for total beginners, guided projects you build step by step, a 10,000-hour core curriculum, career roadmaps for every specialty and a problem judge to sharpen your skills. Built on the science of how people actually learn.</p>
       <div class="row" style="gap:12px">
         ${started?`<button class="btn grad lg" data-act="today">${icon("dash")}Continue learning</button>`:`<button class="btn grad lg" ${firstCourse?`data-course="${firstCourse.id}"`:`data-act="bootcamp"`}>${icon("play")}Start from zero</button>`}
         <button class="btn lg" data-act="paths">${icon("route")}Choose a career</button>
@@ -345,7 +351,7 @@ function viewHome(el){
     <div class="term rv"><div class="tb"><i></i><i></i><i></i><span id="termf">hello.py</span></div><pre id="termp"></pre></div>
   </section>
   <section class="counters">
-    ${[[nL,"core lessons"],[nQ,"quiz questions"],[nP,"judged problems"],[nC,"career roadmaps"],[nS,"bootcamp steps"]].map(([n,t])=>`<div class="counter rv"><b class="gt" data-count="${n}">0</b><span>${t}</span></div>`).join("")}
+    ${[[nL,"core lessons"],[nQ,"quiz questions"],[nP,"judged problems"],[nC,"career roadmaps"],[nS,"bootcamp steps"],[nB,"guided projects"]].map(([n,t])=>`<div class="counter rv"><b class="gt" data-count="${n}">0</b><span>${t}</span></div>`).join("")}
   </section>
   <section style="display:grid;gap:18px">
     <div class="sec-h rv"><div class="head"><span class="eyebrow">Everything in one place</span><h2 class="h2">Six ways to level up</h2></div><p class="lede" style="max-width:48ch">The structure of a university degree, the hands-on feel of a bootcamp and the practice volume of an interview grind.</p></div>
@@ -386,7 +392,7 @@ function pathCard(p){
 /* ================= PROFILE ================= */
 function viewProfile(el){
   const s=Game.stats(); const got=BADGES.filter(b=>P.badges?.[b.id]);
-  const parts=[["Core lessons","lessons","book"],["Module exams","exams","lock"],["Projects","projects","rocket"],["Review cards","reviews","refresh"],["Problems","problems","braces"],["Bootcamp","bootcamp","cap"],["Career paths","paths","route"]];
+  const parts=[["Core lessons","lessons","book"],["Module exams","exams","lock"],["Projects","projects","rocket"],["Review cards","reviews","refresh"],["Problems","problems","braces"],["Bootcamp & projects","bootcamp","cap"],["Career paths","paths","route"]];
   const mx=Math.max(1,...Object.values(s.parts));
   el.innerHTML=`<section class="head"><span class="eyebrow">Your profile</span><h1 class="h1">${esc(Game.rank(s.level))}</h1><p class="lede">Every lesson, exam, problem and roadmap topic earns XP. Level up by learning, not by grinding: XP is recomputed from your real progress, so it always reflects what you've actually done.</p></section>
   <div class="grid2">

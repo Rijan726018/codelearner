@@ -11,7 +11,7 @@ for (const p of data.problems) {
   if (only && p.id !== only) continue; n++;
   for (const lang of ["py", "js"]) {
     for (const [label, code, wantAll] of [["solution", p.solution[lang], true], ["starter", p.starter[lang], false]]) {
-      const spec = { fn: p.fn?.[lang], cls: p.cls?.[lang], kind: p.kind, cmp: p.cmp, inplace: p.inplace, types: p.types };
+      const spec = { fn: p.fn?.[lang], cls: p.cls?.[lang], kind: p.kind, cmp: p.cmp, inplace: p.inplace, types: p.types, opmap: lang === "js" ? p.jsmap : undefined };
       let out = "", err = "";
       if (lang === "py") {
         const prog = J.PY_PRELUDE + code + J.PY_HARNESS(spec, p.tests);

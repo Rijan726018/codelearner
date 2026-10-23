@@ -7,6 +7,7 @@ sys.setrecursionlimit(10000)
 import builtins
 exec("class ListNode:\n def __init__(self, val=0, next=None):\n  self.val = val\n  self.next = next\nclass TreeNode:\n def __init__(self, val=0, left=None, right=None):\n  self.val = val\n  self.left = left\n  self.right = right", builtins.__dict__)
 from problems_src import P, CATS
+import problems_more  # noqa: F401 (adds more problems to P)
 
 def to_list(a):
     d = ListNode(); c = d
@@ -50,7 +51,7 @@ for p in P:
     rec["params"] = p.get("params", [])
     rec["starter"] = {}
     rec["solution"] = {"py": p["py"], "js": p["js"]}
-    for k in ("cmp","inplace","types","kind","cls"):
+    for k in ("cmp","inplace","types","kind","cls","jsmap"):
         if k in p: rec[k] = p[k]
     if p.get("kind") == "design":
         cls = ns[p["cls"]["py"]]
@@ -65,8 +66,9 @@ for p in P:
         # starter code
         import re
         meths = re.findall(r"    def (\w+)\(self(?:, )?([^)]*)\)", p["py"])
+        meths = [(m, a) for m, a in meths if m == "__init__" or not m.startswith("_")]
         rec["starter"]["py"] = f"class {p['cls']['py']}:\n" + "\n\n".join(f"    def {m}(self{', ' + a if a else ''}):\n        pass" for m, a in meths) + "\n"
-        jm = [(m if m != "get_min" else "getMin", a) for m, a in meths if m != "__init__"]
+        jm = [(p.get("jsmap", {}).get(m, m), a) for m, a in meths if m != "__init__"]
         init = [a for m, a in meths if m == "__init__"][0]
         rec["starter"]["js"] = f"class {p['cls']['js']} {{\n  constructor({init}) {{\n\n  }}\n" + "".join(f"\n  {m}({a}) {{\n\n  }}\n" for m, a in jm) + "}\n"
         rec["fnName"] = {"py": p["cls"]["py"], "js": p["cls"]["js"]}
