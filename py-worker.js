@@ -1,11 +1,14 @@
 /* Runs learner Python in Pyodide, off the main thread.
-   Messages in:  {kind:"warm"} | {id, kind:"python", code, stdin:[lines]}
+   Messages in:  {kind:"warm"} | {id, kind:"python", code, stdin:[lines], files?:{"name.py": source}} (files are importable modules)
    Messages out: {type:"ready"} | {type:"fatal", error} | {id, type:"out", s:"o"|"e", text} | {id, type:"done", ms} */
 let py = null, ready = null, cur = null;
 const LIMIT = 100000; let sent = 0;
 
 const HELPER = `
-import sys, traceback, linecache, asyncio
+import sys, os, traceback, linecache, asyncio, importlib
+
+__PROJ = "/home/pyodide/proj"
+__loaded = set()
 
 __tasks = []
 
@@ -14,7 +17,7 @@ def __tb(e):
     while tb is not None and tb.tb_frame.f_code.co_filename != "main.py":
         tb = tb.tb_next
     te = traceback.TracebackException(type(e), e, tb)
-    te.stack = traceback.StackSummary.from_list([f for f in te.stack if f.filename == "main.py"])
+    te.stack = traceback.StackSummary.from_list([f for f in te.stack if f.filename == "main.py" or f.filename.startswith(__PROJ)])
     sys.stderr.write("".join(te.format()))
 
 def __arun(main, *, debug=None):
@@ -29,6 +32,25 @@ async def __drain():
         except BaseException as e:
             __tb(e)
     sys.stdout.flush(); sys.stderr.flush()
+
+def __setfiles(files):
+    # Editor projects: write the other .py files where main.py can import them, and forget old copies of those modules.
+    os.makedirs(__PROJ, exist_ok=True)
+    sys.dont_write_bytecode = True
+    for f in os.listdir(__PROJ):
+        path = os.path.join(__PROJ, f)
+        if os.path.isfile(path):
+            os.remove(path)
+    for name in list(__loaded) + [n[:-3] for n in files]:
+        sys.modules.pop(name, None)
+    __loaded.clear()
+    for name, src in files.items():
+        with open(os.path.join(__PROJ, name), "w") as fh:
+            fh.write(src)
+        __loaded.add(name[:-3])
+    if __PROJ not in sys.path:
+        sys.path.insert(0, __PROJ)
+    importlib.invalidate_caches()
 
 def __run(src, lines):
     it = iter(list(lines))
@@ -78,7 +100,7 @@ function boot() {
 }
 
 self.onmessage = async (e) => {
-  const { id, kind, code, stdin } = e.data;
+  const { id, kind, code, stdin, files } = e.data;
   if (kind === "warm") { try { await boot(); } catch (err) { postMessage({ type: "fatal", error: String(err && err.message || err) }); } return; }
   cur = id; sent = 0;
   try { await boot(); }
@@ -87,7 +109,8 @@ self.onmessage = async (e) => {
   py.setStdout({ raw: o.raw }); py.setStderr({ raw: er.raw });
   const t0 = performance.now();
   try {
-    { const lines = py.toPy(stdin || []); py.globals.get("__run")(code, lines); lines.destroy(); await py.runPythonAsync("await __drain()"); }
+    { const fs = py.toPy(files || {}); py.globals.get("__setfiles")(fs); fs.destroy();
+      const lines = py.toPy(stdin || []); py.globals.get("__run")(code, lines); lines.destroy(); await py.runPythonAsync("await __drain()"); }
   } catch (err) { er.flush(); postMessage({ id, type: "out", s: "e", text: String(err && err.message || err) + "\n" }); }
   o.flush(); er.flush();
   postMessage({ id, type: "done", ms: Math.round(performance.now() - t0) });

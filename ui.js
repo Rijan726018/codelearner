@@ -76,6 +76,7 @@ const ICONS = {
   heart:'<path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z"/>',
   wifi:'<path d="M2 8.8a15 15 0 0 1 20 0M5 12.6a10 10 0 0 1 14 0M8.5 16.4a5 5 0 0 1 7 0M12 20h.01"/>',
   pen:'<path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
   users:'<circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M16 3.1a4 4 0 0 1 0 7.8M22 21a7 7 0 0 0-4-6.3"/>',
   vr:'<path d="M3 8h18v8h-6l-1.5-2.5a1.7 1.7 0 0 0-3 0L9 16H3z"/>',
   menu:'<path d="M4 6h16M4 12h16M4 18h16"/>'
@@ -133,10 +134,10 @@ new MutationObserver(()=>UI.scan(document.getElementById("main"))).observe(docum
 /* ---------- navigation ---------- */
 const NAV = [
   {v:"today", t:"Today", i:"dash"}, {v:"map", t:"Learn", i:"map"},
-  {v:"paths", t:"Paths", i:"route"}, {v:"problems", t:"Problems", i:"braces"}, {v:"bootcamp", t:"Bootcamp", i:"cap"}, {v:"build", t:"Build", i:"rocket"},
+  {v:"paths", t:"Paths", i:"route"}, {v:"problems", t:"Problems", i:"braces"}, {v:"bootcamp", t:"Bootcamp", i:"cap"}, {v:"build", t:"Build", i:"rocket"}, {v:"editor", t:"Editor", i:"terminal"},
   {v:"review", t:"Review", i:"refresh", badge:true}
 ];
-const NAV_MORE = [{v:"home", t:"Home", i:"home"}, {v:"practice", t:"Practice by level", i:"target"}, {v:"projects", t:"Projects", i:"rocket"}, {v:"playground", t:"Playground", i:"terminal"}, {v:"method", t:"The Method", i:"book"}, {v:"profile", t:"Profile & badges", i:"award"}];
+const NAV_MORE = [{v:"home", t:"Home", i:"home"}, {v:"practice", t:"Practice by level", i:"target"}, {v:"projects", t:"Projects", i:"rocket"}, {v:"clock", t:"Practice clock", i:"clock"}, {v:"method", t:"The Method", i:"book"}, {v:"profile", t:"Profile & badges", i:"award"}];
 UI.buildNav = () => {
   document.getElementById("tabs").innerHTML = NAV.map(n=>`<button type="button" data-v="${n.v}">${icon(n.i)}<span>${n.t}</span>${n.badge?`<span class="badge" id="duebadge" hidden>0</span>`:""}</button>`).join("");
   const r=document.querySelector(".top-r"); const m=document.createElement("div"); m.className="more";
@@ -154,16 +155,17 @@ UI.buildNav = () => {
 /* Icon-only tabs when the labels don't fit beside the logo and controls (desktop widths only; phones scroll the tab row). */
 UI.fitNav = () => {
   const t=document.getElementById("tabs"), top=document.querySelector(".top-in"); if(!t||!top) return;
-  t.classList.remove("compact"); top.classList.remove("tight");
+  t.classList.remove("compact"); top.classList.remove("tight","snug");
   const over=()=>innerWidth>980 && t.scrollWidth>t.clientWidth+1;
-  if(over()) top.classList.add("tight");   // first drop the "Search" label, then the tab labels
+  if(over()) top.classList.add("tight");   // first drop the "Search", "Sign in" and XP labels,
+  if(over()) top.classList.add("snug");    // then the streak chip and some tab padding, and only then the tab labels
   if(over()) t.classList.add("compact");
 };
 UI.syncNav = tabV => {
   document.querySelectorAll("#tabs [data-v], #moreMenu [data-v]").forEach(b=>b.setAttribute("aria-current", b.dataset.v===tabV?"page":"false"));
   const g=Game.stats(); const sc=document.getElementById("streakChip"), xc=document.getElementById("xpChip");
   if(sc) sc.innerHTML=`${icon("flame","sm")}${g.streak}`;
-  if(xc) xc.innerHTML=`<span class="lv">Lv ${g.level}</span>${g.xp.toLocaleString()} XP`;
+  if(xc) xc.innerHTML=`<span class="lv">Lv ${g.level}</span><span class="xpn">${g.xp.toLocaleString()} XP</span>`;
   UI.fitNav();
 };
 
@@ -194,7 +196,11 @@ const BADGES = [
   {id:"phase-1", n:"Phase Clear", d:"Complete a full phase of a career path", i:"layers", t:s=>s.phases>=1},
   {id:"path-1", n:"Job Ready", d:"Complete an entire career path", i:"brief", t:s=>s.paths>=1},
   {id:"cards-50", n:"Memory Palace", d:"Get 50 review cards past the first box", i:"refresh", t:s=>s.strongCards>=50},
-  {id:"level-10", n:"Double Digits", d:"Reach level 10", i:"star", t:s=>s.level>=10}
+  {id:"level-10", n:"Double Digits", d:"Reach level 10", i:"star", t:s=>s.level>=10},
+  {id:"hours-1", n:"Clocked In", d:"Practise for 1 hour in total", i:"clock", t:s=>s.hours>=1},
+  {id:"hours-10", n:"Ten Hours", d:"Practise for 10 hours in total", i:"clock", t:s=>s.hours>=10},
+  {id:"hours-100", n:"Century", d:"Practise for 100 hours in total", i:"clock", t:s=>s.hours>=100},
+  {id:"hours-1000", n:"Thousand-Hour Club", d:"Practise for 1,000 hours in total", i:"mountain", t:s=>s.hours>=1000}
 ];
 const Game = {
   xpFor:n=>50*n*(n-1),
@@ -218,7 +224,7 @@ const Game = {
     const parts={lessons:lessons*XPV.lesson, exams:exams*XPV.exam, projects:ms*XPV.milestone, reviews:strongCards*XPV.card, problems:pxp, bootcamp:steps*XPV.step, paths:nodes*XPV.node};
     const xp=Object.values(parts).reduce((a,b)=>a+b,0), level=this.levelOf(xp);
     return {lessons, lessonsTotal:Object.keys(D.lessons).length, exams, examsTotal:D.mods.length, ms, strongCards, solved, easy, medium, hard, steps, courses, coursesTotal:bc.length,
-      nodes, phases, paths, built, projectsTotal:PJ.list.length, streak:streak(), bestStreak:Math.max(this.bestStreak(), streak()), xp, level, parts,
+      nodes, phases, paths, built, projectsTotal:PJ.list.length, hours:typeof Clock!=="undefined"?Clock.stats().hours:0, streak:streak(), bestStreak:Math.max(this.bestStreak(), streak()), xp, level, parts,
       next:this.xpFor(level+1), cur:this.xpFor(level)};
   },
   ready:false,
@@ -325,12 +331,15 @@ function viewHome(el){
   const g=Game.stats(); const started=g.xp>0;
   const firstCourse=BC.courses?.[0];
   const feats=[
-    {i:"cap", t:"Bootcamp", d:"Never coded before? Start here. Bite-sized steps, a live editor and instant checks, freeCodeCamp-style. Build a web page, write Python and JavaScript, query a database.", v:"bootcamp", c:`${nS} interactive steps`},
+    {i:"cap", t:"Bootcamp", d:"Never coded before? Start here. Bite-sized steps, a live editor and instant checks, freeCodeCamp-style, in tracks for the web, Python, JavaScript, SQL and computer science.", v:"bootcamp", c:`${(BC.courses||[]).length} courses · ${nS} steps`},
     {i:"map", t:"The 10,000-Hour Map", d:"A 9-stage core curriculum from your first program to distributed systems. Daily lessons with visuals, runnable examples and spaced-repetition quizzes.", v:"map", c:`${nL} lessons · ${nQ.toLocaleString()} questions`},
     {i:"route", t:"Career Paths", d:"roadmap.sh-style roadmaps for every job in software: AI, security, cloud, games, mobile and more. Each one is a phased curriculum with projects.", v:"paths", c:`${nC} careers`},
     {i:"braces", t:"Problems", d:"LeetCode-style challenges judged right in your browser in Python or JavaScript, with hints, editorials and the patterns behind them.", v:"problems", c:`${nP} problems`},
     {i:"refresh", t:"Spaced review", d:"Every question you answer comes back right before you'd forget it, on a 1 → 3 → 7 → 16 → 35-day schedule. Memory that compounds.", v:"review", c:"Leitner system"},
-    {i:"rocket", t:"Build & Learn", d:"Pick a real project (a to-do app, a game, a bank system, a database) and build it step by step, learning each concept the moment you need it.", v:"build", c:`${nB} guided projects`}
+    {i:"rocket", t:"Build & Learn", d:"Pick a real project (a to-do app, a game, a bank system, a database) and build it step by step, learning each concept the moment you need it.", v:"build", c:`${nB} guided projects`},
+    {i:"terminal", t:"Editor", d:"Your own multi-file projects in Python, JavaScript, SQL or HTML/CSS/JS with a live preview. Saves as you type, and syncs to your account when you sign in.", v:"editor", c:"Python · JS · SQL · web"},
+    {i:"clock", t:"Practice clock", d:"Counts your active practice time and the hours you log from elsewhere, so you can watch your progress toward 10,000 hours, with a daily goal and a projected finish date.", v:"clock", c:"Toward 10,000 hours"},
+    {i:"award", t:"XP, levels & badges", d:"Every lesson, problem, step and hour adds up. XP is recomputed from what you've really done, so it can't be gamed, and badges mark the milestones.", v:"profile", c:`${BADGES.length} badges`}
   ];
   const featured=(PATHS.index||[]).slice(0,8);
   el.innerHTML = `
@@ -354,7 +363,7 @@ function viewHome(el){
     ${[[nL,"core lessons"],[nQ,"quiz questions"],[nP,"judged problems"],[nC,"career roadmaps"],[nS,"bootcamp steps"],[nB,"guided projects"]].map(([n,t])=>`<div class="counter rv"><b class="gt" data-count="${n}">0</b><span>${t}</span></div>`).join("")}
   </section>
   <section style="display:grid;gap:18px">
-    <div class="sec-h rv"><div class="head"><span class="eyebrow">Everything in one place</span><h2 class="h2">Six ways to level up</h2></div><p class="lede" style="max-width:48ch">The structure of a university degree, the hands-on feel of a bootcamp and the practice volume of an interview grind.</p></div>
+    <div class="sec-h rv"><div class="head"><span class="eyebrow">Everything in one place</span><h2 class="h2">Nine ways to level up</h2></div><p class="lede" style="max-width:48ch">The structure of a university degree, the hands-on feel of a bootcamp and the practice volume of an interview grind.</p></div>
     <div class="feat">${feats.map(f=>`<button type="button" class="fcard glow rv" data-act="${f.v}"><span class="fi">${icon(f.i,"lg")}</span><h3>${f.t}</h3><p>${f.d}</p><span class="row" style="justify-content:space-between"><span class="pill acc">${f.c}</span><span class="go">Open ${icon("arrow","sm")}</span></span></button>`).join("")}</div>
   </section>
   <section style="display:grid;gap:18px">
@@ -397,15 +406,17 @@ function viewProfile(el){
   el.innerHTML=`<section class="head"><span class="eyebrow">Your profile</span><h1 class="h1">${esc(Game.rank(s.level))}</h1><p class="lede">Every lesson, exam, problem and roadmap topic earns XP. Level up by learning, not by grinding: XP is recomputed from your real progress, so it always reflects what you've actually done.</p></section>
   <div class="grid2">
     <section class="panel"><div class="lvcardx">${Game.ringSVG(s,150)}<div style="display:grid;gap:8px"><b class="h2"><span class="gt">${s.xp.toLocaleString()}</span> XP</b><span class="muted">${(s.next-s.xp).toLocaleString()} XP to level ${s.level+1} · next rank: ${esc(Game.rank(RANKS.find(r=>r[0]>s.level)?.[0]||s.level))}</span><div class="bar"><i style="width:${100*(s.xp-s.cur)/Math.max(1,s.next-s.cur)}%"></i></div>
-      <div class="row" style="gap:6px">${[["flame",`${s.streak}-day streak`],["award",`${got.length}/${BADGES.length} badges`],["braces",`${s.solved} solved`]].map(([i,t])=>`<span class="pill">${icon(i,"sm")}${t}</span>`).join("")}</div></div></div></section>
+      <div class="row" style="gap:6px">${[["flame",`${s.streak}-day streak`],["clock",`${s.hours<10?s.hours.toFixed(1):Math.round(s.hours).toLocaleString()} h practised`],["award",`${got.length}/${BADGES.length} badges`],["braces",`${s.solved} solved`]].map(([i,t])=>`<span class="pill">${icon(i,"sm")}${t}</span>`).join("")}</div></div></div></section>
     <section class="panel"><h2 class="h3">Where your XP comes from</h2><div class="mast">${parts.map(([t,k])=>`<div class="r"><span>${t}</span><span class="t" data-tip="${s.parts[k].toLocaleString()} XP"><i style="width:${100*s.parts[k]/mx}%"></i></span><span class="n">${s.parts[k].toLocaleString()}</span></div>`).join("")}</div>
       <p class="muted" style="margin:0;font-size:.84rem">Lesson ${XPV.lesson} · exam ${XPV.exam} · milestone ${XPV.milestone} · card ${XPV.card} · Easy/Medium/Hard ${XPV.Easy}/${XPV.Medium}/${XPV.Hard} · step ${XPV.step} · roadmap topic ${XPV.node}</p></section>
   </div>
   <section style="display:grid;gap:14px"><div class="sec-h"><h2 class="h2">Badges</h2><span class="pill acc">${got.length} of ${BADGES.length} unlocked</span></div>
     <div class="badges">${BADGES.map(b=>`<div class="bdg ${P.badges?.[b.id]?"got":""}"><span class="md">${icon(b.i,"lg")}</span><b>${esc(b.n)}</b><span>${esc(b.d)}</span>${P.badges?.[b.id]?`<span class="pill ok">${fmtDay(P.badges[b.id])}</span>`:""}</div>`).join("")}</div></section>
   <section class="panel"><h2 class="h3">Ranks</h2><div class="row">${RANKS.map(([n,t])=>`<span class="pill ${s.level>=n?"acc":""}">Lv ${n}+ · ${t}</span>`).join("")}</div></section>
+  ${typeof Account!=="undefined"?Account.panel():""}
   <section class="panel"><h2 class="h3">Back up your progress</h2><p class="muted" style="margin:0">Progress lives in this browser${stores.p?" and your account":""}. Download a backup file, or restore one on another device.</p>
     <div class="row"><button class="btn" id="exp">${icon("download")}Download backup</button><label class="btn ghost" style="cursor:pointer">${icon("upload")}Restore from file<input type="file" id="imp" accept="application/json" hidden></label><span id="impmsg" class="muted" style="font-size:.88rem"></span></div></section>`;
+  if(typeof Account!=="undefined") Account.wire(el);
   el.querySelector("#exp").onclick=()=>{ const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([JSON.stringify({app:"codelearner",v:3,P,S},null,1)],{type:"application/json"})); a.download=`codelearner-backup-${dayKey(today())}.json`; document.body.appendChild(a); a.click(); a.remove(); };
   el.querySelector("#imp").onchange=async e=>{ const f=e.target.files[0]; if(!f) return; try{ const d=JSON.parse(await f.text()); if(d.app!=="codelearner"||!d.P) throw 0; P=normP(d.P); S={cards:d.S?.cards||{}}; save("p"); save("s"); el.querySelector("#impmsg").textContent="Restored."; Game.sync(true); render(); }catch(err){ el.querySelector("#impmsg").textContent="That file isn't a CodeLearner backup."; } };
 }

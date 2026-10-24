@@ -34,13 +34,13 @@ const Runner = (() => {
     k.w.postMessage({kind:"warm"}); return k.w;
   }
   function kill(msg){ if(!active) return; const a=active; active=null; clearTimeout(a.timer); a.kill?.(); a.onOut("e", msg); a.resolve({ms:null, stopped:true}); note(); }
-  function runIn(kind, code, stdin, onOut, limit, onRows){
+  function runIn(kind, code, stdin, onOut, limit, onRows, files){
     const k=W[kind], wk=get(kind); if(!wk){ onOut("e",k.name+" can't run in this browser.\n"); return Promise.resolve({ms:0}); }
     return new Promise(resolve=>{
       const id=++seq;
       active={id, kind, onOut, onRows, resolve, kill:()=>{ k.w.terminate(); k.w=null; k.ready=false; setTimeout(()=>get(kind), 50); }};
       active.timer=setTimeout(()=>kill(`\nStopped after ${limit/1000} s. Check for a loop that never ends.\n`), limit + (k.ready?0:25000));
-      wk.postMessage({id, kind, code, stdin, json:!!onRows}); note();
+      wk.postMessage({id, kind, code, stdin, json:!!onRows, files}); note();
     });
   }
   const JS_HARNESS = `const __post=(s,text)=>postMessage({type:"out",s,text});
@@ -107,7 +107,7 @@ self.fetch=()=>Promise.reject(new TypeError("fetch is blocked in this sandbox. R
     run(lang, code, stdin, onOut, opt={}){
       if(active) kill("\nStopped (a new run started).\n");
       if(lang==="js") return runJS(code, onOut, opt.limit||5000);
-      return runIn(lang==="sql"?"sql":"python", code, stdin, onOut, opt.limit||10000, opt.onRows);
+      return runIn(lang==="sql"?"sql":"python", code, stdin, onOut, opt.limit||10000, opt.onRows, opt.files);
     },
     JS_HARNESS
   };

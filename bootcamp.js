@@ -2,7 +2,7 @@
 /* ---------- Bootcamp courses and Build projects share one step engine: instructions + starter code + automatic checks.
    A step's starter is the previous step's solution, so the learner builds one program from start to finish.
    Projects group their steps into milestones and add a live demo of the finished app. ---------- */
-const BC = {courses:[], byId:{},
+const BC = {courses:[], byId:{}, tracks:[],
   stepIndex(c){ return c.steps.findIndex(s=>!P.steps?.[s.id]); },
   nextStep(){ let best=null; for(const c of this.courses){ const done=c.steps.filter(s=>P.steps?.[s.id]).length; const i=this.stepIndex(c); if(done>0 && i>=0) return {course:c, idx:i, step:c.steps[i]}; if(!best && i>=0) best={course:c, idx:i, step:c.steps[i]}; } return best; }
 };
@@ -12,7 +12,7 @@ const PJ = {list:[], byId:{},
 const linkSteps = c => c.steps.forEach((s,i)=>{ s.starter = s.starter ?? (i ? c.steps[i-1].solution : ""); if(c.seed) s.seed=c.seed; });
 EXTRA_LOADERS.push(async()=>{
   const d=await fetch("data/bootcamp.json").then(r=>r.ok?r.json():null).catch(()=>null); if(!d) return;
-  BC.courses=d.courses; d.courses.forEach(c=>{ BC.byId[c.id]=c; linkSteps(c); });
+  BC.courses=d.courses; BC.tracks=d.tracks||[]; d.courses.forEach(c=>{ BC.byId[c.id]=c; linkSteps(c); });
 });
 EXTRA_LOADERS.push(async()=>{
   const d=await fetch("data/projects.json").then(r=>r.ok?r.json():null).catch(()=>null); if(!d) return;
@@ -25,20 +25,26 @@ SEARCH_SOURCES.push(()=>PJ.list.flatMap(p=>[{t:p.title, sub:`${p.level} · ${LAN
   ...p.steps.map((s,i)=>({t:s.title, sub:`Build: ${p.title} · step ${i+1}`, kind:"Step", i:"rocket", r:{v:"make", id:p.id, step:i}}))]));
 
 const courseDone = c => c.steps.filter(s=>P.steps?.[s.id]).length;
+let bcTrack="all";
 function viewBootcamp(el){
   if(!BC.courses.length){ el.innerHTML=`<div class="empty">The bootcamp didn't load. Reload the page to try again.</div>`; return; }
   const total=BC.courses.reduce((a,c)=>a+c.steps.length,0), done=BC.courses.reduce((a,c)=>a+courseDone(c),0), ns=BC.nextStep();
   el.innerHTML=`<section class="head"><span class="eyebrow">Zero experience required</span><h1 class="h1">The <span class="gt">Bootcamp</span></h1>
     <p class="lede">Learn by doing, one tiny step at a time. Each step explains one idea, asks you to write a few lines, and checks your code instantly. By the end of a course you'll have built something real, entirely in your browser.</p>
     <div class="row">${ns?`<button class="btn grad lg" data-course="${ns.course.id}" data-step="${ns.idx}">${icon("play")}${done?"Continue":"Start"}: ${esc(ns.course.title)}, step ${ns.idx+1}</button>`:`<span class="pill ok">Every course complete. You're a graduate.</span>`}<span class="pill acc">${done} / ${total} steps passed</span></div></section>
-  <div class="grid2">${BC.courses.map((c,i)=>{ const d=courseDone(c), pct=Math.round(100*d/c.steps.length);
+  <div class="chips" role="group" aria-label="Track">${[{id:"all",name:"All tracks"},...BC.tracks].map(t=>`<button type="button" class="chip" data-bct="${t.id}" aria-pressed="${bcTrack===t.id}">${t.icon?icon(t.icon,"sm"):""}${esc(t.name)}</button>`).join("")}</div>
+  ${(BC.tracks.length?BC.tracks:[{id:"all",name:"Courses"}]).filter(t=>bcTrack==="all"||t.id===bcTrack).map(t=>{ const cs=BC.courses.filter(c=>t.id==="all"||c.track===t.id); if(!cs.length) return "";
+    const td=cs.reduce((a,c)=>a+courseDone(c),0), tt=cs.reduce((a,c)=>a+c.steps.length,0);
+    return `<section class="bctrack" style="display:grid;gap:14px"><div class="sec-h"><div class="head"><span class="eyebrow">${cs.length} course${cs.length===1?"":"s"} · ${td} / ${tt} steps</span><h2 class="h2">${esc(t.name)}</h2></div>${t.blurb?`<p class="lede" style="max-width:52ch;margin:0">${esc(t.blurb)}</p>`:""}</div>
+    <div class="grid2">${cs.map(c=>{ const i=BC.courses.indexOf(c), d=courseDone(c), pct=Math.round(100*d/c.steps.length);
     return `<button type="button" class="course rv" style="--h:${esc(c.hue)}" data-course="${c.id}"><div class="art">${esc(c.art)}</div>
-      <div class="row" style="justify-content:space-between"><span class="eyebrow">Course ${i+1} · ${esc(LANGNAME[c.lang]||c.lang)}</span>${d===c.steps.length?`<span class="pill ok">${icon("award","sm")}Completed</span>`:d?`<span class="pill acc">${pct}%</span>`:`<span class="pill">${c.steps.length} steps · ~${esc(c.hours)}</span>`}</div>
+      <div class="row" style="justify-content:space-between"><span class="eyebrow">Course ${i+1} · ${esc(LANGNAME[c.lang]||c.lang)}${c.level?` · ${esc(c.level)}`:""}</span>${d===c.steps.length?`<span class="pill ok">${icon("award","sm")}Completed</span>`:d?`<span class="pill acc">${pct}%</span>`:`<span class="pill">${c.steps.length} steps · ~${esc(c.hours)}</span>`}</div>
       <h3 class="h3" style="font-size:1.35rem">${esc(c.title)}</h3><p class="muted" style="margin:0">${esc(c.desc)}</p>
       <div class="bar"><i style="width:${pct}%;background:var(--h)"></i></div>
-      <span class="muted" style="font-size:.86rem">${icon("rocket","sm")} You'll build: <b style="color:var(--ink)">${esc(c.project)}</b></span></button>`; }).join("")}</div>
+      <span class="muted" style="font-size:.86rem">${icon("rocket","sm")} You'll build: <b style="color:var(--ink)">${esc(c.project)}</b></span></button>`; }).join("")}</div></section>`; }).join("")}
   <section class="panel"><h2 class="h3">How the bootcamp fits the rest of CodeLearner</h2>
     <div class="grid3">${[["cap","1. Bootcamp","Your first 10–20 hours: the syntax and the feeling of making things work."],["rocket","2. Build & Learn","Pick a real project and build it step by step, learning each idea at the moment you need it."],["map","3. Core curriculum","The 10,000-Hour Map: daily lessons, exams and spaced review, from Python basics to distributed systems."]].map(([i,t,d])=>`<div style="display:grid;gap:6px"><span class="row" style="gap:8px;color:var(--accent)">${icon(i)}<b style="color:var(--ink)">${t}</b></span><span class="muted" style="font-size:.92rem">${d}</span></div>`).join("")}</div></section>`;
+  el.querySelectorAll("[data-bct]").forEach(b=>b.onclick=()=>{ bcTrack=b.dataset.bct; render(); });
 }
 function viewCourse(el){
   const c=BC.byId[route.id]; if(!c){ go({v:"bootcamp"}); return; }
@@ -177,7 +183,7 @@ function viewProject(el){
     <p class="lede">${esc(p.tagline)}</p>
     <div class="prose" style="max-width:80ch">${p.desc.map(x=>`<p>${md(x)}</p>`).join("")}</div>
     <div style="display:grid;gap:6px;max-width:520px"><div class="row" style="justify-content:space-between"><span class="eyebrow">Your progress</span><span class="pill acc">${d} / ${p.steps.length} steps · ${pct}%</span></div><div class="bar"><i style="width:${pct}%;background:var(--h)"></i></div></div>
-    <div class="row">${nextI>=0?`<button class="btn grad lg" data-make="${p.id}" data-step="${nextI}">${icon("play")}${d?"Continue building":"Start building"}</button>`:`<span class="pill ok">${icon("award","sm")}Built. Now make it yours with the stretch goals below.</span><button class="btn" data-make="${p.id}" data-step="0">Revisit the steps</button>`}</div>
+    <div class="row">${nextI>=0?`<button class="btn grad lg" data-make="${p.id}" data-step="${nextI}">${icon("play")}${d?"Continue building":"Start building"}</button>`:`<span class="pill ok">${icon("award","sm")}Built. Now make it yours with the stretch goals below.</span><button class="btn" data-make="${p.id}" data-step="0">Revisit the steps</button>`}<button class="btn ghost" data-ws-from="${p.id}">${icon("terminal")}Open in the Editor</button></div>
   </section>
   <div class="grid2" style="align-items:start">
     <section class="panel"><h2 class="h3">${icon("eye")} What you'll build</h2><p style="margin:0">${md(p.final)}</p>
@@ -202,7 +208,7 @@ function viewProject(el){
 function viewMake(el){
   const p=PJ.byId[route.id]; if(!p){ go({v:"build"}); return; }
   stepWorkspace(el, p, {crumbs:`<button data-act="build">Build &amp; Learn</button><span>›</span><button data-project="${p.id}">${esc(p.title)}</button>`, back:"build", backLabel:"Pick your next project",
-    after:`<button class="btn" data-project="${p.id}">See stretch goals</button>`, done:`You built <b>${esc(p.title)}</b> from an empty file. Open the project page for stretch goals and how to publish it.`});
+    after:`<button class="btn" data-project="${p.id}">See stretch goals</button><button class="btn" data-ws-from="${p.id}">${icon("terminal")}Keep building in the Editor</button>`, done:`You built <b>${esc(p.title)}</b> from an empty file. Open the project page for stretch goals and how to publish it.`});
 }
 document.addEventListener("click",e=>{ const t=e.target.closest("[data-make]"); if(!t||t.getAttribute("aria-disabled")==="true") return; go({v:"make", id:t.dataset.make, ...(t.dataset.step!=null?{step:+t.dataset.step}:{})}); });
 VIEWS.bootcamp=viewBootcamp; VIEWS.course=viewCourse; VIEWS.build=viewBuild; VIEWS.project=viewProject; VIEWS.make=viewMake;
