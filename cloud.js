@@ -62,7 +62,7 @@ const Account = (() => {
   async function signIn(){
     if(!provider || busy) return; busy = true; error = ""; fillMenu();
     try{ await provider.signIn(); }
-    catch(e){ error = e?.code === "auth/popup-closed-by-user" || e?.code === "auth/cancelled-popup-request" ? "" : e?.code === "auth/unauthorized-domain" ? "Sign-in isn't enabled for this web address yet." : "Sign-in didn't finish. Please try again."; }
+    catch(e){ console.warn("Sign-in failed:", e?.code || e); error = e?.code === "auth/popup-closed-by-user" || e?.code === "auth/cancelled-popup-request" ? "" : e?.code === "auth/unauthorized-domain" ? "Sign-in isn't enabled for this web address yet." : "Sign-in didn't finish. Please try again."; }
     busy = false; fillMenu();
   }
   async function signOut(){
