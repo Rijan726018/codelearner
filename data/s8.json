@@ -120,6 +120,10 @@
       "title": "Richard Hamming: You and Your Research",
       "url": "https://www.cs.virginia.edu/~robins/YouAndYourResearch.html"
      },
+     "video": {
+      "id": "a1zDuOPkMSw",
+      "title": "Richard Hamming, \"You and Your Research\" (1995)"
+     },
      "why": "Skill applied to unimportant problems produces unimportant results. Deliberately choosing important, tractable problems is what separates great careers from good ones.",
      "terms": [
       {
@@ -259,6 +263,10 @@
       "title": "Malte Ubl: Design Docs at Google",
       "url": "https://www.industrialempathy.com/posts/design-docs-at-google/"
      },
+     "video": {
+      "id": "XS5avLncLMo",
+      "title": "Design Doc: Forgotten Art of Thinking Before Building"
+     },
      "why": "A design doc finds flaws while they're cheap: an hour of review instead of a month of rework. It's also how senior engineers align teams without meetings.",
      "terms": [
       {
@@ -392,6 +400,10 @@
      "resource": {
       "title": "Tanya Reilly: Being Glue",
       "url": "https://noidea.dog/glue"
+     },
+     "video": {
+      "id": "KClAPipnKqw",
+      "title": "Technical leadership and glue work - Tanya Reilly"
      },
      "why": "Senior engineers rarely have authority over the people they need. Influence through credibility, relationships and clarity is how cross-team change happens.",
      "terms": [
@@ -530,6 +542,10 @@
      "resource": {
       "title": "Open Source Guides: Best practices for maintainers",
       "url": "https://opensource.guide/best-practices/"
+     },
+     "video": {
+      "id": "JMzNiE0sdKo",
+      "title": "Open Source Thursdays: Maintaining an Open Source Project"
      },
      "why": "Code others depend on is a promise. Versioning, deprecation and security handling protect your users and keep maintenance sustainable.",
      "terms": [
@@ -679,6 +695,10 @@
      "resource": {
       "title": "Joel Spolsky: Evidence Based Scheduling",
       "url": "https://www.joelonsoftware.com/2007/10/26/evidence-based-scheduling/"
+     },
+     "video": {
+      "id": "OS6gzabM0pI",
+      "title": "Why Software Estimations Are Always Wrong (Dave Farley)"
      },
      "why": "Large projects fail from unmanaged risk more than from slow coding. Honest estimates and retiring the biggest risk first keep them on track.",
      "terms": [
@@ -935,6 +955,10 @@
       "title": "Greg Wilson: Teaching Tech Together",
       "url": "https://teachtogether.tech/"
      },
+     "video": {
+      "id": "lkHNv3_Nw3U",
+      "title": "Mentoring Junior Developers Into Productive Team Members - Daniel Mallott"
+     },
      "why": "Teaching multiplies your impact and deepens your own understanding. Adapting to the learner's level is what makes it work.",
      "terms": [
       {
@@ -1069,6 +1093,10 @@
       "title": "Paul Graham: How to Write Usefully",
       "url": "https://paulgraham.com/useful.html"
      },
+     "video": {
+      "id": "vtIzMaLkCaM",
+      "title": "The Craft of Writing Effectively - Larry McEnerney, University of Chicago"
+     },
      "why": "Good work that nobody hears about has limited impact. Clear writing and talks spread your ideas and open doors.",
      "terms": [
       {
@@ -1185,6 +1213,10 @@
       "title": "MIT 18.05: Introduction to Probability and Statistics",
       "url": "https://ocw.mit.edu/courses/18-05-introduction-to-probability-and-statistics-spring-2014/"
      },
+     "video": {
+      "id": "IMHneaMO-dg",
+      "title": "How to become a \"T-shaped\" software engineer"
+     },
      "why": "Many breakthroughs come from importing ideas across fields. A deliberate adjacent field, learned by building, extends what you can do.",
      "terms": [
       {
@@ -1300,6 +1332,10 @@
      "resource": {
       "title": "Dan Luu: 95%-ile isn't that good",
       "url": "https://danluu.com/p95-skill/"
+     },
+     "video": {
+      "id": "cUrXRHYK6Ws",
+      "title": "How to go from novice to expert with deliberate practice (Peak, book summary)"
      },
      "why": "Years of experience don't guarantee improvement. Once a skill is automatic, only deliberate practice with honest feedback moves it further.",
      "terms": [
@@ -1435,6 +1471,10 @@
      "resource": {
       "title": "Peter Norvig: Teach Yourself Programming in Ten Years",
       "url": "https://norvig.com/21-days.html"
+     },
+     "video": {
+      "id": "DFjTD8v7xuw",
+      "title": "Be Rare & Valuable: So Good They Can't Ignore You (Cal Newport)"
      },
      "why": "The next five years are roughly another 10,000 hours. A plan with directions, bets and review points makes those hours compound instead of drift.",
      "terms": [
