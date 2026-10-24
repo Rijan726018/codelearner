@@ -6,7 +6,7 @@ Learn to code from your first line to world-class engineering, in one place, ent
 |---|---|---|
 | **Bootcamp** | freeCodeCamp | 17 step-by-step courses, 198 auto-checked steps, in five tracks. **Web foundations:** *Build Your First Web Page*, *CSS Layout Lab*, *Accessible HTML*, *JavaScript & the DOM*. **Python:** *Python from Zero*, *Python Strings & Text*, *Python Functions in Depth*, *Python Data & Objects*, *Python Errors & Testing*. **JavaScript:** *JavaScript from Zero*, *JavaScript Array Methods*, *Regular Expressions*, *Async JavaScript*. **Data & SQL:** *SQL from Zero*, *SQL Analytics*, *SQL Data Modeling*. **Computer science:** *Algorithms with Python* |
 | **Build & Learn** | project tutorials | 19 guided projects, 148 checked steps grouped into milestones: pick a project (a to-do app, calculator, quiz game, expense tracker, focus timer, memory game, habit tracker, Hangman, text adventure, text analyzer, bank system, maze solver, tic-tac-toe AI, Markdown converter, shopping cart, library database, music streaming analytics and more), see the finished thing running, then build it one step at a time with the concept, an example, the task, checks, hints and links to the matching core lessons |
-| **Learn: the 10,000-Hour Map** | university curricula | 9 stages, 215 daily lessons and 1,171 questions, from Base Camp to distributed systems, with module exams, test-outs and spaced repetition |
+| **Learn: the 10,000-Hour Map** | university curricula | 9 stages, 215 daily lessons and 1,171 questions, from Base Camp to distributed systems, with module exams, test-outs and spaced repetition. Each lesson runs in a research-backed order: a warm-up guess, the reading with key terms, a hand-picked short video (188 lessons) followed by a recall prompt, a worked example you predict before running, common mistakes, a try-it task, explain it back, questions answered with a confidence rating, and key takeaways |
 | **Career Paths** | roadmap.sh | 26 phased roadmaps (468 topics) for Frontend, Backend, Full-Stack, Design, AI, ML, Data Science/Engineering/Analysis, Security, DevOps, Cloud, SRE, iOS, Android, Games, Systems, Embedded, Robotics, Blockchain, Graphics/XR, Quantum, QA, Databases and Architecture, plus a path-finder quiz |
 | **Problems** | LeetCode | 144 problems across 15 patterns, judged in the browser in Python or JavaScript against hidden tests, with hints, pattern guides and editorials |
 
@@ -14,6 +14,7 @@ Around them:
 - **Editor**: your own multi-file projects in Python (with importable modules), JavaScript, SQL or HTML/CSS/JS with a live preview and console. It autosaves, downloads files, and any Build & Learn project can be copied in to keep building.
 - **Practice clock**: counts active practice time per section and time you log by hand. It shows your hours toward 10,000, a daily goal, a year heatmap and a projected finish date.
 - **Sign in with Google**: progress, review cards, practice hours and editor projects sync to your account (see [Accounts and cloud sync](#accounts-and-cloud-sync)).
+- **Confidence ratings**: every answer is checked with *Guessing*, *Fairly sure* or *Certain*. Confident misses are flagged, lucky guesses come back tomorrow instead of moving up a box, and your profile shows how often each rating is right. The Method page explains the research behind each lesson step, with sources.
 - A dashboard with "continue" cards and a problem of the day, plus XP, levels, ranks and 28 badges.
 - A Ctrl/⌘ K search across everything, light and dark themes, and backup/restore of progress.
 
@@ -84,10 +85,11 @@ python3 tools/build_bootcamp.py && python3 tools/build_projects.py
 node tools/check_bootcamp.mjs                                         # Python/JS steps of courses and projects
 python3 -m http.server 8765 & NODE_PATH=$(npm root -g) node tools/check_in_browser.cjs   # HTML, web-app and SQL steps, in Chromium
 python3 tools/build_paths.py                                         # validates ids, icons, links and core-module references
+python3 tools/merge_lessons.py                                       # merges lesson videos and why/terms/mistakes/takeaways into data/sN.json
 python3 tools/validate.py data/s*.json                               # core curriculum schema
 ```
 
-Core curriculum content follows `tools/SCHEMA.md`.
+Core curriculum content follows `tools/SCHEMA.md`. Each lesson's videos are listed in `tools/lesson_videos.tsv` and its why/terms/mistakes/takeaways live in `tools/lesson_extra/sN.py`; edit those, then run `merge_lessons.py`. Videos load only when played, from youtube-nocookie.com.
 
 ## Third-party code
 

@@ -102,7 +102,45 @@
      "resource": {
       "title": "CS50x Week 6: Python",
       "url": "https://cs50.harvard.edu/x/weeks/6/"
-     }
+     },
+     "video": {
+      "id": "YYXdXT2l-Gg",
+      "title": "Python Tutorial for Beginners 1: Install and Setup for Mac and Windows (Corey Schafer)"
+     },
+     "why": "Running a file and reading its output is the loop every program you ever write goes through. Getting comfortable with it on day one makes everything else faster.",
+     "terms": [
+      {
+       "t": "Function",
+       "d": "A named action you call with parentheses, such as `print()`."
+      },
+      {
+       "t": "Argument",
+       "d": "A value you pass into a function call: `\"Hello\"` in `print(\"Hello\")`."
+      },
+      {
+       "t": "String",
+       "d": "Text inside quotes. Python needs both the opening and closing quote."
+      },
+      {
+       "t": "Comment",
+       "d": "A line starting with `#` that Python ignores and humans read."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "`print(\"a\", \"b\")` prints `ab`.",
+       "right": "Separate arguments are joined with one space by default, so it prints `a b`. Use `sep=\"\"` to remove it."
+      },
+      {
+       "wrong": "A missing quote only breaks the line it's on.",
+       "right": "Python checks the whole file's grammar first, so a `SyntaxError` stops every line from running."
+      }
+     ],
+     "takeaways": [
+      "Python runs a saved file from top to bottom with `python3 file.py`.",
+      "`print` joins arguments with spaces and ends with a newline; `sep=` and `end=` change both.",
+      "Comments explain why, not what the code already says."
+     ]
     },
     {
      "id": "s1m1l2",
@@ -210,7 +248,45 @@
      "resource": {
       "title": "Automate the Boring Stuff, Ch. 1: Python Basics",
       "url": "https://automatetheboringstuff.com/2e/chapter1/"
-     }
+     },
+     "video": {
+      "id": "KrAldCnF2oM",
+      "title": "Python Tutorial: Basic Data Types - Integer, Float, String, Boolean, NoneType"
+     },
+     "why": "Most beginner crashes are type mix-ups. Knowing the type of every value tells you which operations are allowed before you run the code.",
+     "terms": [
+      {
+       "t": "Type",
+       "d": "The kind of a value (`int`, `float`, `str`, `bool`), which decides what you can do with it."
+      },
+      {
+       "t": "Concatenation",
+       "d": "Joining strings with `+`: `\"3\" + \"4\"` is `\"34\"`."
+      },
+      {
+       "t": "Conversion",
+       "d": "Calling a type's name as a function, such as `int(\"42\")` or `str(99)`."
+      },
+      {
+       "t": "`TypeError`",
+       "d": "The error you get when an operation doesn't fit the types, like `\"3\" + 4`."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "`int(3.9)` rounds to 4.",
+       "right": "`int()` chops off the decimal part, so it gives `3`. Use `round()` to round."
+      },
+      {
+       "wrong": "`\"42\"` is a number because it's made of digits.",
+       "right": "The quotes make it a string. Convert it with `int(\"42\")` before doing maths."
+      }
+     ],
+     "takeaways": [
+      "Every value has a type, and `type()` tells you which.",
+      "`+` adds numbers but glues strings; mixing the two is a `TypeError`.",
+      "Everything users type and files contain arrives as text, so you convert constantly."
+     ]
     },
     {
      "id": "s1m1l3",
@@ -331,7 +407,45 @@
      "resource": {
       "title": "Python docs: the input() function",
       "url": "https://docs.python.org/3/library/functions.html#input"
-     }
+     },
+     "video": {
+      "id": "8T14Q1LDDwk",
+      "title": "Input & Type Conversion - Python for Beginners"
+     },
+     "why": "Variables let a program remember and update things, and `input()` lets it react to a person. Together they turn a script into a tool.",
+     "terms": [
+      {
+       "t": "Variable",
+       "d": "A name that refers to a value, set with `=`."
+      },
+      {
+       "t": "Assignment",
+       "d": "`=` means: work out the right side, then attach the name on the left to the result."
+      },
+      {
+       "t": "snake_case",
+       "d": "Python's naming style: lowercase words joined by underscores, like `monthly_rent`."
+      },
+      {
+       "t": "`input()`",
+       "d": "Shows a prompt, waits for a line of typing, and returns it as a string."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "`age = input(\"Age? \")` gives me a number if the user types 42.",
+       "right": "`input()` always returns a string. Wrap it: `int(input(\"Age? \"))`."
+      },
+      {
+       "wrong": "If I change `price`, a `total` I computed from it earlier updates too.",
+       "right": "A variable stores a value, not a formula. `total` keeps the old result until you recompute it."
+      }
+     ],
+     "takeaways": [
+      "`=` is assignment, not equality: the right side is evaluated first.",
+      "Good names like `tip_percent` are free documentation; don't reuse built-in names like `input`.",
+      "Convert `input()` before doing arithmetic with it."
+     ]
     },
     {
      "id": "s1m1l4",
@@ -443,7 +557,45 @@
      "resource": {
       "title": "Python tutorial: Using Python as a Calculator",
       "url": "https://docs.python.org/3/tutorial/introduction.html#using-python-as-a-calculator"
-     }
+     },
+     "video": {
+      "id": "khKv-8q7YmY",
+      "title": "Python Tutorial for Beginners 3: Integers and Floats - Working with Numeric Data (Corey Schafer)"
+     },
+     "why": "Arithmetic shows up everywhere: prices, times, sizes, indexes. Choosing the right division operator and respecting precedence avoids silent wrong answers.",
+     "terms": [
+      {
+       "t": "Floor division `//`",
+       "d": "Divide, then round down to a whole number: `17 // 5` is `3`."
+      },
+      {
+       "t": "Modulo `%`",
+       "d": "The remainder after division: `17 % 5` is `2`."
+      },
+      {
+       "t": "Precedence",
+       "d": "The order operators run in: `**`, then `* / // %`, then `+ -`."
+      },
+      {
+       "t": "Augmented assignment",
+       "d": "Shorthand like `total += 5` for `total = total + 5`."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "`6 / 2` gives `3`.",
+       "right": "`/` always returns a float, so it gives `3.0`. Use `//` when you want a whole number."
+      },
+      {
+       "wrong": "`a + b + c / 3` computes the average of three numbers.",
+       "right": "Division runs first, so only `c` is divided. Write `(a + b + c) / 3`."
+      }
+     ],
+     "takeaways": [
+      "`//` and `%` work as a pair: quotient and remainder.",
+      "When in doubt about order, add parentheses.",
+      "`0.1 + 0.2` isn't exactly `0.3`; round for display."
+     ]
     },
     {
      "id": "s1m1l5",
@@ -548,7 +700,45 @@
      "resource": {
       "title": "Automate the Boring Stuff, Ch. 6: Manipulating Strings",
       "url": "https://automatetheboringstuff.com/2e/chapter6/"
-     }
+     },
+     "video": {
+      "id": "k9TUPpGqYTo",
+      "title": "Python Tutorial for Beginners 2: Strings - Working with Textual Data (Corey Schafer)"
+     },
+     "why": "Almost every program cleans, slices or formats text. Indexing, string methods and f-strings are the tools you'll reach for daily.",
+     "terms": [
+      {
+       "t": "Index",
+       "d": "A character's position, starting at 0. `word[-1]` is the last character."
+      },
+      {
+       "t": "Method",
+       "d": "A function attached to a value, called with a dot: `name.strip()`."
+      },
+      {
+       "t": "Immutable",
+       "d": "Can't be changed in place. String methods return a new string."
+      },
+      {
+       "t": "Format spec",
+       "d": "The part after `:` in an f-string, such as `{total:.2f}` for two decimals."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "`name.upper()` on its own line makes `name` uppercase.",
+       "right": "Strings are immutable, so the result is thrown away. Write `name = name.upper()`."
+      },
+      {
+       "wrong": "The last character of `word` is `word[len(word)]`.",
+       "right": "Indexes start at 0, so the last is `word[len(word) - 1]`, or simply `word[-1]`."
+      }
+     ],
+     "takeaways": [
+      "Indexes start at 0, and negative indexes count from the end.",
+      "Methods like `.strip()` and `.lower()` return new strings; keep the result.",
+      "f-strings with format specs are the cleanest way to build output."
+     ]
     }
    ],
    "project": {
@@ -764,7 +954,45 @@
      "resource": {
       "title": "Python docs: truth value testing",
       "url": "https://docs.python.org/3/library/stdtypes.html#truth-value-testing"
-     }
+     },
+     "video": {
+      "id": "DZwmZ8Usvnk",
+      "title": "Python Tutorial for Beginners 6: Conditionals and Booleans - If, Else, and Elif Statements (Corey Schafer)"
+     },
+     "why": "Every decision a program makes comes down to a boolean. Writing conditions that say exactly what you mean prevents the subtle bugs that only show up on edge cases.",
+     "terms": [
+      {
+       "t": "Boolean",
+       "d": "One of two values: `True` or `False`."
+      },
+      {
+       "t": "Comparison operator",
+       "d": "`==`, `!=`, `<`, `>`, `<=`, `>=`, which produce booleans."
+      },
+      {
+       "t": "Short-circuiting",
+       "d": "`and` stops at the first false side; `or` stops at the first true side."
+      },
+      {
+       "t": "Truthiness",
+       "d": "`0`, `0.0`, `\"\"` and `None` count as false; nearly everything else as true."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "`if age = 18:` checks whether age is 18.",
+       "right": "`=` assigns. Comparison is `==`, so write `if age == 18:`."
+      },
+      {
+       "wrong": "`a or b and c` is read left to right as `(a or b) and c`.",
+       "right": "`and` binds tighter, so it means `a or (b and c)`. Add parentheses whenever you mix them."
+      }
+     ],
+     "takeaways": [
+      "`==` asks a question; `=` gives a name.",
+      "Combine conditions with `and`, `or`, `not`, and chain comparisons like `0 <= age <= 120`.",
+      "Short-circuiting lets you write safe checks like `count > 0 and total / count > 10`."
+     ]
     },
     {
      "id": "s1m2l2",
@@ -880,7 +1108,45 @@
      "resource": {
       "title": "Python tutorial: if statements",
       "url": "https://docs.python.org/3/tutorial/controlflow.html#if-statements"
-     }
+     },
+     "video": {
+      "id": "yZ5LdU7EsqM",
+      "title": "Conditional Statements in Python (if/else/elif)"
+     },
+     "why": "Branching is how programs respond differently to different inputs. Getting the order and structure of a chain right is the difference between correct and almost-correct logic.",
+     "terms": [
+      {
+       "t": "Block",
+       "d": "The indented lines under a colon that run together."
+      },
+      {
+       "t": "`elif`",
+       "d": "Short for else if: another condition tested only if the earlier ones were false."
+      },
+      {
+       "t": "Mutually exclusive",
+       "d": "Outcomes where exactly one can apply, like letter grades."
+      },
+      {
+       "t": "Indentation",
+       "d": "In Python, the structure itself: four spaces mark what belongs to a block."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "In an `if/elif` chain, every true condition runs its block.",
+       "right": "Only the first true condition runs, then the rest are skipped. Put the most specific check first."
+      },
+      {
+       "wrong": "A chain and several separate `if`s do the same thing.",
+       "right": "Separate `if`s are each tested, so several can run. Use them for independent checks."
+      }
+     ],
+     "takeaways": [
+      "Indentation is structure in Python; let the editor manage it.",
+      "An `if/elif/else` chain runs exactly one branch, so order matters.",
+      "Use separate `if`s for checks that can both be true."
+     ]
     },
     {
      "id": "s1m2l3",
@@ -1043,7 +1309,45 @@
      "resource": {
       "title": "Automate the Boring Stuff, Ch. 2: Flow Control",
       "url": "https://automatetheboringstuff.com/2e/chapter2/"
-     }
+     },
+     "video": {
+      "id": "_Izc-544tS4",
+      "title": "While Loop, Break - Python for Beginners"
+     },
+     "why": "Some tasks repeat an unknown number of times: retrying input, searching, simulating. A `while` loop with a correct update handles them without freezing your program.",
+     "terms": [
+      {
+       "t": "`while` loop",
+       "d": "Repeats its block as long as its condition is true."
+      },
+      {
+       "t": "Update",
+       "d": "The step inside the loop that moves the condition toward false."
+      },
+      {
+       "t": "Infinite loop",
+       "d": "A loop whose condition never becomes false. Stop it with Ctrl+C."
+      },
+      {
+       "t": "`break` / `continue`",
+       "d": "Leave the loop now / skip to the next check."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Python stops a `while` loop as soon as the condition becomes false mid-block.",
+       "right": "The condition is only checked at the top of each pass, so the rest of the block still runs."
+      },
+      {
+       "wrong": "A loop that never ends is a Python bug.",
+       "right": "It's almost always a missing or wrong update. Check that something in the block changes the condition."
+      }
+     ],
+     "takeaways": [
+      "Every `while` loop needs setup, a condition, and an update.",
+      "Use `while` when you don't know the count; use `for` when you do.",
+      "`while True` with one clear `break` is a readable input pattern."
+     ]
     },
     {
      "id": "s1m2l4",
@@ -1216,7 +1520,45 @@
      "resource": {
       "title": "Python tutorial: the range() function",
       "url": "https://docs.python.org/3/tutorial/controlflow.html#the-range-function"
-     }
+     },
+     "video": {
+      "id": "6iF8Xb7Z3wQ",
+      "title": "Python Tutorial for Beginners 7: Loops and Iterations - For/While Loops (Corey Schafer)"
+     },
+     "why": "Walking through a sequence is the most common loop there is. `for` and `range()` do it without counters to manage, which removes a whole category of bugs.",
+     "terms": [
+      {
+       "t": "Loop variable",
+       "d": "The name that takes each item in turn, like `ch` in `for ch in word:`."
+      },
+      {
+       "t": "`range(start, stop, step)`",
+       "d": "A sequence of integers from start up to, but not including, stop."
+      },
+      {
+       "t": "Off-by-one error",
+       "d": "A loop that runs one time too many or too few."
+      },
+      {
+       "t": "Step",
+       "d": "The third `range` argument; negative steps count down."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "`range(1, 5)` includes 5.",
+       "right": "The stop value is excluded, so it gives 1, 2, 3, 4. `range(n)` always runs exactly n times."
+      },
+      {
+       "wrong": "`range(5, 0)` counts down from 5.",
+       "right": "Without a negative step it's empty. Write `range(5, 0, -1)`."
+      }
+     ],
+     "takeaways": [
+      "`for` takes items one at a time with no update to forget.",
+      "`range` starts at 0 by default and stops before the stop value.",
+      "When unsure, print `list(range(...))` and look."
+     ]
     },
     {
      "id": "s1m2l5",
@@ -1382,7 +1724,45 @@
      "resource": {
       "title": "Exercism Python track (practice exercises)",
       "url": "https://exercism.org/tracks/python"
-     }
+     },
+     "video": {
+      "id": "9Z_vxBDDyos",
+      "title": "Beginner Python Tutorial: Nested Loops"
+     },
+     "why": "Most loops are one of four patterns. Recognising them means you only decide the start value, the update and the report, instead of inventing each loop from scratch.",
+     "terms": [
+      {
+       "t": "Accumulate",
+       "d": "Start a total before the loop and add to it inside."
+      },
+      {
+       "t": "Count",
+       "d": "Start at 0 and add 1 whenever an item matches."
+      },
+      {
+       "t": "Search",
+       "d": "Set a flag, set it true and `break` when the target is found."
+      },
+      {
+       "t": "Nested loop",
+       "d": "A loop inside a loop; the inner one runs fully for each outer pass."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Putting `total = 0` as the first line inside the loop is fine.",
+       "right": "It resets the total on every pass, so you only get the last value. Setup goes before the loop."
+      },
+      {
+       "wrong": "An outer loop of 3 and an inner loop of 4 run 7 times.",
+       "right": "The inner loop runs completely for each outer pass: 3 × 4 = 12 times."
+      }
+     ],
+     "takeaways": [
+      "Accumulate, count, max/min and search cover most loops you'll write.",
+      "Setup before the loop, update inside, report after.",
+      "Nested loops multiply, so they get slow fast."
+     ]
     }
    ],
    "project": {
@@ -1615,7 +1995,45 @@
      "resource": {
       "title": "Automate the Boring Stuff, Ch. 3: Functions",
       "url": "https://automatetheboringstuff.com/2e/chapter3/"
-     }
+     },
+     "video": {
+      "id": "9Os0o3wzS_I",
+      "title": "Python Tutorial for Beginners 8: Functions (Corey Schafer)"
+     },
+     "why": "Functions are how you stop repeating yourself and start naming ideas. Every larger program is built out of them.",
+     "terms": [
+      {
+       "t": "Function definition",
+       "d": "`def name():` plus an indented body. Defining doesn't run it."
+      },
+      {
+       "t": "Call",
+       "d": "Writing `name()` to run the body."
+      },
+      {
+       "t": "Parameter",
+       "d": "The name in the definition that receives a value, like `name` in `def greet(name):`."
+      },
+      {
+       "t": "Argument",
+       "d": "The value passed at the call, like `\"Ada\"` in `greet(\"Ada\")`."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Writing `def` runs the function's code.",
+       "right": "`def` only teaches Python the name. The body runs each time you call it."
+      },
+      {
+       "wrong": "Parameters and arguments are the same thing.",
+       "right": "The parameter is the placeholder in the definition; the argument is the actual value at a call."
+      }
+     ],
+     "takeaways": [
+      "Define once, call many times.",
+      "After the body finishes, Python returns to the exact spot of the call.",
+      "Copy-pasted a block twice? Make it a function."
+     ]
     },
     {
      "id": "s1m3l2",
@@ -1737,7 +2155,45 @@
      "resource": {
       "title": "Python tutorial: defining functions",
       "url": "https://docs.python.org/3/tutorial/controlflow.html#defining-functions"
-     }
+     },
+     "video": {
+      "id": "al3ChgHDmVE",
+      "title": "Print vs Return - Python (What's the Difference?)"
+     },
+     "why": "Functions that return values can be combined, stored and tested. Confusing `print` with `return` is the most common reason a beginner's function 'works' but can't be used.",
+     "terms": [
+      {
+       "t": "`return`",
+       "d": "Sends a value back to the caller and ends the function."
+      },
+      {
+       "t": "`None`",
+       "d": "The value a function returns when it has no `return`."
+      },
+      {
+       "t": "Default argument",
+       "d": "A parameter value used when the caller omits it: `percent=15`."
+      },
+      {
+       "t": "Keyword argument",
+       "d": "An argument passed by name, such as `tip(bill=40, percent=20)`."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "A function that prints its answer has given me the answer.",
+       "right": "`print` only shows text. The call still evaluates to `None`, so `double(4) + 1` crashes."
+      },
+      {
+       "wrong": "Lines after `return` still run.",
+       "right": "`return` ends the function immediately on that path."
+      }
+     ],
+     "takeaways": [
+      "`print` is for humans; `return` is for the program.",
+      "A call expression becomes the returned value.",
+      "Take inputs as parameters, return a result: easiest to test and reuse."
+     ]
     },
     {
      "id": "s1m3l3",
@@ -1868,7 +2324,45 @@
      "resource": {
       "title": "Python Tutor: step through code and see each frame",
       "url": "https://pythontutor.com/"
-     }
+     },
+     "video": {
+      "id": "4_ZpPjfdQpI",
+      "title": "Variable Scope: the LEGB rule, global and nonlocal"
+     },
+     "why": "Knowing where a name lives explains a whole family of confusing bugs and pushes you toward functions that are easy to test.",
+     "terms": [
+      {
+       "t": "Local variable",
+       "d": "Created inside a function; exists only during that call."
+      },
+      {
+       "t": "Global variable",
+       "d": "Created at the top level of the file."
+      },
+      {
+       "t": "`UnboundLocalError`",
+       "d": "Raised when a function assigns to a name and reads it before the assignment."
+      },
+      {
+       "t": "Scope",
+       "d": "The region of code where a name refers to a particular variable."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Assigning to `x` inside a function changes the global `x`.",
+       "right": "Assignment makes `x` local to the function; the global is untouched."
+      },
+      {
+       "wrong": "`global count` is the right fix for `UnboundLocalError`.",
+       "right": "It works but hides dependencies. Pass the value in and return the new one instead."
+      }
+     ],
+     "takeaways": [
+      "Assigning to a name anywhere in a function makes it local throughout that function.",
+      "Every call gets fresh local variables.",
+      "Pass data in as arguments and send results out with `return`."
+     ]
     },
     {
      "id": "s1m3l4",
@@ -1974,7 +2468,45 @@
      "resource": {
       "title": "CS50x Week 6: Python",
       "url": "https://cs50.harvard.edu/x/weeks/6/"
-     }
+     },
+     "video": {
+      "id": "YSozY8AmTSY",
+      "title": "Mastering Programming Part 1: Decomposing Simple Tasks"
+     },
+     "why": "Real programs are too big to write in one go. Decomposition lets you solve one small, clear problem at a time and still end up with the whole.",
+     "terms": [
+      {
+       "t": "Decomposition",
+       "d": "Splitting a problem into small functions that each do one job."
+      },
+      {
+       "t": "Wishful thinking",
+       "d": "Writing `main()` first, calling functions you haven't written yet."
+      },
+      {
+       "t": "Stub",
+       "d": "A placeholder function that returns a fixed value so the program can run early."
+      },
+      {
+       "t": "Contract",
+       "d": "What a function takes, what it returns, and no hidden side effects."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "I should write the whole program top to bottom, then run it.",
+       "right": "Write `main()` with stubs, run it, and fill in one function at a time, running after each."
+      },
+      {
+       "wrong": "Mixing `input()` into calculation functions saves time.",
+       "right": "It makes the logic impossible to test. Keep input/output separate from logic."
+      }
+     ],
+     "takeaways": [
+      "Describe the program in 3–6 steps and turn each into a function.",
+      "If a function isn't obviously 15 lines or so, split it again.",
+      "Separate logic from input/output, and start everything from `main()`."
+     ]
     },
     {
      "id": "s1m3l5",
@@ -2072,7 +2604,45 @@
      "resource": {
       "title": "PEP 257: Docstring Conventions",
       "url": "https://peps.python.org/pep-0257/"
-     }
+     },
+     "video": {
+      "id": "jjUgWvNxHys",
+      "title": "Starting With Python's assert Statement"
+     },
+     "why": "Tests catch bugs minutes after you write them instead of weeks later, and docstrings tell callers how to use a function without reading it.",
+     "terms": [
+      {
+       "t": "Docstring",
+       "d": "A string on the first line of a function body describing what it does; `help()` shows it."
+      },
+      {
+       "t": "`assert`",
+       "d": "Does nothing if true; raises `AssertionError` if false."
+      },
+      {
+       "t": "Edge case",
+       "d": "An input at the boundary: zero, empty, negative, the exact cut-off."
+      },
+      {
+       "t": "Test function",
+       "d": "A `test_` function grouping asserts for one piece of code."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "If my program runs without errors, it's correct.",
+       "right": "Running isn't checking. Asserts compare actual results with expected ones."
+      },
+      {
+       "wrong": "`assert 0.1 + 0.2 == 0.3` is a fine float test.",
+       "right": "It fails because of binary floats. Compare with `round()` or `abs(a - b) < 1e-9`."
+      }
+     ],
+     "takeaways": [
+      "Write docstrings for the caller, not the implementer.",
+      "Test normal cases and edge cases; silence means all asserts passed.",
+      "Writing tests before the function forces you to pin down the requirements."
+     ]
     }
    ],
    "project": {
@@ -2364,7 +2934,45 @@
      "resource": {
       "title": "Automate the Boring Stuff, Ch. 4: Lists",
       "url": "https://automatetheboringstuff.com/2e/chapter4/"
-     }
+     },
+     "video": {
+      "id": "W8KRzm-HUcc",
+      "title": "Python Tutorial for Beginners 4: Lists, Tuples, and Sets (Corey Schafer)"
+     },
+     "why": "Real programs handle many values at once: scores, names, rows, events. Lists are the first and most-used way to keep them in order.",
+     "terms": [
+      {
+       "t": "List",
+       "d": "An ordered, changeable collection in square brackets: `[88, 92, 75]`."
+      },
+      {
+       "t": "Mutable",
+       "d": "Can be changed in place, as with `scores[1] = 95`."
+      },
+      {
+       "t": "`append()`",
+       "d": "Adds one item to the end of a list."
+      },
+      {
+       "t": "`enumerate()`",
+       "d": "Gives index and value together: `for i, x in enumerate(xs):`."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "`scores = scores.append(60)` adds 60 and keeps the list.",
+       "right": "`append` changes the list in place and returns `None`, so this replaces your list with `None`. Just call `scores.append(60)`."
+      },
+      {
+       "wrong": "I need `range(len(scores))` to loop over a list.",
+       "right": "`for score in scores:` visits each item directly. Use `enumerate` if you also need the index."
+      }
+     ],
+     "takeaways": [
+      "Lists keep items in order and are indexed from 0.",
+      "Build lists by starting with `[]` and appending in a loop.",
+      "`in` tests membership; `len`, `sum`, `max` and `min` work on lists."
+     ]
     },
     {
      "id": "s1m4l2",
@@ -2477,7 +3085,45 @@
      "resource": {
       "title": "Python tutorial: More on Lists",
       "url": "https://docs.python.org/3/tutorial/datastructures.html#more-on-lists"
-     }
+     },
+     "video": {
+      "id": "ajrtAuDg3yw",
+      "title": "Python Tutorial: Slicing Lists and Strings (Corey Schafer)"
+     },
+     "why": "Slicing, sorting and splitting are how you reshape data, from taking the top five results to turning a line of text into fields.",
+     "terms": [
+      {
+       "t": "Slice",
+       "d": "`items[start:stop]`: a new piece of the sequence, stop not included."
+      },
+      {
+       "t": "`pop()`",
+       "d": "Removes an item and returns it; the last one by default."
+      },
+      {
+       "t": "`sorted()`",
+       "d": "Returns a new sorted list and leaves the original alone."
+      },
+      {
+       "t": "`split()` / `join()`",
+       "d": "Turn a string into a list of pieces, and a list of strings back into one string."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "`nums = nums.sort()` gives me a sorted list.",
+       "right": "`sort()` sorts in place and returns `None`. Use `nums.sort()` alone, or `nums = sorted(nums)`."
+      },
+      {
+       "wrong": "`items[1:3]` gives three items.",
+       "right": "Stop is excluded, so it gives positions 1 and 2: two items."
+      }
+     ],
+     "takeaways": [
+      "Slices follow the same stop-excluded rule as `range`.",
+      "In-place methods return `None`; `sorted()` returns a new list.",
+      "`split` and `join` convert between strings and lists."
+     ]
     },
     {
      "id": "s1m4l3",
@@ -2627,7 +3273,45 @@
      "resource": {
       "title": "Automate the Boring Stuff, Ch. 5: Dictionaries",
       "url": "https://automatetheboringstuff.com/2e/chapter5/"
-     }
+     },
+     "video": {
+      "id": "daefaLgNkw0",
+      "title": "Python Tutorial for Beginners 5: Dictionaries - Working with Key-Value Pairs (Corey Schafer)"
+     },
+     "why": "Looking things up by name instead of position is everywhere: settings, word counts, user records, JSON from APIs. Dictionaries make those lookups fast and readable.",
+     "terms": [
+      {
+       "t": "Dictionary",
+       "d": "A mapping from unique keys to values: `{\"ana\": 31}`."
+      },
+      {
+       "t": "Key",
+       "d": "The unique, immutable label you look up by, usually a string or number."
+      },
+      {
+       "t": "`get(key, default)`",
+       "d": "Returns the value, or the default instead of raising `KeyError`."
+      },
+      {
+       "t": "Counting pattern",
+       "d": "`counts[w] = counts.get(w, 0) + 1` inside a loop builds a tally."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Reading a missing key returns `None`.",
+       "right": "`d[\"missing\"]` raises `KeyError`. Use `in` to check, or `d.get(key, default)`."
+      },
+      {
+       "wrong": "Assigning to an existing key adds a second entry.",
+       "right": "Keys are unique, so it replaces the old value."
+      }
+     ],
+     "takeaways": [
+      "Ask by key, not position: `ages[\"ben\"]`.",
+      "`.items()` loops over keys and values together.",
+      "The `get` counting pattern tallies anything in one line."
+     ]
     },
     {
      "id": "s1m4l4",
@@ -2746,7 +3430,45 @@
      "resource": {
       "title": "Python tutorial: Tuples and Sequences, Sets",
       "url": "https://docs.python.org/3/tutorial/datastructures.html#tuples-and-sequences"
-     }
+     },
+     "video": {
+      "id": "W8KRzm-HUcc",
+      "title": "Python Tutorial for Beginners 4: Lists, Tuples, and Sets (Corey Schafer)"
+     },
+     "why": "Picking the right collection makes code simpler and faster. A set check on a million items is instant where a list check crawls.",
+     "terms": [
+      {
+       "t": "Tuple",
+       "d": "An immutable, ordered group like `(3, 4)`, often a fixed record."
+      },
+      {
+       "t": "Set",
+       "d": "An unordered collection of unique items with fast `in` checks."
+      },
+      {
+       "t": "Unpacking",
+       "d": "Assigning a tuple's parts to names: `x, y = point`."
+      },
+      {
+       "t": "Hashable",
+       "d": "Immutable enough to be a dict key or set member, like strings, numbers and tuples."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "`{}` creates an empty set.",
+       "right": "`{}` is an empty dict. Write `set()` for an empty set."
+      },
+      {
+       "wrong": "`set(names)` removes duplicates and keeps the original order.",
+       "right": "Sets are unordered. If order matters, use `list(dict.fromkeys(names))`."
+      }
+     ],
+     "takeaways": [
+      "List for ordered items, tuple for fixed records, set for uniqueness, dict for lookup by key.",
+      "A function can return several values as a tuple that you unpack.",
+      "Membership checks in sets and dicts are fast even when they're huge."
+     ]
     },
     {
      "id": "s1m4l5",
@@ -2867,7 +3589,45 @@
      "resource": {
       "title": "Ned Batchelder: Facts and myths about Python names and values",
       "url": "https://nedbatchelder.com/text/names.html"
-     }
+     },
+     "video": {
+      "id": "3dt4OGnU5sM",
+      "title": "Python Tutorial: Comprehensions - How they work and why you should be using them (Corey Schafer)"
+     },
+     "why": "Aliasing bugs, where changing one list mysteriously changes another, are among the most confusing in Python. Understanding references makes them predictable.",
+     "terms": [
+      {
+       "t": "Reference",
+       "d": "A variable refers to an object; it doesn't contain it."
+      },
+      {
+       "t": "Aliasing",
+       "d": "Two names for the same object, so a change through one shows through the other."
+      },
+      {
+       "t": "Shallow copy",
+       "d": "A new outer list whose inner objects are still shared."
+      },
+      {
+       "t": "List comprehension",
+       "d": "Builds a new list in one line: `[n * 2 for n in nums if n > 0]`."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "`b = a` makes a copy of the list.",
+       "right": "It makes `b` a second name for the same list. Use `a.copy()`, `list(a)` or `a[:]`."
+      },
+      {
+       "wrong": "`a.copy()` makes a list of lists fully independent.",
+       "right": "It's shallow: the inner lists are still shared. Copy them too if you'll change them."
+      }
+     ],
+     "takeaways": [
+      "Assignment never copies; it adds another name.",
+      "Functions receive references, so they can change a list you pass in.",
+      "Building a new list with a comprehension avoids most mutation surprises."
+     ]
     }
    ],
    "project": {
@@ -3083,7 +3843,45 @@
      "resource": {
       "title": "Python tutorial: Reading and Writing Files",
       "url": "https://docs.python.org/3/tutorial/inputoutput.html#reading-and-writing-files"
-     }
+     },
+     "video": {
+      "id": "Uh2ebFW8OYM",
+      "title": "Python Tutorial: File Objects - Reading and Writing to Files (Corey Schafer)"
+     },
+     "why": "Programs forget everything when they stop unless they save it. Files are the simplest way to make data last between runs.",
+     "terms": [
+      {
+       "t": "File mode",
+       "d": "`\"r\"` read, `\"w\"` write (wipes the file first), `\"a\"` append."
+      },
+      {
+       "t": "`with open(...)`",
+       "d": "Opens a file and closes it automatically when the block ends."
+      },
+      {
+       "t": "Newline",
+       "d": "Each line read from a file keeps its `\\n`; `strip()` removes it."
+      },
+      {
+       "t": "Current working directory",
+       "d": "Where relative paths are looked up: the folder you ran `python3` from."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Opening a file with `\"w\"` adds to the end.",
+       "right": "`\"w\"` empties the file first. Use `\"a\"` to append."
+      },
+      {
+       "wrong": "A relative path is found relative to the script's folder.",
+       "right": "It's relative to the terminal's working directory. Check `pwd` if you get `FileNotFoundError`."
+      }
+     ],
+     "takeaways": [
+      "Always use `with open(...)` so the file is closed even after an error.",
+      "Loop over a file to read it line by line, and strip each line.",
+      "Know which mode you're in before you run it: `\"w\"` destroys."
+     ]
     },
     {
      "id": "s1m5l2",
@@ -3177,7 +3975,45 @@
      "resource": {
       "title": "Automate the Boring Stuff, Ch. 16: CSV Files and JSON Data",
       "url": "https://automatetheboringstuff.com/2e/chapter16/"
-     }
+     },
+     "video": {
+      "id": "9N6a-VLBa2I",
+      "title": "Python Tutorial: Working with JSON Data using the json Module (Corey Schafer)"
+     },
+     "why": "Structured data moves between programs as JSON and between people as spreadsheets. Reading and writing both correctly is a daily job.",
+     "terms": [
+      {
+       "t": "JSON",
+       "d": "A text format of objects and arrays that maps closely to Python dicts and lists."
+      },
+      {
+       "t": "`json.dump` / `json.load`",
+       "d": "Write Python data to a file as JSON, and read it back."
+      },
+      {
+       "t": "CSV",
+       "d": "Spreadsheet text: one row per line, values separated by commas, usually a header first."
+      },
+      {
+       "t": "`csv.DictReader`",
+       "d": "Reads each CSV row as a dict keyed by the header names."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "JSON keeps my dict's integer keys as integers.",
+       "right": "JSON keys are always strings, so `{1: \"a\"}` loads back as `{\"1\": \"a\"}`."
+      },
+      {
+       "wrong": "I can read CSV with `line.split(\",\")`.",
+       "right": "Quoted values can contain commas. Use the `csv` module, which handles quoting."
+      }
+     ],
+     "takeaways": [
+      "`json` round-trips dicts and lists, with small differences (strings as keys, tuples as lists).",
+      "Use `csv.DictReader` and `csv.writer` instead of splitting by hand.",
+      "Everything read from CSV is a string until you convert it."
+     ]
     },
     {
      "id": "s1m5l3",
@@ -3307,7 +4143,45 @@
      "resource": {
       "title": "Python tutorial: Errors and Exceptions",
       "url": "https://docs.python.org/3/tutorial/errors.html"
-     }
+     },
+     "video": {
+      "id": "NIWwJbo-9_8",
+      "title": "Python Tutorial: Using Try/Except Blocks for Error Handling (Corey Schafer)"
+     },
+     "why": "Real input is messy and files go missing. Handling the errors you expect, and only those, keeps a program running without hiding real bugs.",
+     "terms": [
+      {
+       "t": "Exception",
+       "d": "An error raised while a program runs, such as `ValueError` or `FileNotFoundError`."
+      },
+      {
+       "t": "`try` / `except`",
+       "d": "Attempt a block; if a matching exception is raised, run the handler instead of crashing."
+      },
+      {
+       "t": "`else` / `finally`",
+       "d": "Runs only if nothing was raised / runs no matter what."
+      },
+      {
+       "t": "`raise`",
+       "d": "Signal an error yourself, such as `raise ValueError(\"amount must be positive\")`."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "A bare `except:` around everything makes my program robust.",
+       "right": "It hides typos and real bugs too. Catch the specific exception you expect, around as little code as possible."
+      },
+      {
+       "wrong": "Code after the line that raised still runs inside `try`.",
+       "right": "Python jumps straight to the matching `except`; the rest of the `try` block is skipped."
+      }
+     ],
+     "takeaways": [
+      "Catch specific exceptions and keep `try` blocks small.",
+      "Put success code in `else` and cleanup in `finally`.",
+      "Raise your own errors early to reject bad input."
+     ]
     },
     {
      "id": "s1m5l4",
@@ -3409,7 +4283,45 @@
      "resource": {
       "title": "Automate the Boring Stuff, Ch. 11: Debugging",
       "url": "https://automatetheboringstuff.com/2e/chapter11/"
-     }
+     },
+     "video": {
+      "id": "Qmj5UQRkL4s",
+      "title": "Traceback (most recent call last): Python's tracebacks explained"
+     },
+     "why": "You'll spend more time debugging than writing new code. A repeatable process and the ability to read tracebacks turn hours of frustration into minutes.",
+     "terms": [
+      {
+       "t": "Traceback",
+       "d": "Python's crash report. Read it from the bottom: error type, message, then the failing line."
+      },
+      {
+       "t": "Hypothesis",
+       "d": "A specific guess about the cause, like 'total is a string here'."
+      },
+      {
+       "t": "Debugger",
+       "d": "A tool that pauses the program so you can inspect every variable."
+      },
+      {
+       "t": "Breakpoint",
+       "d": "A marked line where the debugger pauses."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "The top of the traceback is the most important part.",
+       "right": "The bottom line names the error, and the frames just above show where it happened."
+      },
+      {
+       "wrong": "Changing things until the error goes away is debugging.",
+       "right": "Reproduce, read, hypothesise, test. Random changes create new bugs."
+      }
+     ],
+     "takeaways": [
+      "Read tracebacks from the bottom up.",
+      "Debugging is reproduce, read, hypothesise, test, fix.",
+      "`print(repr(x), type(x))` and breakpoints show what's really in a variable."
+     ]
     },
     {
      "id": "s1m5l5",
@@ -3506,7 +4418,45 @@
      "resource": {
       "title": "Python tutorial: Virtual Environments and Packages",
       "url": "https://docs.python.org/3/tutorial/venv.html"
-     }
+     },
+     "video": {
+      "id": "CqvZ3vGoGs0",
+      "title": "Python Tutorial for Beginners 9: Import Modules and Exploring The Standard Library (Corey Schafer)"
+     },
+     "why": "No one writes everything from scratch. Importing modules and installing packages cleanly is how you build on other people's work without breaking your machine.",
+     "terms": [
+      {
+       "t": "Module",
+       "d": "A `.py` file you can import, such as `math` or your own `helpers.py`."
+      },
+      {
+       "t": "Standard library",
+       "d": "The modules that ship with Python: `math`, `random`, `json`, `csv` and more."
+      },
+      {
+       "t": "`if __name__ == \"__main__\":`",
+       "d": "Code here runs when the file is executed directly, not when it's imported."
+      },
+      {
+       "t": "requirements.txt",
+       "d": "A list of a project's pip packages so others can install the same ones."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Importing a file only makes its functions available.",
+       "right": "Importing runs the whole file. Put script code under `if __name__ == \"__main__\":`."
+      },
+      {
+       "wrong": "Naming my file `random.py` is fine.",
+       "right": "It shadows the standard library module, so `import random` loads your file instead."
+      }
+     ],
+     "takeaways": [
+      "Check the standard library before installing anything.",
+      "One virtual environment per project; install with pip inside it.",
+      "Record dependencies with `pip freeze > requirements.txt`."
+     ]
     }
    ],
    "project": {
@@ -3774,7 +4724,45 @@
      "resource": {
       "title": "Python tutorial: A First Look at Classes",
       "url": "https://docs.python.org/3/tutorial/classes.html#a-first-look-at-classes"
-     }
+     },
+     "video": {
+      "id": "ZDa-Z5JzLYM",
+      "title": "Python OOP Tutorial 1: Classes and Instances (Corey Schafer)"
+     },
+     "why": "Classes bundle data with the code that works on it. Most libraries you'll use are built from them, so reading and writing classes is essential.",
+     "terms": [
+      {
+       "t": "Class",
+       "d": "A blueprint describing what a kind of object has and can do."
+      },
+      {
+       "t": "Instance",
+       "d": "One object made from a class, such as `acct = BankAccount(\"Ana\", 100)`."
+      },
+      {
+       "t": "`__init__`",
+       "d": "The method Python calls when creating an instance, to set its starting attributes."
+      },
+      {
+       "t": "`self`",
+       "d": "The instance a method is working on, passed automatically."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "All instances share the attributes set in `__init__`.",
+       "right": "Each instance gets its own `self.balance`. Changing one account doesn't touch another."
+      },
+      {
+       "wrong": "I call methods as `deposit(acct, 50)`.",
+       "right": "Call them on the instance: `acct.deposit(50)`. Python passes `acct` as `self`."
+      }
+     ],
+     "takeaways": [
+      "A class bundles attributes with methods.",
+      "`__init__` sets up each new instance; `self` is that instance.",
+      "Add `__str__` so `print()` shows something useful."
+     ]
     },
     {
      "id": "s1m6l2",
@@ -3872,7 +4860,45 @@
      "resource": {
       "title": "Python docs: dataclasses",
       "url": "https://docs.python.org/3/library/dataclasses.html"
-     }
+     },
+     "video": {
+      "id": "JeznW_7DlB0",
+      "title": "Python Object Oriented Programming (OOP) - For Beginners"
+     },
+     "why": "Using a class where a dict would do adds ceremony; skipping one where rules must hold invites bugs. Knowing which to pick is a design skill.",
+     "terms": [
+      {
+       "t": "Invariant",
+       "d": "A rule that must always be true, like 'the balance never goes negative'."
+      },
+      {
+       "t": "Encapsulation",
+       "d": "Making all changes go through methods so the invariants can't be broken."
+      },
+      {
+       "t": "Plain data",
+       "d": "A dict or list plus functions, fine for simple records."
+      },
+      {
+       "t": "Dataclass",
+       "d": "`@dataclass`: a shortcut for classes that mostly hold data."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Classes are always the more professional choice.",
+       "right": "A dict and a few functions is often clearer. Use a class when data and behaviour belong together."
+      },
+      {
+       "wrong": "A class with only `__init__` and one method is good design.",
+       "right": "That's really a function. A class with no methods is really a dict or dataclass."
+      }
+     ],
+     "takeaways": [
+      "Reach for a class when data and behaviour belong together.",
+      "The strongest reason is protecting invariants through methods.",
+      "Watch for classes that are secretly functions or dicts."
+     ]
     },
     {
      "id": "s1m6l3",
@@ -4032,7 +5058,45 @@
      "resource": {
       "title": "CS50x Week 3: Algorithms (includes recursion)",
       "url": "https://cs50.harvard.edu/x/weeks/3/"
-     }
+     },
+     "video": {
+      "id": "CfvjW3O-P4E",
+      "title": "Recursion, Visually (It's Just a Stack)"
+     },
+     "why": "Recursion is the natural way to handle nested data like folders, trees and JSON, and the call stack it relies on explains how every function call works.",
+     "terms": [
+      {
+       "t": "Recursive function",
+       "d": "A function that calls itself on a smaller version of the problem."
+      },
+      {
+       "t": "Base case",
+       "d": "The smallest input, answered directly without recursing."
+      },
+      {
+       "t": "Stack frame",
+       "d": "One call's private set of local variables, stacked on its caller's."
+      },
+      {
+       "t": "`RecursionError`",
+       "d": "Raised when calls nest past Python's limit of about 1,000 frames."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Each recursive call overwrites the previous call's `n`.",
+       "right": "Every call has its own frame with its own `n`; the caller's waits intact."
+      },
+      {
+       "wrong": "Any function that calls itself will eventually stop.",
+       "right": "Only if each call moves toward a base case that's actually reached."
+      }
+     ],
+     "takeaways": [
+      "Every recursive function needs a base case and a recursive case that shrinks the problem.",
+      "Frames pile up on the way down and unwind on the way back.",
+      "A missing or unreachable base case ends in `RecursionError`."
+     ]
     },
     {
      "id": "s1m6l4",
@@ -4130,7 +5194,45 @@
      "resource": {
       "title": "Composing Programs 1.7: Recursive Functions",
       "url": "https://www.composingprograms.com/pages/17-recursive-functions.html"
-     }
+     },
+     "video": {
+      "id": "kF656IEsnwQ",
+      "title": "Why Recursion Blows Up: Call Stacks, Stack Overflow, and Memoization"
+     },
+     "why": "Choosing between a loop and recursion affects clarity and speed. Spotting exponential recursion early saves you from programs that never finish.",
+     "terms": [
+      {
+       "t": "Iteration",
+       "d": "Repeating with a loop."
+      },
+      {
+       "t": "Recursive data",
+       "d": "Data that contains smaller versions of itself: folders, trees, comment threads."
+      },
+      {
+       "t": "Exponential blow-up",
+       "d": "When calls repeat work so the count roughly doubles each step, as in naive `fib`."
+      },
+      {
+       "t": "Memoization",
+       "d": "Caching results so each subproblem is computed once."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Recursion is always more elegant, so it's always better.",
+       "right": "For straight-line problems a loop is clearer, faster in Python, and can't hit the recursion limit."
+      },
+      {
+       "wrong": "`fib(n - 1) + fib(n - 2)` is fine for `fib(40)`.",
+       "right": "It makes hundreds of millions of calls. Use a loop or memoization."
+      }
+     ],
+     "takeaways": [
+      "Loops suit straight-line problems; recursion suits recursive data.",
+      "Any loop can become recursion and vice versa.",
+      "Repeated subproblems mean exponential time; cache them."
+     ]
     },
     {
      "id": "s1m6l5",
@@ -4237,7 +5339,45 @@
      "resource": {
       "title": "CS50x Final Project guidelines",
       "url": "https://cs50.harvard.edu/x/project/"
-     }
+     },
+     "video": {
+      "id": "AGWyx96lP8U",
+      "title": "How I Plan My Coding Projects - 9 Steps"
+     },
+     "why": "Bigger programs fail from losing track of the whole, not from hard lines. A one-page plan keeps 300 lines manageable and shows you what to build first.",
+     "terms": [
+      {
+       "t": "Must-have features",
+       "d": "The smallest set of features that makes the program useful."
+      },
+      {
+       "t": "Data model",
+       "d": "The shapes of the data your program stores and passes around."
+      },
+      {
+       "t": "Vertical slice",
+       "d": "A thin, runnable feature end to end, like 'add and list transactions'."
+      },
+      {
+       "t": "Build order",
+       "d": "The sequence of slices, each runnable and committed."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Planning is wasted time; I should start coding.",
+       "right": "Ten minutes on `PLAN.md` saves hours of rework when the pieces don't fit."
+      },
+      {
+       "wrong": "I should build each layer fully (all storage, then all logic, then all UI).",
+       "right": "Build thin vertical slices so something runs end to end from the first hour."
+      }
+     ],
+     "takeaways": [
+      "Write the plan before the code: features, data model, files, functions, build order.",
+      "Keep logic separate from input/output and storage.",
+      "Build in runnable slices and commit after each."
+     ]
     }
    ],
    "project": {

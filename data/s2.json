@@ -132,7 +132,45 @@
      "resource": {
       "title": "Big-O Cheat Sheet",
       "url": "https://www.bigocheatsheet.com/"
-     }
+     },
+     "video": {
+      "id": "v4cd1O4zkGw",
+      "title": "Big O Notation (HackerRank, Gayle Laakmann McDowell)"
+     },
+     "why": "Big-O lets you predict whether code will finish before you run it. It's the first question in every interview and every design review about performance.",
+     "terms": [
+      {
+       "t": "Big-O",
+       "d": "How the number of steps grows with input size `n`, ignoring constants."
+      },
+      {
+       "t": "O(log n)",
+       "d": "Steps grow by one each time `n` doubles, as in binary search."
+      },
+      {
+       "t": "O(n log n)",
+       "d": "Typical of good sorting: a little worse than linear."
+      },
+      {
+       "t": "Worst case",
+       "d": "The input that makes the algorithm do the most work; the default meaning of 'complexity'."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "O(n) code is always faster than O(n²) code.",
+       "right": "For small `n`, constants can win. Big-O describes how runtime grows, not the time for one input."
+      },
+      {
+       "wrong": "`3n + 50` is O(3n).",
+       "right": "Constants and lower-order terms are dropped, so it's simply O(n)."
+      }
+     ],
+     "takeaways": [
+      "Read the class from the code's shape: one loop O(n), nested loops O(n²), halving O(log n).",
+      "Doubling `n` doubles O(n) work and quadruples O(n²) work.",
+      "At about 10^7 simple Python steps per second, you can estimate runtime from n."
+     ]
     },
     {
      "id": "s2m1l2",
@@ -250,7 +288,45 @@
      "resource": {
       "title": "Python wiki: TimeComplexity",
       "url": "https://wiki.python.org/moin/TimeComplexity"
-     }
+     },
+     "video": {
+      "id": "2R8_ABfiQcc",
+      "title": "Time Complexity of Nested Loops (Dependent Loops)"
+     },
+     "why": "Real code rarely has two neat nested loops. Counting the innermost line, and knowing which built-ins hide loops, catches the O(n²) code that looks O(n).",
+     "terms": [
+      {
+       "t": "Innermost line",
+       "d": "The statement that runs most often; count its executions as a function of n."
+      },
+      {
+       "t": "Triangular loop",
+       "d": "`for j in range(i)` inside `for i in range(n)`: about n²/2 runs, still O(n²)."
+      },
+      {
+       "t": "Logarithmic loop",
+       "d": "A loop variable that doubles or halves: about log₂ n iterations."
+      },
+      {
+       "t": "Hidden cost",
+       "d": "Built-ins like `x in list`, `pop(0)` and slicing that are O(n) each call."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "A loop that calls `list.pop(0)` once per iteration is O(n).",
+       "right": "Each `pop(0)` shifts every element, so the loop is O(n²). Use `collections.deque`."
+      },
+      {
+       "wrong": "Sequential loops multiply: two loops over n are O(n²).",
+       "right": "Loops one after another add (O(n) + O(n) = O(n)); only nested loops multiply."
+      }
+     ],
+     "takeaways": [
+      "Count how many times the innermost line runs.",
+      "Nested loops multiply, sequential loops add.",
+      "`in` on a list, `pop(0)`, `insert(0, x)` and slices are O(n) each."
+     ]
     },
     {
      "id": "s2m1l3",
@@ -348,7 +424,45 @@
      "resource": {
       "title": "Python docs: sys.getrecursionlimit",
       "url": "https://docs.python.org/3/library/sys.html#sys.getrecursionlimit"
-     }
+     },
+     "video": {
+      "id": "wlumpKWvuys",
+      "title": "Space Complexity Explained"
+     },
+     "why": "Memory is a budget too. Knowing the extra space your code uses, including the recursion stack, prevents crashes and lets you trade memory for speed on purpose.",
+     "terms": [
+      {
+       "t": "Auxiliary space",
+       "d": "Extra memory allocated as n grows, not counting the input."
+      },
+      {
+       "t": "Stack frame",
+       "d": "Memory held by each call that hasn't returned yet."
+      },
+      {
+       "t": "Recursion depth",
+       "d": "How many frames are alive at once; Python's default limit is about 1,000."
+      },
+      {
+       "t": "Time–space trade-off",
+       "d": "Spending memory (like a `seen` set) to save time, or the reverse."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "A recursive function that allocates nothing uses O(1) space.",
+       "right": "Each pending call keeps a frame, so recursing n deep is O(n) space."
+      },
+      {
+       "wrong": "Big integers make a few variables use O(n) space.",
+       "right": "We count variables that grow with n. A fixed number of integer variables is O(1)."
+      }
+     ],
+     "takeaways": [
+      "Count new lists, sets, dicts and recursion depth as n grows.",
+      "Deep recursion costs memory and can hit the recursion limit.",
+      "Choose the trade-off deliberately: a `seen` set turns O(n²) into O(n) for O(n) memory."
+     ]
     },
     {
      "id": "s2m1l4",
@@ -520,7 +634,45 @@
      "resource": {
       "title": "LeetCode 167: Two Sum II",
       "url": "https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/"
-     }
+     },
+     "video": {
+      "id": "PMlYYNrciJ8",
+      "title": "Coding Interview Pattern: Two Pointers"
+     },
+     "why": "Two pointers turns many 'check every pair' problems from O(n²) into one O(n) pass with no extra memory. It's one of the most common interview patterns.",
+     "terms": [
+      {
+       "t": "Opposite-ends pointers",
+       "d": "`l` from the start and `r` from the end, moving inward."
+      },
+      {
+       "t": "Same-direction pointers",
+       "d": "`fast` scans everything while `slow` marks where to write the next kept item."
+      },
+      {
+       "t": "In place",
+       "d": "Changing the array itself instead of building a new one: O(1) extra space."
+      },
+      {
+       "t": "Invariant",
+       "d": "A statement that stays true every step, such as 'no answer lies outside l..r'."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Two pointers works for pair sums on any array.",
+       "right": "The opposite-ends version relies on sorted order to know which pointer to move."
+      },
+      {
+       "wrong": "Moving either pointer is fine when the sum is wrong.",
+       "right": "If the sum is too small, only moving `l` right can increase it; moving `r` would skip valid pairs."
+      }
+     ],
+     "takeaways": [
+      "Each pointer only moves forward, so every element is visited a constant number of times.",
+      "Opposite ends for sorted pair problems and palindromes; same direction for compaction.",
+      "Be able to say why moving a pointer can't skip the answer."
+     ]
     },
     {
      "id": "s2m1l5",
@@ -621,7 +773,45 @@
      "resource": {
       "title": "LeetCode 3: Longest Substring Without Repeating Characters",
       "url": "https://leetcode.com/problems/longest-substring-without-repeating-characters/"
-     }
+     },
+     "video": {
+      "id": "a8GvJ2Ckttk",
+      "title": "Sliding Window Technique Explained - Algorithm Tutorial for Beginners"
+     },
+     "why": "Contiguous-range questions (best streak, longest substring, smallest subarray) come up constantly in data processing and interviews. Sliding a window makes them O(n).",
+     "terms": [
+      {
+       "t": "Window",
+       "d": "A contiguous range `a[l..r]`."
+      },
+      {
+       "t": "Fixed-size window",
+       "d": "Slide by adding the entering element and subtracting the leaving one."
+      },
+      {
+       "t": "Variable-size window",
+       "d": "Grow with `r`, shrink from the left while the rule is broken."
+      },
+      {
+       "t": "Monotonic validity",
+       "d": "If a window is invalid, every larger window containing it is too."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Sliding window works for any subarray-sum problem.",
+       "right": "With negative numbers, shrinking can increase the sum, so validity isn't monotonic. Use prefix sums instead."
+      },
+      {
+       "wrong": "A variable window with an inner `while` loop is O(n²).",
+       "right": "`l` only moves forward, at most n times in total, so the whole thing is O(n)."
+      }
+     ],
+     "takeaways": [
+      "Only contiguous answers fit a window.",
+      "Update the window in O(1) per step instead of recomputing it.",
+      "Check monotonic validity before choosing this pattern."
+     ]
     }
    ],
    "project": {
@@ -836,7 +1026,45 @@
      "resource": {
       "title": "Princeton Algorithms: Hash Tables",
       "url": "https://algs4.cs.princeton.edu/34hash/"
-     }
+     },
+     "video": {
+      "id": "shs0KM3wKv8",
+      "title": "Data Structures: Hash Tables (HackerRank)"
+     },
+     "why": "Dicts and sets are the most-used data structures in Python. Knowing how hashing works explains why they're fast, when they're not, and why keys must be immutable.",
+     "terms": [
+      {
+       "t": "Hash function",
+       "d": "Turns a key into an integer; `hash(key) % capacity` picks a bucket."
+      },
+      {
+       "t": "Collision",
+       "d": "Two keys landing in the same bucket."
+      },
+      {
+       "t": "Load factor",
+       "d": "Items ÷ buckets; past a threshold the table resizes."
+      },
+      {
+       "t": "Amortized O(1)",
+       "d": "Occasional expensive resizes averaged over many cheap inserts."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Hash map lookups are always O(1).",
+       "right": "They're O(1) on average. If many keys collide, a lookup degrades toward O(n)."
+      },
+      {
+       "wrong": "I can use a list as a dict key if I don't change it.",
+       "right": "Lists aren't hashable at all. Use a tuple for compound keys."
+      }
+     ],
+     "takeaways": [
+      "Hashing picks a bucket, so a lookup compares against only a few entries.",
+      "Resizing keeps the load factor low, making inserts amortized O(1).",
+      "Keys must be hashable: immutable values like strings, numbers and tuples."
+     ]
     },
     {
      "id": "s2m2l2",
@@ -1022,7 +1250,45 @@
      "resource": {
       "title": "Python docs: collections.Counter",
       "url": "https://docs.python.org/3/library/collections.html#collections.Counter"
-     }
+     },
+     "video": {
+      "id": "-Q6ySZY6Pvc",
+      "title": "LeetCode 1: Two Sum Visualized"
+     },
+     "why": "'Have I seen this?' and 'how many of each?' replace whole nested loops. These two habits alone fix a large share of slow beginner code.",
+     "terms": [
+      {
+       "t": "Set",
+       "d": "A hash map of keys only, with O(1) average `add` and `in`."
+      },
+      {
+       "t": "Frequency counting",
+       "d": "Mapping each item to how often it appears, by hand or with `Counter`."
+      },
+      {
+       "t": "Complement trick",
+       "d": "Before adding x, check whether `target - x` has already been seen."
+      },
+      {
+       "t": "Prefix sum",
+       "d": "Running total; counting prefix sums finds subarrays with a given sum."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Two Sum needs a nested loop over all pairs.",
+       "right": "One pass with a dict of seen values checks each complement in O(1), so it's O(n)."
+      },
+      {
+       "wrong": "For Two Sum I can add all numbers to the dict first, then look for complements.",
+       "right": "Then `x` can match itself. Check for the complement before inserting `x`."
+      }
+     ],
+     "takeaways": [
+      "Use a set for membership and duplicates.",
+      "`Counter` compares multisets, which makes anagram checks one line.",
+      "The complement trick turns pair searches into one pass."
+     ]
     },
     {
      "id": "s2m2l3",
@@ -1121,7 +1387,45 @@
      "resource": {
       "title": "LeetCode 739: Daily Temperatures",
       "url": "https://leetcode.com/problems/daily-temperatures/"
-     }
+     },
+     "video": {
+      "id": "Dq_ObZwTY_Q",
+      "title": "Monotonic Stack Data Structure Explained"
+     },
+     "why": "Stacks handle anything nested, from brackets to undo history. The monotonic stack answers 'next greater element' questions in one pass that would otherwise be O(n²).",
+     "terms": [
+      {
+       "t": "Stack",
+       "d": "Last in, first out. A Python list with `append` and `pop()`."
+      },
+      {
+       "t": "Nesting",
+       "d": "Structures where the most recent opening is closed first, like brackets."
+      },
+      {
+       "t": "Monotonic stack",
+       "d": "A stack kept sorted; popping reveals each element's next greater or smaller value."
+      },
+      {
+       "t": "Indices on the stack",
+       "d": "Storing positions so you can compute distances and still read values."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Popping in a loop inside a loop makes the monotonic stack O(n²).",
+       "right": "Each index is pushed once and popped at most once, so the total is O(n)."
+      },
+      {
+       "wrong": "Storing values on the stack is enough.",
+       "right": "You often need distances or positions, so store indices and look values up."
+      }
+     ],
+     "takeaways": [
+      "Reach for a stack when the most recent item matters most.",
+      "Decreasing stack finds next greater; increasing finds next smaller.",
+      "Push and pop each element once: O(n)."
+     ]
     },
     {
      "id": "s2m2l4",
@@ -1233,7 +1537,45 @@
      "resource": {
       "title": "Python docs: collections.deque",
       "url": "https://docs.python.org/3/library/collections.html#collections.deque"
-     }
+     },
+     "video": {
+      "id": "wjI1WNcIntg",
+      "title": "Data Structures: Stacks and Queues (HackerRank)"
+     },
+     "why": "Processing things in arrival order is everywhere: BFS, job queues, rate limiters. Using the right structure keeps a queue O(1) per operation instead of O(n).",
+     "terms": [
+      {
+       "t": "Queue",
+       "d": "First in, first out."
+      },
+      {
+       "t": "`deque`",
+       "d": "Double-ended queue with O(1) append and pop at both ends."
+      },
+      {
+       "t": "Bounded buffer",
+       "d": "`deque(maxlen=k)`: keeps the last k items, dropping the oldest."
+      },
+      {
+       "t": "Monotonic deque",
+       "d": "Keeps indices in decreasing value order to track a sliding-window maximum."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "A list with `pop(0)` is a fine queue.",
+       "right": "Each `pop(0)` is O(n), so draining n items is O(n²). Use `deque.popleft()`."
+      },
+      {
+       "wrong": "Sliding-window maximum needs re-scanning each window.",
+       "right": "A monotonic deque gives each window's maximum in amortized O(1)."
+      }
+     ],
+     "takeaways": [
+      "Use `collections.deque` for queues.",
+      "`maxlen` gives you a ring buffer for free.",
+      "Drop items from the back that can never be the maximum again."
+     ]
     },
     {
      "id": "s2m2l5",
@@ -1337,7 +1679,45 @@
      "resource": {
       "title": "LeetCode 206: Reverse Linked List",
       "url": "https://leetcode.com/problems/reverse-linked-list/"
-     }
+     },
+     "video": {
+      "id": "njTh_OwMljA",
+      "title": "Data Structures: Linked Lists (HackerRank)"
+     },
+     "why": "Linked lists teach pointer manipulation, which you'll need for trees, graphs and low-level code, and they're a staple of interviews.",
+     "terms": [
+      {
+       "t": "Singly linked list",
+       "d": "Nodes each holding a value and a `next` reference; the list is a reference to the head."
+      },
+      {
+       "t": "Dummy head",
+       "d": "A placeholder node before the real head that removes special cases."
+      },
+      {
+       "t": "Fast and slow pointers",
+       "d": "One moves one step, the other two; finds the middle and detects cycles."
+      },
+      {
+       "t": "Floyd's algorithm",
+       "d": "Cycle detection where the fast pointer laps the slow one, in O(1) space."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Linked lists are faster than Python lists for everything.",
+       "right": "Indexing a linked list is O(k) from the head. They only win for inserts and deletes next to a node you hold."
+      },
+      {
+       "wrong": "I can set `curr.next = prev` and then move on to `curr.next`.",
+       "right": "That loses the rest of the list. Save `nxt = curr.next` first."
+      }
+     ],
+     "takeaways": [
+      "Save `next` before you overwrite it.",
+      "A dummy head simplifies inserts and deletes at the front.",
+      "Fast and slow pointers find the middle and detect cycles with O(1) space."
+     ]
     }
    ],
    "project": {
@@ -1658,7 +2038,45 @@
      "resource": {
       "title": "Python docs: bisect",
       "url": "https://docs.python.org/3/library/bisect.html"
-     }
+     },
+     "video": {
+      "id": "P3YID7liBug",
+      "title": "Algorithms: Binary Search (HackerRank)"
+     },
+     "why": "Binary search turns a million-item search into 20 comparisons, and its lower-bound form underpins sorted lookups, databases and many harder problems.",
+     "terms": [
+      {
+       "t": "Binary search",
+       "d": "Compare with the middle of a sorted range and discard the half that can't hold the target."
+      },
+      {
+       "t": "Interval convention",
+       "d": "Closed `[lo, hi]` or half-open `[lo, hi)`; pick one and keep it."
+      },
+      {
+       "t": "Lower bound",
+       "d": "The first index whose value is ≥ x, which `bisect_left` returns."
+      },
+      {
+       "t": "Invariant",
+       "d": "What stays true each step, such as 'if present, the target is in [lo, hi]'."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Mixing `while lo < hi` with `hi = mid - 1` is fine.",
+       "right": "Mixing conventions causes off-by-one bugs and infinite loops. Use one convention consistently."
+      },
+      {
+       "wrong": "Binary search works on any list.",
+       "right": "It requires sorted order (or a monotonic condition). On unsorted data it gives wrong answers."
+      }
+     ],
+     "takeaways": [
+      "Each step halves the range: O(log n).",
+      "State the invariant and one interval convention before coding.",
+      "`bisect_right - bisect_left` counts occurrences in a sorted list."
+     ]
     },
     {
      "id": "s2m3l2",
@@ -1759,7 +2177,45 @@
      "resource": {
       "title": "LeetCode 875: Koko Eating Bananas",
       "url": "https://leetcode.com/problems/koko-eating-bananas/"
-     }
+     },
+     "video": {
+      "id": "12Z40cCDAT4",
+      "title": "Koko Eating Bananas - LeetCode 875 - Binary Search on Answer"
+     },
+     "why": "Many optimisation problems have no array to search, but their answers do. Binary searching the answer turns 'find the best value' into a sequence of yes/no checks.",
+     "terms": [
+      {
+       "t": "Answer range",
+       "d": "The bounds `lo` and `hi` that certainly contain the best answer."
+      },
+      {
+       "t": "Feasibility check",
+       "d": "`feasible(v)`: can the task be done with value v? Usually an O(n) greedy pass."
+      },
+      {
+       "t": "Monotonic predicate",
+       "d": "Once feasible becomes true it stays true for larger values."
+      },
+      {
+       "t": "O(n · log R)",
+       "d": "n work per check times log of the answer range R."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Binary search needs a sorted array.",
+       "right": "It needs a monotonic condition. The range of possible answers is sorted by definition."
+      },
+      {
+       "wrong": "I can skip proving monotonicity.",
+       "right": "If feasibility isn't monotonic, the search gives wrong answers. Say in one sentence why larger values also work."
+      }
+     ],
+     "takeaways": [
+      "Bound the answer, write `feasible(v)`, then search for the first true.",
+      "Look for 'minimise the maximum' or 'smallest capacity such that'.",
+      "Always state why the predicate is monotonic."
+     ]
     },
     {
      "id": "s2m3l3",
@@ -1884,7 +2340,45 @@
      "resource": {
       "title": "Princeton Algorithms: Mergesort",
       "url": "https://algs4.cs.princeton.edu/22mergesort/"
-     }
+     },
+     "video": {
+      "id": "KF2j-9iSf4Q",
+      "title": "Algorithms: Merge Sort (HackerRank)"
+     },
+     "why": "Merge sort is the cleanest example of divide and conquer, and reading its recurrence teaches you to analyse any recursive algorithm.",
+     "terms": [
+      {
+       "t": "Divide and conquer",
+       "d": "Split the problem, solve the parts recursively, combine the results."
+      },
+      {
+       "t": "Merge",
+       "d": "Combine two sorted lists in O(n) with two pointers."
+      },
+      {
+       "t": "Stable sort",
+       "d": "Equal elements keep their original order."
+      },
+      {
+       "t": "Recurrence",
+       "d": "T(n) = 2T(n/2) + O(n): two half-size subproblems plus linear combining, giving O(n log n)."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Merge sort is O(n²) on bad inputs, like quicksort.",
+       "right": "It always splits in half, so it's O(n log n) in every case."
+      },
+      {
+       "wrong": "Using `<` or `<=` in the merge makes no difference.",
+       "right": "Taking from the left on ties (`<=`) is what keeps the sort stable."
+      }
+     ],
+     "takeaways": [
+      "Split, sort each half, merge.",
+      "O(n log n) always, at the cost of O(n) extra space.",
+      "Learn the recurrence shapes: 2T(n/2)+O(n) is n log n; T(n/2)+O(1) is log n."
+     ]
     },
     {
      "id": "s2m3l4",
@@ -1985,7 +2479,45 @@
      "resource": {
       "title": "Princeton Algorithms: Quicksort",
       "url": "https://algs4.cs.princeton.edu/23quicksort/"
-     }
+     },
+     "video": {
+      "id": "SLauY6PpjW4",
+      "title": "Algorithms: Quicksort (HackerRank)"
+     },
+     "why": "Quicksort is fast in practice and its partition step is a tool in its own right, giving you the k-th smallest element in linear average time.",
+     "terms": [
+      {
+       "t": "Pivot",
+       "d": "The element the array is partitioned around."
+      },
+      {
+       "t": "Partition",
+       "d": "Rearrange so smaller elements come before the pivot and larger after, in one O(n) pass."
+      },
+      {
+       "t": "Lomuto partition",
+       "d": "Pivot is the last element; `i` marks the end of the smaller region."
+      },
+      {
+       "t": "Quickselect",
+       "d": "Partition, then recurse into only the side holding the k-th element: O(n) average."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Quicksort is O(n log n) in every case.",
+       "right": "Bad pivots (always the smallest or largest) give O(n²). A random pivot makes that vanishingly unlikely."
+      },
+      {
+       "wrong": "Quicksort is stable like merge sort.",
+       "right": "Partition swaps elements across the array, so equal elements can change order."
+      }
+     ],
+     "takeaways": [
+      "Partition is a single in-place pass; after it the pivot is in its final place.",
+      "Use a random pivot to avoid the sorted-input worst case.",
+      "Quickselect finds the k-th element without fully sorting."
+     ]
     },
     {
      "id": "s2m3l5",
@@ -2082,7 +2614,45 @@
      "resource": {
       "title": "Python docs: Sorting Techniques",
       "url": "https://docs.python.org/3/howto/sorting.html"
-     }
+     },
+     "video": {
+      "id": "SzzSwvQfKyk",
+      "title": "Algorithms: Sort An Array with Comparator (HackerRank)"
+     },
+     "why": "Sorting first is often the shortest path to a correct, fast solution. Multi-key sorting with `key=` is also everyday code for reports and leaderboards.",
+     "terms": [
+      {
+       "t": "`sorted()` vs `.sort()`",
+       "d": "New list vs in-place sort that returns `None`."
+      },
+      {
+       "t": "Key function",
+       "d": "Maps each item to what's compared: `key=lambda p: (p.age, p.name)`."
+      },
+      {
+       "t": "Merge intervals",
+       "d": "Sort by start, then extend or start a new interval in one sweep."
+      },
+      {
+       "t": "Counting sort",
+       "d": "For small integer keys, count occurrences instead of comparing: O(n + k)."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "`x = a.sort()` gives me the sorted list.",
+       "right": "`.sort()` returns `None`. Use `sorted(a)` or call `a.sort()` on its own line."
+      },
+      {
+       "wrong": "To sort by age descending then name ascending I need two separate sorts in that order.",
+       "right": "Use a tuple key with a negated number, `key=lambda p: (-p.age, p.name)`, or sort by the secondary key first, relying on stability."
+      }
+     ],
+     "takeaways": [
+      "Sorting puts duplicates together, enables two pointers and makes sweeps possible.",
+      "Tuple keys sort by several fields at once.",
+      "One sort plus one pass is O(n log n)."
+     ]
     }
    ],
    "project": {
@@ -2310,7 +2880,45 @@
      "resource": {
       "title": "LeetCode 94: Binary Tree Inorder Traversal",
       "url": "https://leetcode.com/problems/binary-tree-inorder-traversal/"
-     }
+     },
+     "video": {
+      "id": "6jfKWLGWU34",
+      "title": "Binary Tree Traversal (In order, Pre order, Post order, and level order traversal)"
+     },
+     "why": "Trees are everywhere: file systems, HTML, JSON, ASTs, databases. Most tree problems become short once you see them as 'solve the children, combine at the node'.",
+     "terms": [
+      {
+       "t": "Preorder / inorder / postorder",
+       "d": "Visit the node before, between, or after its children."
+      },
+      {
+       "t": "Level order",
+       "d": "Visit the tree one depth at a time with a queue (BFS)."
+      },
+      {
+       "t": "Height h",
+       "d": "The longest root-to-leaf path; recursion depth and stack size are O(h)."
+      },
+      {
+       "t": "Combine at the node",
+       "d": "Compute the answer from the children's answers, like `1 + max(depth(l), depth(r))`."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "I need a different algorithm for each tree problem.",
+       "right": "Most follow one pattern: define what a call returns for a subtree, handle `None`, combine the children."
+      },
+      {
+       "wrong": "Recursive traversal uses O(1) extra space.",
+       "right": "The call stack holds O(h) frames, up to O(n) for a skewed tree."
+      }
+     ],
+     "takeaways": [
+      "The three DFS orders differ only in when the node itself is visited.",
+      "Define the base case for `None` first.",
+      "Iterative versions replace the call stack with your own stack or queue."
+     ]
     },
     {
      "id": "s2m4l2",
@@ -2408,7 +3016,45 @@
      "resource": {
       "title": "Princeton Algorithms: Binary Search Trees",
       "url": "https://algs4.cs.princeton.edu/32bst/"
-     }
+     },
+     "video": {
+      "id": "oSWTXtMglKE",
+      "title": "Data Structures: Trees (HackerRank)"
+     },
+     "why": "BSTs explain how ordered maps and database indexes keep data searchable and sorted at the same time, and why balance matters.",
+     "terms": [
+      {
+       "t": "BST invariant",
+       "d": "Every value in the left subtree is smaller than the node; every value in the right is larger."
+      },
+      {
+       "t": "O(h)",
+       "d": "Search, insert and delete walk one path, so cost depends on height."
+      },
+      {
+       "t": "Degenerate tree",
+       "d": "Inserting sorted data makes a chain, so h = n."
+      },
+      {
+       "t": "Self-balancing tree",
+       "d": "AVL or red-black trees rotate to keep h = O(log n)."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Checking each node against its two children validates a BST.",
+       "right": "The rule covers whole subtrees. Pass down min and max bounds, or check that inorder is strictly increasing."
+      },
+      {
+       "wrong": "BST operations are always O(log n).",
+       "right": "Only when the tree is balanced. Sorted inserts make it O(n)."
+      }
+     ],
+     "takeaways": [
+      "Inorder traversal of a BST gives sorted order.",
+      "All operations are O(h); balance keeps h at O(log n).",
+      "Validate with bounds passed down from ancestors."
+     ]
     },
     {
      "id": "s2m4l3",
@@ -2506,7 +3152,45 @@
      "resource": {
       "title": "Python docs: heapq",
       "url": "https://docs.python.org/3/library/heapq.html"
-     }
+     },
+     "video": {
+      "id": "t0Cq6tVNRBA",
+      "title": "Data Structures: Heaps (HackerRank)"
+     },
+     "why": "Whenever you need 'the next most urgent thing' (schedulers, Dijkstra, merging streams), a heap gives it to you in O(log n) instead of re-sorting.",
+     "terms": [
+      {
+       "t": "Min-heap",
+       "d": "A complete binary tree where every parent is ≤ its children, so the minimum is at the root."
+      },
+      {
+       "t": "Array layout",
+       "d": "Children of index i live at 2i+1 and 2i+2; no pointers needed."
+      },
+      {
+       "t": "Sift up / sift down",
+       "d": "Swap a new or moved item with its parent or smaller child until the order holds."
+      },
+      {
+       "t": "Heapify",
+       "d": "Turn a list into a heap in O(n)."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "A heap keeps the whole list sorted.",
+       "right": "Only the root is guaranteed to be the minimum; the rest is only partially ordered."
+      },
+      {
+       "wrong": "`heapq` has a max-heap mode.",
+       "right": "It's min-heap only. Push negated values (or `(-priority, item)`) for a max-heap."
+      }
+     ],
+     "takeaways": [
+      "Push and pop are O(log n); peeking at the minimum is O(1).",
+      "Tuples like `(priority, counter, task)` order tasks and break ties.",
+      "`heapify` builds a heap from a list in linear time."
+     ]
     },
     {
      "id": "s2m4l4",
@@ -2617,7 +3301,45 @@
      "resource": {
       "title": "LeetCode 215: Kth Largest Element in an Array",
       "url": "https://leetcode.com/problems/kth-largest-element-in-an-array/"
-     }
+     },
+     "video": {
+      "id": "YPTqKIgVk-k",
+      "title": "Top K Frequent Elements - Bucket Sort - Leetcode 347 (NeetCode)"
+     },
+     "why": "'Top k' questions (best sellers, nearest points, trending tags) come up constantly. Choosing the right method is the difference between O(n log n) and O(n log k).",
+     "terms": [
+      {
+       "t": "Heap of size k",
+       "d": "Keep only the best k so far: O(n log k)."
+      },
+      {
+       "t": "Quickselect",
+       "d": "O(n) average for the k-th element, but mutates the input."
+      },
+      {
+       "t": "Bucket by count",
+       "d": "For top-k frequent, index buckets by frequency for O(n)."
+      },
+      {
+       "t": "Running median",
+       "d": "A max-heap for the lower half and a min-heap for the upper half."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "For the k largest I should keep a max-heap of everything.",
+       "right": "Keep a min-heap of size k; its root is the smallest of the best k, so you know what to evict."
+      },
+      {
+       "wrong": "Two heaps for the median can have any sizes.",
+       "right": "Keep their sizes within one of each other, rebalancing after each insert."
+      }
+     ],
+     "takeaways": [
+      "Sort when n is small and simplicity matters.",
+      "A size-k heap is the general-purpose top-k tool.",
+      "Two balanced heaps give a streaming median in O(log n) per insert."
+     ]
     },
     {
      "id": "s2m4l5",
@@ -2718,7 +3440,45 @@
      "resource": {
       "title": "Princeton Algorithms: Tries",
       "url": "https://algs4.cs.princeton.edu/52trie/"
-     }
+     },
+     "video": {
+      "id": "zIjfhVPRZCg",
+      "title": "Data Structures: Tries (HackerRank)"
+     },
+     "why": "Autocomplete, spell-checkers and routing tables all ask prefix questions. A trie answers them in time proportional to the prefix, not the number of words.",
+     "terms": [
+      {
+       "t": "Trie",
+       "d": "A tree storing strings one character per level, sharing common prefixes."
+      },
+      {
+       "t": "End-of-word flag",
+       "d": "Marks that a complete word ends at a node."
+      },
+      {
+       "t": "Prefix query",
+       "d": "Walk the prefix's characters, then explore below that node."
+      },
+      {
+       "t": "O(L)",
+       "d": "Insert and search cost the length of the word, not the number of words."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Reaching the last character's node means the word is in the trie.",
+       "right": "It may only be a prefix of a longer word. Check the end-of-word flag."
+      },
+      {
+       "wrong": "A trie always uses less memory than a set of strings.",
+       "right": "Each node has its own dict, so a trie can be many times larger. It wins on prefix queries, not space."
+      }
+     ],
+     "takeaways": [
+      "Use a trie when you need prefix queries; use a set for exact lookup.",
+      "Insert and search are O(L).",
+      "Store extra data on nodes (counts, top words) to speed up queries."
+     ]
     }
    ],
    "project": {
@@ -2950,7 +3710,45 @@
      "resource": {
       "title": "Princeton Algorithms: Undirected Graphs",
       "url": "https://algs4.cs.princeton.edu/41graph/"
-     }
+     },
+     "video": {
+      "id": "g7VAuxFeAD0",
+      "title": "Graph Representations Explained: Edge Lists, Adjacency Lists & Adjacency Matrices"
+     },
+     "why": "Maps, networks, dependencies and social connections are graphs. Spotting the graph and choosing a representation is usually the hardest part of the problem.",
+     "terms": [
+      {
+       "t": "Vertex / edge",
+       "d": "The things and the connections between them."
+      },
+      {
+       "t": "Adjacency list",
+       "d": "A dict from each vertex to its neighbours: O(V + E) space."
+      },
+      {
+       "t": "Adjacency matrix",
+       "d": "A V × V grid: O(1) edge checks but O(V²) space."
+      },
+      {
+       "t": "Sparse / dense",
+       "d": "Few edges compared with V² / close to V² edges."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "For an undirected graph, adding `u → v` is enough.",
+       "right": "Add both directions, or traversals will miss half the edges."
+      },
+      {
+       "wrong": "A grid needs to be converted into an adjacency list first.",
+       "right": "Generate neighbours on the fly with direction offsets; the grid already is the graph."
+      }
+     ],
+     "takeaways": [
+      "Default to an adjacency list built with `defaultdict(list)`.",
+      "Use a matrix only for dense graphs or constant-time edge checks.",
+      "Many problems become graphs: states as vertices, moves as edges."
+     ]
     },
     {
      "id": "s2m5l2",
@@ -3051,7 +3849,45 @@
      "resource": {
       "title": "CP-Algorithms: Breadth-first search",
       "url": "https://cp-algorithms.com/graph/breadth-first-search.html"
-     }
+     },
+     "video": {
+      "id": "zaBhtODEL0w",
+      "title": "Algorithms: Graph Search, DFS and BFS (HackerRank)"
+     },
+     "why": "BFS gives shortest paths whenever every step costs the same: mazes, word ladders, fewest moves, degrees of separation.",
+     "terms": [
+      {
+       "t": "BFS",
+       "d": "Explore in rings of distance using a FIFO queue."
+      },
+      {
+       "t": "Shortest path (unweighted)",
+       "d": "The first time BFS reaches a vertex, it has the fewest edges."
+      },
+      {
+       "t": "Parent map",
+       "d": "Record where each vertex was reached from to rebuild the path."
+      },
+      {
+       "t": "Multi-source BFS",
+       "d": "Start with several vertices at distance 0 to find nearest distances in one pass."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Mark vertices visited when I take them off the queue.",
+       "right": "Mark them when you enqueue; otherwise the same vertex can be queued many times."
+      },
+      {
+       "wrong": "BFS finds the cheapest path when edges have weights.",
+       "right": "It minimises edge count only. Weighted graphs need Dijkstra."
+      }
+     ],
+     "takeaways": [
+      "BFS = queue + visited set, O(V + E).",
+      "Mark visited on enqueue.",
+      "Keep a parent map if you need the path, not just its length."
+     ]
     },
     {
      "id": "s2m5l3",
@@ -3149,7 +3985,45 @@
      "resource": {
       "title": "CP-Algorithms: Disjoint Set Union",
       "url": "https://cp-algorithms.com/data_structures/disjoint_set_union.html"
-     }
+     },
+     "video": {
+      "id": "ibjEGG7ylHk",
+      "title": "Union Find Introduction (William Fiset)"
+     },
+     "why": "'Which things are connected?' is a basic question in networks, images and clustering. DFS answers it once; union-find answers it as connections keep arriving.",
+     "terms": [
+      {
+       "t": "DFS",
+       "d": "Go as deep as possible before backtracking, recursively or with a stack."
+      },
+      {
+       "t": "Connected component",
+       "d": "A maximal set of vertices that can all reach each other."
+      },
+      {
+       "t": "Union-find",
+       "d": "Tracks which set each element belongs to, merging sets as edges arrive."
+      },
+      {
+       "t": "Path compression / union by size",
+       "d": "Optimisations that keep union-find operations nearly O(1)."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Recursive DFS is fine on any grid.",
+       "right": "A 100 × 100 all-land grid recurses 10,000 deep and hits Python's limit. Use an explicit stack."
+      },
+      {
+       "wrong": "DFS gives shortest paths too.",
+       "right": "DFS finds reachability, not distances. Use BFS for fewest steps."
+      }
+     ],
+     "takeaways": [
+      "Count components by starting a DFS from each unvisited vertex.",
+      "Use union-find when edges stream in or for cycle detection and Kruskal's MST.",
+      "Path compression and union by size make union-find nearly constant time."
+     ]
     },
     {
      "id": "s2m5l4",
@@ -3250,7 +4124,45 @@
      "resource": {
       "title": "CP-Algorithms: Topological Sorting",
       "url": "https://cp-algorithms.com/graph/topological-sort.html"
-     }
+     },
+     "video": {
+      "id": "ZW3tb6sY5PI",
+      "title": "Topological Sorting Explained: Kahn's Algorithm & DFS"
+     },
+     "why": "Build systems, package managers, course planners and spreadsheets all need to run things in dependency order and detect impossible cycles.",
+     "terms": [
+      {
+       "t": "DAG",
+       "d": "A directed graph with no cycles."
+      },
+      {
+       "t": "Topological order",
+       "d": "A list where every edge u → v has u before v."
+      },
+      {
+       "t": "In-degree",
+       "d": "The number of edges coming into a vertex: its unmet dependencies."
+      },
+      {
+       "t": "Kahn's algorithm",
+       "d": "Repeatedly take vertices with in-degree 0 and decrement their neighbours."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Every graph has a topological order.",
+       "right": "Only DAGs do. If Kahn's output has fewer than V vertices, there's a cycle."
+      },
+      {
+       "wrong": "There's exactly one correct topological order.",
+       "right": "Usually there are many; any order that respects every edge is valid."
+      }
+     ],
+     "takeaways": [
+      "Kahn's algorithm is BFS on in-degrees, O(V + E).",
+      "A short output means a cycle.",
+      "The DFS version records postorder and reverses it."
+     ]
     },
     {
      "id": "s2m5l5",
@@ -3366,7 +4278,45 @@
      "resource": {
       "title": "CP-Algorithms: Dijkstra",
       "url": "https://cp-algorithms.com/graph/dijkstra.html"
-     }
+     },
+     "video": {
+      "id": "GazC3A4OQTE",
+      "title": "Dijkstra's Algorithm - Computerphile"
+     },
+     "why": "Route planners, network routing and game AI need cheapest paths when steps cost different amounts. Dijkstra is the standard tool.",
+     "terms": [
+      {
+       "t": "Relax",
+       "d": "If going through u gives v a shorter distance, update it and push v."
+      },
+      {
+       "t": "Min-heap by distance",
+       "d": "Always expand the closest unfinished vertex next."
+      },
+      {
+       "t": "Lazy deletion",
+       "d": "Skip heap entries whose distance is larger than the best known."
+      },
+      {
+       "t": "A*",
+       "d": "Dijkstra plus a heuristic estimate of the remaining distance, to search toward the goal."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Dijkstra works with negative edge weights if I'm careful.",
+       "right": "A negative edge can make a finished vertex's distance wrong. Use Bellman–Ford for negative weights."
+      },
+      {
+       "wrong": "I must update entries inside the heap when a distance improves.",
+       "right": "Push a new entry and skip stale ones when popped; that's simpler and just as fast in practice."
+      }
+     ],
+     "takeaways": [
+      "BFS with a min-heap instead of a queue.",
+      "Requires non-negative weights.",
+      "O((V + E) log V) with `heapq` and lazy deletion."
+     ]
     }
    ],
    "project": {
@@ -3584,7 +4534,45 @@
      "resource": {
       "title": "Python docs: functools.cache",
       "url": "https://docs.python.org/3/library/functools.html#functools.cache"
-     }
+     },
+     "video": {
+      "id": "P8Xa2BitN3I",
+      "title": "Algorithms: Memoization and Dynamic Programming (HackerRank)"
+     },
+     "why": "Dynamic programming turns exponential brute force into polynomial time. The recurse–memoize–tabulate sequence makes it a method instead of a trick.",
+     "terms": [
+      {
+       "t": "Overlapping subproblems",
+       "d": "The same smaller question is asked many times."
+      },
+      {
+       "t": "Optimal substructure",
+       "d": "The best answer is built from best answers to subproblems."
+      },
+      {
+       "t": "Memoization",
+       "d": "Cache recursive results so each state is computed once."
+      },
+      {
+       "t": "Tabulation",
+       "d": "Fill a table bottom-up in an order where dependencies come first."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "DP means finding a clever formula.",
+       "right": "Start with a plain recursive solution and a clearly defined state; the rest is mechanical."
+      },
+      {
+       "wrong": "Greedy works for coin change.",
+       "right": "With coins 1, 3 and 4, greedy pays 6 as 4+1+1 instead of 3+3. DP tries every last coin."
+      }
+     ],
+     "takeaways": [
+      "Define the state in words, then the recurrence and base cases.",
+      "Recurse, memoize, tabulate, compress.",
+      "If each state depends only on the last few, keep just those."
+     ]
     },
     {
      "id": "s2m6l2",
@@ -3711,7 +4699,45 @@
      "resource": {
       "title": "LeetCode 1143: Longest Common Subsequence",
       "url": "https://leetcode.com/problems/longest-common-subsequence/"
-     }
+     },
+     "video": {
+      "id": "4ClOkX0SWW4",
+      "title": "Longest Common Subsequence Problem Visually Explained"
+     },
+     "why": "Diff tools, spell-checkers and DNA alignment all use 2D DP over two strings. The same table technique solves grid path problems.",
+     "terms": [
+      {
+       "t": "2D state",
+       "d": "A state needing two numbers, like a cell (r, c) or positions (i, j) in two strings."
+      },
+      {
+       "t": "LCS",
+       "d": "Longest common subsequence: characters in order, not necessarily adjacent."
+      },
+      {
+       "t": "Edit distance",
+       "d": "Fewest inserts, deletes and substitutions to turn one string into another."
+      },
+      {
+       "t": "Row compression",
+       "d": "Keep only the previous row when each row depends on the one above."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "A subsequence must be contiguous.",
+       "right": "That's a substring. A subsequence keeps order but can skip characters."
+      },
+      {
+       "wrong": "I can fill the table in any order.",
+       "right": "Every cell must be filled after the cells it depends on: above, left and diagonal."
+      }
+     ],
+     "takeaways": [
+      "Define `dp[i][j]` in words before writing the recurrence.",
+      "On a match, extend the diagonal; otherwise take the best of dropping a character.",
+      "Two rows are enough for most 2D DPs."
+     ]
     },
     {
      "id": "s2m6l3",
@@ -3808,7 +4834,45 @@
      "resource": {
       "title": "LeetCode 435: Non-overlapping Intervals",
       "url": "https://leetcode.com/problems/non-overlapping-intervals/"
-     }
+     },
+     "video": {
+      "id": "9zso22POLEg",
+      "title": "Greedy Algorithms 2 - Devising a Greedy Scheduling Algorithm"
+     },
+     "why": "Greedy algorithms are short and fast, but plausible greedy rules are often wrong. Testing and proving them is what separates a lucky answer from a correct one.",
+     "terms": [
+      {
+       "t": "Greedy choice",
+       "d": "Make the locally best choice and never revisit it."
+      },
+      {
+       "t": "Counterexample",
+       "d": "A small input where the greedy rule gives a wrong answer."
+      },
+      {
+       "t": "Exchange argument",
+       "d": "Show any optimal solution can swap in the greedy choice without getting worse."
+      },
+      {
+       "t": "Interval scheduling",
+       "d": "Pick the most non-overlapping intervals: sort by end time."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "If greedy works on my examples, it's correct.",
+       "right": "Try to break it with tiny inputs, then justify it with an exchange argument."
+      },
+      {
+       "wrong": "For interval scheduling, take the shortest or earliest-starting meeting first.",
+       "right": "Both fail on small counterexamples. Earliest end time is the rule that's provably optimal."
+      }
+     ],
+     "takeaways": [
+      "Greedy is usually sort plus one scan.",
+      "Hunt for counterexamples before coding.",
+      "The exchange argument is the standard proof."
+     ]
     },
     {
      "id": "s2m6l4",
@@ -3905,7 +4969,45 @@
      "resource": {
       "title": "LeetCode 78: Subsets",
       "url": "https://leetcode.com/problems/subsets/"
-     }
+     },
+     "video": {
+      "id": "REOH22Xwdkk",
+      "title": "Subsets - Backtracking - Leetcode 78 (NeetCode)"
+     },
+     "why": "Puzzles, scheduling, configuration and search problems often require trying combinations. Backtracking explores them systematically and prunes the hopeless ones early.",
+     "terms": [
+      {
+       "t": "Choose–explore–unchoose",
+       "d": "Add a choice, recurse, then undo it before trying the next."
+      },
+      {
+       "t": "Subsets",
+       "d": "2^n possibilities: each element in or out."
+      },
+      {
+       "t": "Permutations",
+       "d": "n! orderings: any unused element can go next."
+      },
+      {
+       "t": "Pruning",
+       "d": "Stop exploring a branch as soon as it can't lead to a valid answer."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "I can append `path` itself to the results.",
+       "right": "It keeps changing as you backtrack. Append a copy: `path[:]`."
+      },
+      {
+       "wrong": "Pruning changes the worst-case complexity.",
+       "right": "It often helps a lot in practice, but the output-size bound (like n · 2^n) still applies."
+      }
+     ],
+     "takeaways": [
+      "Backtracking is DFS over a tree of choices.",
+      "Undo every choice after exploring it.",
+      "State complexity by output size: n · 2^n subsets, n · n! permutations."
+     ]
     },
     {
      "id": "s2m6l5",
@@ -4010,7 +5112,45 @@
      "resource": {
       "title": "NeetCode Roadmap",
       "url": "https://neetcode.io/roadmap"
-     }
+     },
+     "video": {
+      "id": "Q4C3ZRJLnac",
+      "title": "How to Solve ANY Coding Interview Question in 6 Steps"
+     },
+     "why": "Under pressure, a process beats inspiration. Running the same six steps every time makes unseen problems approachable and your interviews predictable.",
+     "terms": [
+      {
+       "t": "Understand",
+       "d": "Restate the problem and ask about sizes, ranges, duplicates and empty inputs."
+      },
+      {
+       "t": "Brute force",
+       "d": "The simplest correct solution, stated with its complexity."
+      },
+      {
+       "t": "Optimise",
+       "d": "Use constraints to set a target complexity and ask the pattern questions."
+      },
+      {
+       "t": "Test",
+       "d": "Trace by hand on examples and edge cases, or compare with brute force."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Skipping brute force saves time.",
+       "right": "It proves you understand the problem, gives a fallback, and is a reference for testing."
+      },
+      {
+       "wrong": "I'll test after the code is finished and correct.",
+       "right": "Trace small examples and edge cases as you go; most bugs show up there."
+      }
+     ],
+     "takeaways": [
+      "Understand, examples, brute force, optimise, code, test.",
+      "Constraints tell you the target: n ≤ 10^5 means O(n log n) or better.",
+      "Ask: what's repeated, is it sorted, is it a graph, is it a choice?"
+     ]
     }
    ],
    "project": {

@@ -118,7 +118,45 @@
      "resource": {
       "title": "Fallacies of distributed computing (Wikipedia)",
       "url": "https://en.wikipedia.org/wiki/Fallacies_of_distributed_computing"
-     }
+     },
+     "video": {
+      "id": "JG2ESDGwHHY",
+      "title": "The Eight Fallacies of Distributed Computing (Stephen Asbury)"
+     },
+     "why": "Distribution buys scale and resilience at the cost of new failure modes. Knowing the fallacies lets you predict outages before they happen.",
+     "terms": [
+      {
+       "t": "Scalability",
+       "d": "Handling more load than one machine can."
+      },
+      {
+       "t": "Fault tolerance",
+       "d": "Continuing to work when some machines fail."
+      },
+      {
+       "t": "Eight fallacies",
+       "d": "Assumptions that fail in production, starting with 'the network is reliable' and 'latency is zero'."
+      },
+      {
+       "t": "Chatty RPC",
+       "d": "Many small remote calls where one batched call would do."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "A remote call is just a slower function call.",
+       "right": "It can fail, time out or succeed without you knowing. Design every call for those outcomes."
+      },
+      {
+       "wrong": "With reliable machines, failures are rare enough to ignore.",
+       "right": "At 1,000 machines at 99.9% each, all being up at once is under 37% likely. Failure is constant."
+      }
+     ],
+     "takeaways": [
+      "Distribute for scalability, fault tolerance or latency, not by default.",
+      "Batch remote calls; one round trip per item adds up fast.",
+      "At scale, something is always failing."
+     ]
     },
     {
      "id": "s6m1l2",
@@ -223,7 +261,45 @@
      "resource": {
       "title": "AWS Builders' Library: Timeouts, retries, and backoff with jitter",
       "url": "https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/"
-     }
+     },
+     "video": {
+      "id": "UbjUETifVac",
+      "title": "Better Retries with Exponential Backoff and Jitter"
+     },
+     "why": "Timeouts and retries are on every remote call you'll write. Getting them wrong turns a small slowdown into a retry storm that takes the whole system down.",
+     "terms": [
+      {
+       "t": "Partial failure",
+       "d": "Some parts work while others don't, and you can't always tell which."
+      },
+      {
+       "t": "Timeout",
+       "d": "Giving up waiting; it can't distinguish dead from slow."
+      },
+      {
+       "t": "Exponential backoff with jitter",
+       "d": "Wait `random(0, min(cap, base × 2^attempt))` before retrying."
+      },
+      {
+       "t": "Retry budget",
+       "d": "A cap on retries, such as 10% of requests, to stop amplification."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "A timeout tells me the server didn't do the work.",
+       "right": "The request may have succeeded and only the reply was lost. Retries need idempotency."
+      },
+      {
+       "wrong": "Retrying immediately and often is the most reliable approach.",
+       "right": "Synchronised retries pile onto a struggling service. Back off, add jitter and cap retries."
+      }
+     ],
+     "takeaways": [
+      "No timeout is 'correct'; choose one from observed latency, like a bit above p99.",
+      "Back off exponentially with jitter.",
+      "Retry only idempotent operations, within a budget."
+     ]
     },
     {
      "id": "s6m1l3",
@@ -382,7 +458,45 @@
      "resource": {
       "title": "Lamport, \"Time, Clocks, and the Ordering of Events in a Distributed System\"",
       "url": "https://lamport.azurewebsites.net/pubs/time-clocks.pdf"
-     }
+     },
+     "video": {
+      "id": "UqY1tF3zxjc",
+      "title": "CSE138 Distributed Systems L3: partial orders, Lamport clocks, vector clocks"
+     },
+     "why": "Ordering events across machines is impossible with wall clocks alone. Logical clocks let you say which event could have caused which.",
+     "terms": [
+      {
+       "t": "Clock drift",
+       "d": "Quartz clocks gain or lose time; 20 ppm is about 1.7 seconds a day."
+      },
+      {
+       "t": "Happens-before",
+       "d": "a → b if they're in order on one process, or a sends a message b receives, or transitively."
+      },
+      {
+       "t": "Lamport clock",
+       "d": "A counter that respects happens-before but can't detect concurrency."
+      },
+      {
+       "t": "Vector clock",
+       "d": "One counter per process; compares events as before, after or concurrent."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Timestamps from different machines tell me which event happened first.",
+       "right": "Clocks drift and can jump backwards. Use logical clocks for ordering."
+      },
+      {
+       "wrong": "If L(a) < L(b) for Lamport clocks, a happened before b.",
+       "right": "The converse isn't guaranteed; concurrent events can have either order. Vector clocks can tell."
+      }
+     ],
+     "takeaways": [
+      "Use monotonic clocks for durations, never wall clocks.",
+      "Lamport clocks give a consistent total order; vector clocks detect concurrency.",
+      "Physical time works only with a known error bound, as in Spanner's TrueTime."
+     ]
     },
     {
      "id": "s6m1l4",
@@ -484,7 +598,45 @@
      "resource": {
       "title": "Stripe: Designing robust and predictable APIs with idempotency",
       "url": "https://stripe.com/blog/idempotency"
-     }
+     },
+     "video": {
+      "id": "jfHBrweuKRA",
+      "title": "What Is Idempotency? Idempotency Keys, Deduplication & Retries Explained"
+     },
+     "why": "Retries are necessary, and without idempotency they double-charge customers. Idempotency keys are how payment APIs make retries safe.",
+     "terms": [
+      {
+       "t": "At-most-once",
+       "d": "Never retry; the operation may be lost."
+      },
+      {
+       "t": "At-least-once",
+       "d": "Retry until acknowledged; the operation may run twice."
+      },
+      {
+       "t": "Idempotent",
+       "d": "Doing it twice has the same effect as once."
+      },
+      {
+       "t": "Idempotency key",
+       "d": "A client-chosen id the server stores to recognise and dedupe retries."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Exactly-once delivery is possible with the right protocol.",
+       "right": "Delivery can't be exactly once. You get effectively-once effects with at-least-once delivery plus dedupe."
+      },
+      {
+       "wrong": "Storing the idempotency key after doing the work is fine.",
+       "right": "Store it in the same transaction as the effect, or a crash in between reintroduces duplicates."
+      }
+     ],
+     "takeaways": [
+      "Assume at-least-once and design for duplicates.",
+      "Make operations idempotent or dedupe with keys.",
+      "Commit the dedupe record and the effect atomically."
+     ]
     },
     {
      "id": "s6m1l5",
@@ -591,7 +743,45 @@
      "resource": {
       "title": "Dean & Ghemawat, \"MapReduce: Simplified Data Processing on Large Clusters\"",
       "url": "https://pdos.csail.mit.edu/6.824/papers/mapreduce.pdf"
-     }
+     },
+     "video": {
+      "id": "cQP8WApzIQQ",
+      "title": "MIT 6.824 Distributed Systems, Lecture 1: Introduction (MapReduce)"
+     },
+     "why": "MapReduce introduced the patterns behind most batch processing: split the work, shuffle by key, and handle failures by re-running tasks.",
+     "terms": [
+      {
+       "t": "Map",
+       "d": "Turns each input record into intermediate key/value pairs."
+      },
+      {
+       "t": "Shuffle",
+       "d": "Groups intermediate pairs by key and sends each group to one reducer."
+      },
+      {
+       "t": "Reduce",
+       "d": "Combines all values for a key into output."
+      },
+      {
+       "t": "Backup task",
+       "d": "A duplicate of a slow task near the end, to beat stragglers."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "A worker that misses its deadline must have crashed.",
+       "right": "It may just be slow and finish later. Write to a temp file and atomically rename to make duplicates harmless."
+      },
+      {
+       "wrong": "Map and reduce functions can have side effects.",
+       "right": "Re-execution means they may run more than once. Keep them deterministic and side-effect free."
+      }
+     ],
+     "takeaways": [
+      "Two pure functions, map and reduce; the framework does the rest.",
+      "Fault tolerance is re-execution of tasks.",
+      "Atomic renames make duplicate outputs safe."
+     ]
     }
    ],
    "project": {
@@ -801,7 +991,45 @@
      "resource": {
       "title": "RocksDB Wiki: RocksDB Overview",
       "url": "https://github.com/facebook/rocksdb/wiki/RocksDB-Overview"
-     }
+     },
+     "video": {
+      "id": "tLYgGaY1MYo",
+      "title": "LSM Tree vs B-Tree"
+     },
+     "why": "Every database is built on one of these two engines. Knowing their trade-offs lets you predict performance and choose the right store for a workload.",
+     "terms": [
+      {
+       "t": "B-tree",
+       "d": "Fixed-size pages in a balanced tree, updated in place."
+      },
+      {
+       "t": "LSM tree",
+       "d": "Writes go to an in-memory memtable, flushed to sorted immutable SSTables, merged by compaction."
+      },
+      {
+       "t": "Write / read / space amplification",
+       "d": "Extra bytes written, pages read and storage used per unit of user data."
+      },
+      {
+       "t": "Bloom filter",
+       "d": "A compact structure that says 'definitely not here' to skip SSTables on reads."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "LSM trees are always faster.",
+       "right": "They favour writes. Reads may check several files and compaction uses background I/O."
+      },
+      {
+       "wrong": "Deleting a key in an LSM tree frees space immediately.",
+       "right": "It writes a tombstone; space is reclaimed only when compaction merges it away."
+      }
+     ],
+     "takeaways": [
+      "B-trees suit read-heavy workloads with predictable latency.",
+      "LSM trees suit write-heavy workloads.",
+      "Compare engines by write, read and space amplification."
+     ]
     },
     {
      "id": "s6m2l2",
@@ -912,7 +1140,45 @@
      "resource": {
       "title": "PostgreSQL docs: Write-Ahead Logging (WAL)",
       "url": "https://www.postgresql.org/docs/current/wal-intro.html"
-     }
+     },
+     "video": {
+      "id": "mh5L6PI65uI",
+      "title": "Write-Ahead Logging in Databases"
+     },
+     "why": "Crash safety is what makes a database a database. The write-ahead log is how almost every durable system survives power cuts.",
+     "terms": [
+      {
+       "t": "Write-ahead log",
+       "d": "Append each change to a log before applying it, then replay after a crash."
+      },
+      {
+       "t": "`fsync`",
+       "d": "Forces data from the OS page cache onto stable storage."
+      },
+      {
+       "t": "Torn write",
+       "d": "A crash in the middle of a write, leaving a partial record."
+      },
+      {
+       "t": "Group commit",
+       "d": "Batch several transactions into one `fsync` to amortise its cost."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "A successful `write()` means the data is on disk.",
+       "right": "It's only in the page cache. Call `fsync` before acknowledging."
+      },
+      {
+       "wrong": "Recovery should fail if the last record is corrupt.",
+       "right": "A torn final record was never acknowledged, so stop at it and drop it. Use length and checksum to detect it."
+      }
+     ],
+     "takeaways": [
+      "Log, fsync, then acknowledge.",
+      "Replay records in order and stop at the first invalid one.",
+      "Checkpoints bound how much log must be replayed."
+     ]
     },
     {
      "id": "s6m2l3",
@@ -1028,7 +1294,41 @@
      "resource": {
       "title": "Protocol Buffers: Encoding",
       "url": "https://protobuf.dev/programming-guides/encoding/"
-     }
+     },
+     "why": "Services and stored data outlive any single deploy. Compatible schema evolution lets old and new code run side by side during rollouts.",
+     "terms": [
+      {
+       "t": "Backward compatibility",
+       "d": "New code can read data written by old code."
+      },
+      {
+       "t": "Forward compatibility",
+       "d": "Old code can read data written by new code."
+      },
+      {
+       "t": "Field tags",
+       "d": "Numbers that identify protobuf fields on the wire; names aren't sent."
+      },
+      {
+       "t": "Varint",
+       "d": "Integers encoded 7 bits per byte, low group first, high bit meaning 'more follows'."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "I can reuse a deleted field's tag number.",
+       "right": "Old data with that tag will be misread. Reserve retired tags forever."
+      },
+      {
+       "wrong": "`pickle` is fine for data between services.",
+       "right": "It's Python-only, insecure on untrusted input and fragile across versions. Use JSON, protobuf or Avro."
+      }
+     ],
+     "takeaways": [
+      "Rolling deploys need both backward and forward compatibility.",
+      "Add fields with new tags; never change or reuse tags.",
+      "Choose language-neutral encodings for service boundaries."
+     ]
     },
     {
      "id": "s6m2l4",
@@ -1134,7 +1434,45 @@
      "resource": {
       "title": "DeCandia et al., \"Dynamo: Amazon's Highly Available Key-value Store\"",
       "url": "https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf"
-     }
+     },
+     "video": {
+      "id": "3SSDXcOFvoE",
+      "title": "System Design: Database Replication - Multi Leader, Single Leader, Leaderless"
+     },
+     "why": "Replication keeps data available and close to users, but lag creates anomalies users notice. Each topology makes a different trade-off.",
+     "terms": [
+      {
+       "t": "Leader-follower",
+       "d": "One leader takes writes and streams changes to followers."
+      },
+      {
+       "t": "Replication lag",
+       "d": "Followers behind the leader; causes stale and out-of-order reads."
+      },
+      {
+       "t": "Multi-leader",
+       "d": "A leader per region accepting writes; conflicts must be resolved."
+      },
+      {
+       "t": "Quorum (N, W, R)",
+       "d": "Write to W and read from R of N replicas; W + R > N makes them overlap."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Reading from any replica is fine after a write.",
+       "right": "A lagging follower may not have it. Route read-your-writes to the leader or a caught-up replica."
+      },
+      {
+       "wrong": "W + R > N guarantees linearizable reads.",
+       "right": "It ensures overlap, but sloppy quorums, concurrent writes and failures can still return stale data."
+      }
+     ],
+     "takeaways": [
+      "Asynchronous replication is fast but can lose recent writes on failover.",
+      "Watch for read-your-writes and monotonic-read anomalies.",
+      "Multi-leader and leaderless systems need conflict resolution."
+     ]
     },
     {
      "id": "s6m2l5",
@@ -1231,7 +1569,45 @@
      "resource": {
       "title": "Consistent hashing (Wikipedia)",
       "url": "https://en.wikipedia.org/wiki/Consistent_hashing"
-     }
+     },
+     "video": {
+      "id": "zaRkONvyGr8",
+      "title": "What is Consistent Hashing and Where is it used? (ByteByteGo)"
+     },
+     "why": "Data outgrows one machine. How you partition decides whether adding a node moves 20% of your data or 80%, and whether one hot key melts a server.",
+     "terms": [
+      {
+       "t": "Key-range partitioning",
+       "d": "Contiguous key ranges per node; good for range scans, prone to hot spots."
+      },
+      {
+       "t": "Hash partitioning",
+       "d": "Spread keys by hash; even load, no efficient range scans."
+      },
+      {
+       "t": "Consistent hashing",
+       "d": "Adding a node moves only about 1/N of the keys."
+      },
+      {
+       "t": "Hot key",
+       "d": "One key with so much traffic it overloads its partition."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "`hash(key) % N` is a fine way to shard.",
+       "right": "Changing N from 4 to 5 moves about 80% of keys. Use consistent hashing or many fixed partitions."
+      },
+      {
+       "wrong": "Even key distribution means even load.",
+       "right": "A single celebrity key can dominate. Split or replicate hot keys."
+      }
+     ],
+     "takeaways": [
+      "Range partitioning for scans; hash partitioning for even spread.",
+      "Virtual nodes smooth out consistent hashing.",
+      "Plan for hot keys explicitly."
+     ]
     }
    ],
    "project": {
@@ -1477,7 +1853,45 @@
      "resource": {
       "title": "Jepsen: Consistency Models",
       "url": "https://jepsen.io/consistency"
-     }
+     },
+     "video": {
+      "id": "WfZ33lhvvx4",
+      "title": "Strong Consistency & Linearizability Explained"
+     },
+     "why": "'Consistent' means different things in different systems. Knowing the models precisely tells you what a database actually promises.",
+     "terms": [
+      {
+       "t": "Linearizability",
+       "d": "Behaves like one copy; each operation takes effect at one instant between its start and end."
+      },
+      {
+       "t": "Serializability",
+       "d": "Transactions give the result of some serial order, not necessarily real-time order."
+      },
+      {
+       "t": "Strict serializability",
+       "d": "Serializable and consistent with real time."
+      },
+      {
+       "t": "Eventual consistency",
+       "d": "Replicas converge if writes stop, with no bound on when."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Serializable and linearizable mean the same thing.",
+       "right": "Serializability is about transactions over many objects; linearizability is about single operations in real time."
+      },
+      {
+       "wrong": "Eventual consistency means data is correct within a few seconds.",
+       "right": "It gives no time bound and no rules for reads in the meantime."
+      }
+     ],
+     "takeaways": [
+      "Linearizability = one copy, real-time order.",
+      "Serializability = some serial order of transactions.",
+      "Ask what a database guarantees, not whether it's 'consistent'."
+     ]
     },
     {
      "id": "s6m3l2",
@@ -1573,7 +1987,45 @@
      "resource": {
       "title": "Kleppmann: Please stop calling databases CP or AP",
       "url": "https://martin.kleppmann.com/2015/05/11/please-stop-calling-databases-cp-or-ap.html"
-     }
+     },
+     "video": {
+      "id": "dWjiUqikRx0",
+      "title": "CAP & PACELC theorems explained"
+     },
+     "why": "CAP is quoted constantly and often wrongly. Stating it precisely, and using PACELC for normal operation, lets you describe real databases honestly.",
+     "terms": [
+      {
+       "t": "CAP",
+       "d": "During a partition, a system can be linearizable or available, not both."
+      },
+      {
+       "t": "Partition",
+       "d": "A network failure that splits nodes into groups that can't communicate."
+      },
+      {
+       "t": "Availability (in CAP)",
+       "d": "Every request to a non-failed node gets a response."
+      },
+      {
+       "t": "PACELC",
+       "d": "If Partition, choose A or C; Else, choose Latency or Consistency."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "CAP means pick any two of consistency, availability and partition tolerance.",
+       "right": "Partitions happen whether you like it or not. The choice is C or A during a partition."
+      },
+      {
+       "wrong": "CAP covers the trade-offs I care about day to day.",
+       "right": "It ignores latency and normal operation. PACELC adds the latency/consistency trade-off."
+      }
+     ],
+     "takeaways": [
+      "CAP is narrow: linearizability vs availability during partitions.",
+      "Most of the time the real trade-off is latency vs consistency.",
+      "Describe systems as PA/EL, PC/EC and so on."
+     ]
     },
     {
      "id": "s6m3l3",
@@ -1690,7 +2142,45 @@
      "resource": {
       "title": "PostgreSQL docs: Transaction Isolation",
       "url": "https://www.postgresql.org/docs/current/transaction-iso.html"
-     }
+     },
+     "video": {
+      "id": "AiYvR8yBMaU",
+      "title": "Transactions, ACID, and Isolation levels (Designing Data-Intensive Applications ch. 7)"
+     },
+     "why": "Isolation anomalies cause real money and safety bugs that only appear under concurrency. Recognising each one tells you the cheapest correct fix.",
+     "terms": [
+      {
+       "t": "Dirty read",
+       "d": "Seeing another transaction's uncommitted data."
+      },
+      {
+       "t": "Lost update",
+       "d": "Two read-modify-write cycles interleave and one overwrites the other."
+      },
+      {
+       "t": "Read skew",
+       "d": "Reading related values at different points in time."
+      },
+      {
+       "t": "Write skew",
+       "d": "Two transactions read the same data, write different rows, and break an invariant together."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Snapshot isolation prevents all anomalies.",
+       "right": "It still allows write skew, like two doctors both going off call."
+      },
+      {
+       "wrong": "Row locks on the rows I update prevent write skew.",
+       "right": "The conflicting transactions write different rows. Lock the rows you read with `FOR UPDATE`, or use Serializable."
+      }
+     ],
+     "takeaways": [
+      "Read Committed prevents dirty reads only.",
+      "Snapshot isolation prevents lost updates and read skew, not write skew.",
+      "Serializable prevents all; retry on serialization failures."
+     ]
     },
     {
      "id": "s6m3l4",
@@ -1796,7 +2286,45 @@
      "resource": {
       "title": "Two-phase commit protocol (Wikipedia)",
       "url": "https://en.wikipedia.org/wiki/Two-phase_commit_protocol"
-     }
+     },
+     "video": {
+      "id": "eltn4x788UM",
+      "title": "Distributed Transactions are Hard (How Two-Phase Commit works)"
+     },
+     "why": "Atomic commit across machines is a recurring need. Knowing exactly why 2PC blocks explains why many systems use sagas or consensus instead.",
+     "terms": [
+      {
+       "t": "Atomic commit",
+       "d": "All participants commit or all abort."
+      },
+      {
+       "t": "Prepare / vote",
+       "d": "Each participant makes the change durable and promises it can commit."
+      },
+      {
+       "t": "Commit point",
+       "d": "The coordinator logging its decision; after that the outcome is fixed."
+      },
+      {
+       "t": "In doubt",
+       "d": "A participant that voted yes but hasn't heard the decision; it must wait."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "If the coordinator crashes, participants can just abort.",
+       "right": "After voting yes they can't decide alone; aborting could contradict a commit decision. They block."
+      },
+      {
+       "wrong": "2PC is a consensus algorithm.",
+       "right": "It needs every participant and blocks on coordinator failure. Consensus tolerates a minority failing."
+      }
+     ],
+     "takeaways": [
+      "Two points of no return: the yes vote and the logged decision.",
+      "2PC blocks while the coordinator is down.",
+      "Sagas use compensating actions instead of distributed locks."
+     ]
     },
     {
      "id": "s6m3l5",
@@ -1898,7 +2426,45 @@
      "resource": {
       "title": "The Raft Consensus Algorithm (paper, visualization and talks)",
       "url": "https://raft.github.io/"
-     }
+     },
+     "video": {
+      "id": "no5Im1daS-o",
+      "title": "USENIX ATC '14 - In Search of an Understandable Consensus Algorithm (Raft, Diego Ongaro)"
+     },
+     "why": "Raft keeps the configuration and metadata of systems like etcd, Consul and Kubernetes consistent. Understanding it demystifies consensus.",
+     "terms": [
+      {
+       "t": "Term",
+       "d": "A numbered period with at most one leader."
+      },
+      {
+       "t": "Election timeout",
+       "d": "Randomised wait after which a follower becomes a candidate."
+      },
+      {
+       "t": "Up-to-date log",
+       "d": "Higher last term, or same last term and at least as long; required to win votes."
+      },
+      {
+       "t": "Committed entry",
+       "d": "Stored on a majority by the current leader; never lost."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "A leader can commit an entry as soon as it's on a majority, whatever its term.",
+       "right": "A leader only commits entries from its own term by counting replicas; earlier entries commit indirectly."
+      },
+      {
+       "wrong": "Raft works with any number of servers surviving.",
+       "right": "It needs a majority. Five servers tolerate two failures."
+      }
+     ],
+     "takeaways": [
+      "Randomised timeouts make split votes rare.",
+      "Votes go only to candidates with up-to-date logs, so leaders hold all committed entries.",
+      "AppendEntries consistency checks repair followers' logs."
+     ]
     }
    ],
    "project": {
@@ -2129,7 +2695,45 @@
      "resource": {
       "title": "epoll(7) Linux manual page",
       "url": "https://man7.org/linux/man-pages/man7/epoll.7.html"
-     }
+     },
+     "video": {
+      "id": "MzLZhAShgs0",
+      "title": "epoll: How Linux Handles 10,000 Connections"
+     },
+     "why": "Event loops let one thread serve thousands of connections. They power nginx, Redis, Node.js and Python's asyncio, and one blocking call stalls them all.",
+     "terms": [
+      {
+       "t": "C10K problem",
+       "d": "Serving 10,000 concurrent connections efficiently."
+      },
+      {
+       "t": "epoll",
+       "d": "Linux readiness notification: register once, get only ready descriptors."
+      },
+      {
+       "t": "Event loop",
+       "d": "Wait for ready events, run callbacks or resume coroutines, repeat."
+      },
+      {
+       "t": "Blocking the loop",
+       "d": "Any synchronous slow call stalls every other connection."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "`async def` makes my code run in parallel.",
+       "right": "Coroutines interleave on one thread at `await` points; CPU work still runs one at a time."
+      },
+      {
+       "wrong": "Calling `time.sleep` or a sync HTTP client inside a coroutine is fine.",
+       "right": "It blocks the whole loop. Use `await asyncio.sleep` and async libraries, or offload to a thread."
+      }
+     ],
+     "takeaways": [
+      "Readiness notification scales where thread-per-connection doesn't.",
+      "Never block the loop.",
+      "Offload CPU-heavy work to threads or processes."
+     ]
     },
     {
      "id": "s6m4l2",
@@ -2240,7 +2844,45 @@
      "resource": {
       "title": "Fred Hébert: Queues Don't Fix Overload",
       "url": "https://ferd.ca/queues-don-t-fix-overload.html"
-     }
+     },
+     "video": {
+      "id": "6vDnlXWkAtY",
+      "title": "Backpressure in Stream Processing: Keeping Fast Producers from Breaking Slow Consumers"
+     },
+     "why": "Queues hide overload until they explode. Little's law and deliberate overload policies keep latency bounded when traffic spikes.",
+     "terms": [
+      {
+       "t": "Little's law",
+       "d": "L = λ × W: items in system = arrival rate × time in system."
+      },
+      {
+       "t": "Utilisation",
+       "d": "Arrival rate ÷ service rate; waits grow sharply as it nears 1."
+      },
+      {
+       "t": "Back-pressure",
+       "d": "Bound the queue and slow producers when it's full."
+      },
+      {
+       "t": "Load shedding",
+       "d": "Reject excess work early to protect latency for the rest."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "An unbounded queue makes the system more reliable.",
+       "right": "It turns overload into ever-growing latency and memory. Bound it."
+      },
+      {
+       "wrong": "Adding a queue adds capacity.",
+       "right": "A queue absorbs bursts. If arrivals exceed service rate for long, it grows without bound."
+      }
+     ],
+     "takeaways": [
+      "Use Little's law to size queues and predict waits.",
+      "Keep utilisation well below 100%.",
+      "Choose back-pressure, shedding or a durable log deliberately."
+     ]
     },
     {
      "id": "s6m4l3",
@@ -2339,7 +2981,45 @@
      "resource": {
       "title": "AWS: Caching Best Practices",
       "url": "https://aws.amazon.com/caching/best-practices/"
-     }
+     },
+     "video": {
+      "id": "6picL_46kQ8",
+      "title": "Caching Strategies Explained: Cache-Aside, Write-Through & Write-Back"
+     },
+     "why": "Caches make systems fast and cheap, and stale or stampeding caches cause some of the most confusing outages. Choosing the pattern and invalidation strategy matters.",
+     "terms": [
+      {
+       "t": "Cache-aside",
+       "d": "App reads cache, on a miss reads the database and fills the cache."
+      },
+      {
+       "t": "Write-through / write-behind",
+       "d": "Write cache and database together / write cache now, database later."
+      },
+      {
+       "t": "Effective latency",
+       "d": "hit rate × cache latency + miss rate × database latency."
+      },
+      {
+       "t": "Stampede",
+       "d": "Many clients missing at once and hammering the database; prevented with leases or locks."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Deleting the cache key after a write prevents stale data.",
+       "right": "A concurrent reader can put an old value back. Use leases, versions or short TTLs."
+      },
+      {
+       "wrong": "A 90% hit rate means 90% less latency.",
+       "right": "Misses dominate: 0.9 × 1 ms + 0.1 × 50 ms is still 5.9 ms."
+      }
+     ],
+     "takeaways": [
+      "Cache-aside is the default; know its races.",
+      "Compute effective latency from the hit rate.",
+      "Protect against stampedes with leases, request coalescing or jittered TTLs."
+     ]
     },
     {
      "id": "s6m4l4",
@@ -2436,7 +3116,45 @@
      "resource": {
       "title": "Sam Rose: Load Balancing (interactive essay)",
       "url": "https://samwho.dev/load-balancing/"
-     }
+     },
+     "video": {
+      "id": "uGB53fnW6XQ",
+      "title": "Load Balancers L4 vs L7 Explained"
+     },
+     "why": "Load balancers decide which server handles each request. The algorithm and health checks determine whether one slow backend degrades everything.",
+     "terms": [
+      {
+       "t": "L4 vs L7",
+       "d": "Forward TCP/UDP connections vs route HTTP requests by content."
+      },
+      {
+       "t": "Least connections",
+       "d": "Send to the backend with the fewest outstanding requests."
+      },
+      {
+       "t": "Power of two choices",
+       "d": "Pick two random backends, send to the less loaded."
+      },
+      {
+       "t": "Health check",
+       "d": "Active probes or passive outlier detection to remove bad backends."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Round robin is always fair.",
+       "right": "With uneven requests or a slow backend it piles work onto the struggling one."
+      },
+      {
+       "wrong": "Health checks should verify every dependency.",
+       "right": "Then one shared dependency failing ejects every backend at once. Check what the instance itself controls."
+      }
+     ],
+     "takeaways": [
+      "L7 enables routing by path and header; L4 is simpler and faster.",
+      "Power of two choices balances well without global state.",
+      "Design health checks that don't fail all backends together."
+     ]
     },
     {
      "id": "s6m4l5",
@@ -2541,7 +3259,45 @@
      "resource": {
       "title": "Dean & Barroso, \"The Tail at Scale\" (CACM 2013)",
       "url": "https://research.google/pubs/the-tail-at-scale/"
-     }
+     },
+     "video": {
+      "id": "co2LZv0n4U4",
+      "title": "Latency is a distribution, not a number: p99, fan-out and the tail at scale"
+     },
+     "why": "At scale, the rare slow request becomes the common case for users. Tail latency, not average latency, is what people feel.",
+     "terms": [
+      {
+       "t": "p99",
+       "d": "The latency 99% of requests beat."
+      },
+      {
+       "t": "Fan-out amplification",
+       "d": "A request touching 100 backends hits some backend's p99 most of the time."
+      },
+      {
+       "t": "Hedged request",
+       "d": "Send a second copy after about p95 and take the first answer."
+      },
+      {
+       "t": "Coordinated omission",
+       "d": "Measurement that pauses during slow periods and under-reports the tail."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "If the average is low, users are happy.",
+       "right": "Averages hide the slow tail. Track p99 and p99.9."
+      },
+      {
+       "wrong": "A 1% slow backend only affects 1% of user requests.",
+       "right": "With fan-out of 100, about 63% of requests touch at least one slow call."
+      }
+     ],
+     "takeaways": [
+      "Report percentiles, not averages.",
+      "Fan-out makes the tail common: 1 − 0.99^n.",
+      "Use hedging, deadlines and isolation to cut the tail."
+     ]
     }
    ],
    "project": {
@@ -2761,7 +3517,45 @@
      "resource": {
       "title": "The System Design Primer",
       "url": "https://github.com/donnemartin/system-design-primer"
-     }
+     },
+     "video": {
+      "id": "AsJJGe5vxFM",
+      "title": "System Design Basics: Back Of The Envelope Estimation"
+     },
+     "why": "A repeatable design method and quick estimates turn vague requirements into defensible designs, in interviews and in real design reviews.",
+     "terms": [
+      {
+       "t": "Functional / non-functional requirements",
+       "d": "What users do / scale, latency and availability targets."
+      },
+      {
+       "t": "QPS",
+       "d": "Queries per second; a day is about 10⁵ seconds."
+      },
+      {
+       "t": "Back-of-envelope estimate",
+       "d": "Order-of-magnitude numbers with assumptions stated out loud."
+      },
+      {
+       "t": "Deep dive",
+       "d": "Detailed design of the hardest parts after the high-level diagram."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Estimates need to be precise.",
+       "right": "Within about 2× is enough to choose an architecture. Round hard and state assumptions."
+      },
+      {
+       "wrong": "I should start by drawing boxes.",
+       "right": "Start with requirements and estimates; they decide which boxes you need."
+      }
+     ],
+     "takeaways": [
+      "Requirements, estimates, API, data model, diagram, deep dives.",
+      "1 million requests a day ≈ 12 per second; peak is 2–3× average.",
+      "Memorise rough latencies: memory ~100 ns, SSD ~100 µs, cross-region ~100 ms."
+     ]
     },
     {
      "id": "s6m5l2",
@@ -2862,7 +3656,45 @@
      "resource": {
       "title": "System Design Primer: Design Pastebin.com (or Bit.ly)",
       "url": "https://github.com/donnemartin/system-design-primer/blob/master/solutions/system_design/pastebin/README.md"
-     }
+     },
+     "video": {
+      "id": "qSJAvd5Mgio",
+      "title": "Design a URL Shortener (Bitly) - System Design Interview"
+     },
+     "why": "A URL shortener is small enough to design fully and touches every core decision: IDs, storage, caching and HTTP semantics.",
+     "terms": [
+      {
+       "t": "Base62",
+       "d": "Digits and letters; 7 characters give about 3.5 trillion codes."
+      },
+      {
+       "t": "Counter-based IDs",
+       "d": "Unique by construction but guessable unless shuffled."
+      },
+      {
+       "t": "Hash-based IDs",
+       "d": "Derived from the URL; collisions must be handled."
+      },
+      {
+       "t": "301 vs 302",
+       "d": "Permanent (browsers cache it) vs temporary (every click reaches you, enabling analytics)."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "301 is always the right redirect.",
+       "right": "Browsers cache it, so you lose click analytics and can't change the target. Use 302 or 307 if you need them."
+      },
+      {
+       "wrong": "Hashing the long URL guarantees unique codes.",
+       "right": "Truncated hashes collide. Check and retry, or use a counter or random ID."
+      }
+     ],
+     "takeaways": [
+      "Reads dominate, so cache hot codes.",
+      "Pick an ID scheme by uniqueness, guessability and coordination cost.",
+      "Choose the redirect code by whether you need analytics."
+     ]
     },
     {
      "id": "s6m5l3",
@@ -2959,7 +3791,45 @@
      "resource": {
       "title": "System Design Primer: Design the Twitter timeline and search",
       "url": "https://github.com/donnemartin/system-design-primer/blob/master/solutions/system_design/twitter/README.md"
-     }
+     },
+     "video": {
+      "id": "IbwgUJcGMnA",
+      "title": "Design Facebook Messenger/WhatsApp"
+     },
+     "why": "Chat and feeds are classic large-scale designs. The fan-out trade-off shows how estimates drive architecture.",
+     "terms": [
+      {
+       "t": "WebSocket",
+       "d": "A persistent two-way connection for real-time delivery."
+      },
+      {
+       "t": "Per-conversation sequence number",
+       "d": "Orders messages within a chat and lets clients sync what they missed."
+      },
+      {
+       "t": "Fan-out on write (push)",
+       "d": "Copy each post into followers' feeds when it's created."
+      },
+      {
+       "t": "Fan-out on read (pull)",
+       "d": "Merge followees' posts when the feed is read."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Message timestamps from clients give the correct order.",
+       "right": "Client clocks disagree. Assign sequence numbers on the server per conversation."
+      },
+      {
+       "wrong": "Push fan-out works for every account.",
+       "right": "A post from an account with millions of followers means millions of writes. Pull for those accounts."
+      }
+     ],
+     "takeaways": [
+      "Order chat messages with server-assigned sequence numbers.",
+      "Store messages for offline delivery and sync by sequence.",
+      "Use a hybrid: push for normal accounts, pull for celebrities."
+     ]
     },
     {
      "id": "s6m5l4",
@@ -3075,7 +3945,45 @@
      "resource": {
       "title": "Google SRE Workbook: Alerting on SLOs",
       "url": "https://sre.google/workbook/alerting-on-slos/"
-     }
+     },
+     "video": {
+      "id": "ywNR71uGvHI",
+      "title": "SRE Fundamentals: SLIs, SLOs & Error Budgets"
+     },
+     "why": "SLOs turn 'reliable enough' into a number, and error budgets make the trade-off between shipping and stability explicit.",
+     "terms": [
+      {
+       "t": "SLI",
+       "d": "A measured ratio of good events, like requests under 300 ms without a 5xx."
+      },
+      {
+       "t": "SLO",
+       "d": "A target for an SLI over a window, like 99.9% over 30 days."
+      },
+      {
+       "t": "Error budget",
+       "d": "The allowed failures: 0.1% of requests, or about 43 minutes a month."
+      },
+      {
+       "t": "Burn rate",
+       "d": "How fast the budget is being spent; alerts fire on fast burns."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Alert on high CPU and memory.",
+       "right": "Those are causes, not user pain. Page on symptoms like SLO burn rate."
+      },
+      {
+       "wrong": "Aim for 100% availability.",
+       "right": "It's unachievable and freezes change. Pick an SLO users actually need and spend the rest on shipping."
+      }
+     ],
+     "takeaways": [
+      "Define SLIs from the user's view.",
+      "Error budget = 1 − SLO.",
+      "Page on fast burn, ticket on slow burn."
+     ]
     },
     {
      "id": "s6m5l5",
@@ -3180,7 +4088,45 @@
      "resource": {
       "title": "Google SRE Book: Postmortem Culture",
       "url": "https://sre.google/sre-book/postmortem-culture/"
-     }
+     },
+     "video": {
+      "id": "qgHWzQ2zcqQ",
+      "title": "Postmortem Culture at Google"
+     },
+     "why": "Reliability comes from redundancy, planned degradation and learning from incidents. Availability maths tells you where redundancy pays.",
+     "terms": [
+      {
+       "t": "In series",
+       "d": "Components a request needs one after another; availabilities multiply."
+      },
+      {
+       "t": "In parallel",
+       "d": "Redundant copies; the system fails only if all fail."
+      },
+      {
+       "t": "Graceful degradation",
+       "d": "Serving a reduced experience when a dependency fails."
+      },
+      {
+       "t": "Blameless postmortem",
+       "d": "An incident write-up focused on systems and contributing factors, not people."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Adding more components makes a system more reliable.",
+       "right": "Each component in series lowers availability. Only redundancy raises it."
+      },
+      {
+       "wrong": "A postmortem should identify who caused the outage.",
+       "right": "Blame hides information. Ask how the system allowed the mistake and fix that."
+      }
+     ],
+     "takeaways": [
+      "Multiply availabilities in series; combine failures in parallel.",
+      "Decide degraded modes before the outage, with circuit breakers and bulkheads.",
+      "Write blameless postmortems with owned action items."
+     ]
     }
    ],
    "project": {

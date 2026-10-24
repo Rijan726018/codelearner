@@ -111,7 +111,45 @@
      "resource": {
       "title": "MDN: Accessibility",
       "url": "https://developer.mozilla.org/en-US/docs/Web/Accessibility"
-     }
+     },
+     "video": {
+      "id": "qHrm9pR-p_s",
+      "title": "Web accessibility tutorials 01: Landmarks & semantic HTML elements"
+     },
+     "why": "Semantic HTML makes pages usable with a keyboard and screen reader for free, helps search engines and keeps your CSS and JavaScript simpler.",
+     "terms": [
+      {
+       "t": "Semantic element",
+       "d": "A tag that says what content is, like `<button>`, `<nav>` or `<main>`."
+      },
+      {
+       "t": "Landmarks",
+       "d": "`<header>`, `<nav>`, `<main>`, `<aside>`, `<footer>`: regions screen readers can jump between."
+      },
+      {
+       "t": "Label",
+       "d": "Text tied to an input with `for`/`id` or by wrapping, read aloud when it's focused."
+      },
+      {
+       "t": "Accessibility tree",
+       "d": "The browser's view of the page for assistive technology; inspect it in DevTools."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "A `<div>` with a click handler is as good as a `<button>`.",
+       "right": "It isn't focusable, doesn't respond to Enter or Space, and isn't announced as a button."
+      },
+      {
+       "wrong": "Placeholder text can replace a label.",
+       "right": "Placeholders disappear when typing starts and many screen readers skip them. Use a real `<label>`."
+      }
+     ],
+     "takeaways": [
+      "Choose elements for meaning, then style them.",
+      "One `<main>`, a sensible heading outline, and landmarks for the rest.",
+      "Every input needs a label; check it in the accessibility tree."
+     ]
     },
     {
      "id": "s4m1l2",
@@ -227,7 +265,45 @@
      "resource": {
       "title": "CSS-Tricks: A Complete Guide to Flexbox",
       "url": "https://css-tricks.com/snippets/css/a-guide-to-flexbox/"
-     }
+     },
+     "video": {
+      "id": "yMEjLBKyvEg",
+      "title": "The fundamentals of CSS layout (Kevin Powell)"
+     },
+     "why": "Layout bugs are mostly box-model surprises. Knowing how size is computed, and when to use flexbox or grid, makes CSS predictable instead of trial and error.",
+     "terms": [
+      {
+       "t": "Box model",
+       "d": "Content, padding, border, margin."
+      },
+      {
+       "t": "`box-sizing: border-box`",
+       "d": "Makes `width` include padding and border."
+      },
+      {
+       "t": "Flexbox",
+       "d": "One-dimensional layout along a main axis."
+      },
+      {
+       "t": "Grid",
+       "d": "Two-dimensional layout with rows and columns; `fr` is a fraction of free space."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "`width: 200px; padding: 20px` gives a 200px-wide box.",
+       "right": "With the default `content-box` it's 240px wide. Set `box-sizing: border-box` globally."
+      },
+      {
+       "wrong": "Vertical margins between blocks add up.",
+       "right": "Adjacent vertical margins collapse to the larger one."
+      }
+     ],
+     "takeaways": [
+      "Set `box-sizing: border-box` on everything.",
+      "Flexbox for a row or column of items; grid for two-dimensional layouts.",
+      "`repeat(auto-fill, minmax(200px, 1fr))` makes a responsive grid with no media queries."
+     ]
     },
     {
      "id": "s4m1l3",
@@ -340,7 +416,45 @@
      "resource": {
       "title": "MDN: Closures",
       "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures"
-     }
+     },
+     "video": {
+      "id": "beZfCfiuIkA",
+      "title": "Learn JavaScript closures in 10 minutes"
+     },
+     "why": "JavaScript looks like Python until it doesn't. Knowing exactly where equality, scope and `this` differ prevents the bugs that catch Python programmers out.",
+     "terms": [
+      {
+       "t": "`const` / `let`",
+       "d": "Block-scoped declarations; `const` can't be reassigned (but objects stay mutable)."
+      },
+      {
+       "t": "`===`",
+       "d": "Strict equality with no type coercion; use it instead of `==`."
+      },
+      {
+       "t": "`undefined` vs `null`",
+       "d": "Never set vs intentionally empty."
+      },
+      {
+       "t": "`this`",
+       "d": "Set by how a function is called, not where it's defined; arrow functions inherit it."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "`[1, 2] === [1, 2]` is true.",
+       "right": "Objects and arrays compare by identity, so two separate arrays are never `===`."
+      },
+      {
+       "wrong": "`const` makes an object immutable.",
+       "right": "It only prevents reassigning the name; you can still change the object's properties."
+      }
+     ],
+     "takeaways": [
+      "Use `const` by default, `let` when you must reassign, never `var`.",
+      "Always use `===` and `!==`.",
+      "Detached methods lose `this`; arrow functions keep the surrounding one."
+     ]
     },
     {
      "id": "s4m1l4",
@@ -445,7 +559,45 @@
      "resource": {
       "title": "javascript.info: Event delegation",
       "url": "https://javascript.info/event-delegation"
-     }
+     },
+     "video": {
+      "id": "aZ3JWv0ofuA",
+      "title": "Event Delegation in JavaScript, Simplified"
+     },
+     "why": "Every interactive page reads and changes the DOM in response to events. A state-then-render habit keeps the page in sync as it grows.",
+     "terms": [
+      {
+       "t": "DOM",
+       "d": "The browser's live tree of objects built from HTML."
+      },
+      {
+       "t": "Event bubbling",
+       "d": "An event travels up from the target to its ancestors."
+      },
+      {
+       "t": "Event delegation",
+       "d": "One listener on a parent handles events from many children via `event.target.closest()`."
+      },
+      {
+       "t": "State, then render",
+       "d": "Change the data first, then redraw the page from it."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "I should attach a listener to every list item.",
+       "right": "Delegate from the list. It's less code and works for items added later."
+      },
+      {
+       "wrong": "Updating the DOM directly in each handler keeps things simple.",
+       "right": "It drifts out of sync with your data. Update the array, then re-render from it."
+      }
+     ],
+     "takeaways": [
+      "`querySelector` finds elements; `textContent` sets text safely.",
+      "Use delegation with `closest()` for lists.",
+      "Keep one source of truth in an array and render from it."
+     ]
     },
     {
      "id": "s4m1l5",
@@ -543,7 +695,45 @@
      "resource": {
       "title": "javascript.info: Event loop, microtasks and macrotasks",
       "url": "https://javascript.info/event-loop"
-     }
+     },
+     "video": {
+      "id": "8aGhZQkoFbQ",
+      "title": "What the heck is the event loop anyway? (Philip Roberts, JSConf EU)"
+     },
+     "why": "Every network request, timer and file read in JavaScript is asynchronous. Predicting the order code runs in, and handling failures, is essential for any web app.",
+     "terms": [
+      {
+       "t": "Event loop",
+       "d": "Runs queued callbacks one at a time on JavaScript's single thread."
+      },
+      {
+       "t": "Promise",
+       "d": "A value that will exist later: pending, then fulfilled or rejected."
+      },
+      {
+       "t": "`async` / `await`",
+       "d": "Syntax that pauses an async function until a promise settles."
+      },
+      {
+       "t": "Microtask",
+       "d": "Promise callbacks run before timers and other macrotasks."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "`fetch` rejects on a 404 or 500.",
+       "right": "It rejects only on network failure. Check `res.ok` yourself."
+      },
+      {
+       "wrong": "`setTimeout(f, 0)` runs `f` immediately.",
+       "right": "It runs after the current code and all pending promise callbacks finish."
+      }
+     ],
+     "takeaways": [
+      "Synchronous code runs first, then microtasks, then timers.",
+      "Wrap `await` calls in `try/catch` and check `res.ok`.",
+      "Use `Promise.all` to run independent requests at once."
+     ]
     }
    ],
    "project": {
@@ -763,7 +953,45 @@
      "resource": {
       "title": "TypeScript Handbook: Narrowing",
       "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html"
-     }
+     },
+     "video": {
+      "id": "4EcR6o17PEU",
+      "title": "TypeScript Advanced - Generics, Utility Types, Narrowing"
+     },
+     "why": "TypeScript catches whole classes of bugs before you run anything and makes large codebases navigable. Most modern frontend and Node projects use it.",
+     "terms": [
+      {
+       "t": "Static type checker",
+       "d": "Checks types at build time; types are erased at runtime."
+      },
+      {
+       "t": "Union type",
+       "d": "A value that is one of several types: `'idle' | 'loading' | 'error'`."
+      },
+      {
+       "t": "Narrowing",
+       "d": "Checks like `typeof` or `if (x.kind === 'a')` that refine a union's type."
+      },
+      {
+       "t": "Generic",
+       "d": "A type parameter like `T` that links input and output types."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "TypeScript checks data coming from an API at runtime.",
+       "right": "Types are erased. Validate external data with a schema library such as Zod."
+      },
+      {
+       "wrong": "`any` is a harmless shortcut.",
+       "right": "It switches off checking for that value and everything it touches. Use `unknown` and narrow."
+      }
+     ],
+     "takeaways": [
+      "Model states as unions, especially discriminated unions with a `kind` field.",
+      "Let inference work; annotate function boundaries.",
+      "Validate anything from outside your program at runtime."
+     ]
     },
     {
      "id": "s4m2l2",
@@ -868,7 +1096,45 @@
      "resource": {
       "title": "react.dev: Passing Props to a Component",
       "url": "https://react.dev/learn/passing-props-to-a-component"
-     }
+     },
+     "video": {
+      "id": "tMc_VSt6Cco",
+      "title": "React Components & Props"
+     },
+     "why": "Components are how every React app is built. Clean props and stable keys keep the UI predictable as data changes.",
+     "terms": [
+      {
+       "t": "Component",
+       "d": "A function that takes props and returns JSX."
+      },
+      {
+       "t": "Props",
+       "d": "Read-only inputs passed from parent to child."
+      },
+      {
+       "t": "One-way data flow",
+       "d": "Data goes down through props; changes come back up through callbacks."
+      },
+      {
+       "t": "Key",
+       "d": "A stable, unique id that tells React which list item is which."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Using the array index as a key is fine.",
+       "right": "When items are inserted, deleted or reordered, indexes shift and React mixes up their state. Use a real id."
+      },
+      {
+       "wrong": "A child can change its props to update the parent.",
+       "right": "Props are read-only. Pass a callback prop and let the parent update its state."
+      }
+     ],
+     "takeaways": [
+      "Treat components as pure functions of their props.",
+      "Split UI into components by what changes together.",
+      "Give list items stable keys from your data."
+     ]
     },
     {
      "id": "s4m2l3",
@@ -976,7 +1242,45 @@
      "resource": {
       "title": "react.dev: Synchronizing with Effects",
       "url": "https://react.dev/learn/synchronizing-with-effects"
-     }
+     },
+     "video": {
+      "id": "uC9-bXdnHDk",
+      "title": "You might not need an effect (React)"
+     },
+     "why": "State and effects are where most React bugs come from. Understanding render snapshots and when not to use an effect avoids stale values and loops.",
+     "terms": [
+      {
+       "t": "`useState`",
+       "d": "Gives a component memory; the setter schedules a re-render."
+      },
+      {
+       "t": "Snapshot",
+       "d": "Each render sees the state values as they were for that render."
+      },
+      {
+       "t": "Immutable update",
+       "d": "Create a new array or object instead of mutating: `[...items, x]`."
+      },
+      {
+       "t": "`useEffect`",
+       "d": "Runs after render to sync with things outside React, with optional cleanup."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "After `setCount(count + 1)`, `count` is updated on the next line.",
+       "right": "It's a snapshot for this render. The new value appears on the next render; use `setCount(c => c + 1)` to chain updates."
+      },
+      {
+       "wrong": "I need an effect to compute filtered data from state.",
+       "right": "Compute it during render. Effects are for syncing with outside systems."
+      }
+     ],
+     "takeaways": [
+      "Never mutate state; create new values.",
+      "Derive data in render; respond to events in handlers.",
+      "Effects need correct dependencies and cleanup."
+     ]
     },
     {
      "id": "s4m2l4",
@@ -1079,7 +1383,45 @@
      "resource": {
       "title": "Full Stack Open: Getting data from server",
       "url": "https://fullstackopen.com/en/part2/getting_data_from_server"
-     }
+     },
+     "video": {
+      "id": "SYs5E4yrtpY",
+      "title": "Be Cautious of React.useEffect Race Condition Bugs"
+     },
+     "why": "Almost every app loads data and accepts input. Handling loading, errors, out-of-order responses and validation is what separates a demo from something usable.",
+     "terms": [
+      {
+       "t": "Loading / error / data",
+       "d": "The three states every fetch must represent."
+      },
+      {
+       "t": "Race condition",
+       "d": "A slow, older response arriving after a newer one and overwriting it."
+      },
+      {
+       "t": "Ignore flag / AbortController",
+       "d": "Ways to discard or cancel stale requests in an effect's cleanup."
+      },
+      {
+       "t": "Controlled input",
+       "d": "An input whose value lives in state and changes through `onChange`."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Responses arrive in the order I sent the requests.",
+       "right": "They can arrive out of order. Ignore or abort stale ones in the effect cleanup."
+      },
+      {
+       "wrong": "Client-side validation is enough.",
+       "right": "It's for user experience. The server must validate again because requests can bypass the form."
+      }
+     ],
+     "takeaways": [
+      "Show loading and error states, not just data.",
+      "Cancel or ignore stale requests.",
+      "Controlled inputs make validation and resetting simple."
+     ]
     },
     {
      "id": "s4m2l5",
@@ -1184,7 +1526,45 @@
      "resource": {
       "title": "react.dev: Thinking in React",
       "url": "https://react.dev/learn/thinking-in-react"
-     }
+     },
+     "video": {
+      "id": "uqKoqcO08ho",
+      "title": "How to Folder Structure Your React App"
+     },
+     "why": "As apps grow, the hard part is knowing where state lives and where code goes. A few rules keep features easy to find and change.",
+     "terms": [
+      {
+       "t": "Lift state up",
+       "d": "Move state to the closest common parent of the components that need it."
+      },
+      {
+       "t": "Server state vs UI state",
+       "d": "Data owned by your API vs local details like which tab is open."
+      },
+      {
+       "t": "Custom hook",
+       "d": "A `use…` function that packages stateful logic for reuse."
+      },
+      {
+       "t": "Feature folder",
+       "d": "Grouping a feature's components, hooks and API calls together."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Put everything in global state so any component can reach it.",
+       "right": "Keep state as local as possible; lift it only as far as needed."
+      },
+      {
+       "wrong": "Organise by file type: all components here, all hooks there.",
+       "right": "Past a handful of files, organise by feature so related code sits together."
+      }
+     ],
+     "takeaways": [
+      "Find the minimal state and its closest common owner.",
+      "Treat server state separately; a library like React Query helps.",
+      "Extract custom hooks to keep components focused on rendering."
+     ]
     }
    ],
    "project": {
@@ -1400,7 +1780,45 @@
      "resource": {
       "title": "MDN: HTTP caching",
       "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching"
-     }
+     },
+     "video": {
+      "id": "iYM2zFP3Zn0",
+      "title": "HTTP Crash Course & Exploration"
+     },
+     "why": "Every API you build or call speaks HTTP. Choosing the right method, status code and cache headers makes APIs predictable, fast and safe to retry.",
+     "terms": [
+      {
+       "t": "Safe method",
+       "d": "Has no side effects, like `GET`."
+      },
+      {
+       "t": "Idempotent method",
+       "d": "Repeating it has the same effect as doing it once, like `PUT` and `DELETE`."
+      },
+      {
+       "t": "Status code",
+       "d": "201 created, 204 no content, 400 bad input, 401 not authenticated, 403 forbidden, 404 not found."
+      },
+      {
+       "t": "`Cache-Control`",
+       "d": "Tells caches whether and how long to reuse a response."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "`POST` and `PUT` are interchangeable.",
+       "right": "`PUT` replaces a resource at a known URL and is idempotent; `POST` creates and isn't."
+      },
+      {
+       "wrong": "401 and 403 mean the same thing.",
+       "right": "401: we don't know who you are. 403: we know, and you're not allowed."
+      }
+     ],
+     "takeaways": [
+      "Methods carry meaning: GET reads, POST creates, PUT/PATCH update, DELETE removes.",
+      "Pick precise status codes so clients can react correctly.",
+      "Cache headers save round trips; `no-store` for private data."
+     ]
     },
     {
      "id": "s4m3l2",
@@ -1507,7 +1925,45 @@
      "resource": {
       "title": "Full Stack Open: Node.js and Express",
       "url": "https://fullstackopen.com/en/part3/node_js_and_express"
-     }
+     },
+     "video": {
+      "id": "OTz2mlLYeWU",
+      "title": "Create a CRUD REST API with Node.js, Express and MySQL"
+     },
+     "why": "A REST API with clear routes and layers is the backbone of most web apps. Express shows the middleware pattern you'll see in nearly every web framework.",
+     "terms": [
+      {
+       "t": "Resource",
+       "d": "A thing identified by a URL, like `/notes/42`."
+      },
+      {
+       "t": "Middleware",
+       "d": "`(req, res, next)` functions that run in order, each responding or passing on."
+      },
+      {
+       "t": "Route handler",
+       "d": "Parses the request and chooses the status code."
+      },
+      {
+       "t": "Service / repository",
+       "d": "Business rules / database access, kept out of routes."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Putting SQL and business rules directly in route handlers is fine.",
+       "right": "It makes them hard to test and change. Keep routes thin and push logic into a service."
+      },
+      {
+       "wrong": "Middleware order doesn't matter.",
+       "right": "It runs in registration order; `express.json()` must come before routes that read `req.body`."
+      }
+     ],
+     "takeaways": [
+      "Name routes after resources, not actions.",
+      "Middleware is a pipeline; order matters.",
+      "Routes → service → repository keeps each layer simple."
+     ]
     },
     {
      "id": "s4m3l3",
@@ -1605,7 +2061,45 @@
      "resource": {
       "title": "Express: Error handling",
       "url": "https://expressjs.com/en/guide/error-handling.html"
-     }
+     },
+     "video": {
+      "id": "O0OkcpfkflQ",
+      "title": "Zod Input Validation in Node.js (Beginner Tutorial)"
+     },
+     "why": "Unvalidated input causes crashes, data corruption and security holes. Validating at the boundary and returning consistent errors makes an API robust and easy to use.",
+     "terms": [
+      {
+       "t": "Validate at the boundary",
+       "d": "Check types, required fields, lengths and formats before business logic runs."
+      },
+      {
+       "t": "Schema",
+       "d": "A declarative description of valid input, as with Zod."
+      },
+      {
+       "t": "Error-handling middleware",
+       "d": "`(err, req, res, next)` registered after routes."
+      },
+      {
+       "t": "Mass assignment",
+       "d": "Copying all request fields into a record, letting clients set fields like `isAdmin`."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Returning the raw exception message helps clients debug.",
+       "right": "It can leak internals such as SQL and file paths. Log details; return a generic message with a code."
+      },
+      {
+       "wrong": "Validating the frontend form means the API is safe.",
+       "right": "Anyone can send requests directly. The API must validate every request."
+      }
+     ],
+     "takeaways": [
+      "Parse every request with a schema and pick only the fields you allow.",
+      "Return errors in one consistent shape.",
+      "Catch async errors so they reach your error handler instead of crashing."
+     ]
     },
     {
      "id": "s4m3l4",
@@ -1702,7 +2196,45 @@
      "resource": {
       "title": "OWASP Password Storage Cheat Sheet",
       "url": "https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html"
-     }
+     },
+     "video": {
+      "id": "7fIOSZtU3EE",
+      "title": "Session vs Token Authentication"
+     },
+     "why": "Authentication bugs expose every user at once. Hashing passwords correctly and understanding sessions versus tokens is basic professional practice.",
+     "terms": [
+      {
+       "t": "Password hashing",
+       "d": "A slow, salted one-way function like argon2id, scrypt or bcrypt."
+      },
+      {
+       "t": "Salt",
+       "d": "A unique random value per password so identical passwords hash differently."
+      },
+      {
+       "t": "Session",
+       "d": "A random id in a cookie mapped to the user on the server."
+      },
+      {
+       "t": "JWT",
+       "d": "A signed token whose claims the server trusts after checking the signature."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Encrypting passwords is safe storage.",
+       "right": "Encryption can be reversed with the key. Store a slow, salted hash."
+      },
+      {
+       "wrong": "A JWT's contents are secret.",
+       "right": "They're base64url-encoded, not encrypted; anyone can read them. Don't put secrets inside."
+      }
+     ],
+     "takeaways": [
+      "Use argon2id, scrypt or bcrypt, never a fast hash like SHA-256 alone.",
+      "Sessions are easy to revoke; JWTs avoid a lookup but are hard to revoke early.",
+      "Cookies should be `HttpOnly`, `Secure` and `SameSite`."
+     ]
     },
     {
      "id": "s4m3l5",
@@ -1814,7 +2346,45 @@
      "resource": {
       "title": "OWASP Authorization Cheat Sheet",
       "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html"
-     }
+     },
+     "video": {
+      "id": "eJEbe6byDZk",
+      "title": "OWASP Top 10 - Broken Access Control"
+     },
+     "why": "Broken access control is the most common serious web vulnerability. Checking permissions on the server, on every request, protects every user's data.",
+     "terms": [
+      {
+       "t": "Authentication vs authorization",
+       "d": "Who you are vs what you may do."
+      },
+      {
+       "t": "IDOR",
+       "d": "Insecure direct object reference: changing an id in a request reaches someone else's data."
+      },
+      {
+       "t": "Deny by default",
+       "d": "Everything is forbidden unless a rule allows it."
+      },
+      {
+       "t": "RBAC",
+       "d": "Role-based access control: permissions attached to roles like member or admin."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Hiding a button in the UI stops users from doing the action.",
+       "right": "Anyone can send the request directly. Check permissions on the server."
+      },
+      {
+       "wrong": "If a user is logged in, they can access any id they ask for.",
+       "right": "Scope queries by owner, such as `WHERE id = $1 AND user_id = $2`."
+      }
+     ],
+     "takeaways": [
+      "Authorize on the server, on every request, close to the data.",
+      "Return 404 for other users' resources to avoid revealing they exist.",
+      "Put rules in one `can(user, action, resource)` function and test them as cases."
+     ]
     }
    ],
    "project": {
@@ -2041,7 +2611,45 @@
      "resource": {
       "title": "SQLBolt: Introduction to SQL",
       "url": "https://sqlbolt.com/lesson/select_queries_introduction"
-     }
+     },
+     "video": {
+      "id": "h0nxCDiD-zg",
+      "title": "SQL Tutorial for Beginners (Kevin Stratvert)"
+     },
+     "why": "Most applications keep their important data in a relational database. Solid SQL basics, including NULL handling, let you get exactly the data you need.",
+     "terms": [
+      {
+       "t": "Table",
+       "d": "Rows with a fixed set of typed columns."
+      },
+      {
+       "t": "Primary key",
+       "d": "A column that uniquely identifies each row."
+      },
+      {
+       "t": "Foreign key",
+       "d": "A column that must match a primary key in another table."
+      },
+      {
+       "t": "NULL",
+       "d": "Unknown; comparisons with it are neither true nor false."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "`WHERE phone = NULL` finds rows without a phone.",
+       "right": "Comparing with NULL gives NULL, so no rows match. Use `IS NULL`."
+      },
+      {
+       "wrong": "Rows come back in insertion order.",
+       "right": "Order is undefined without `ORDER BY`."
+      }
+     ],
+     "takeaways": [
+      "Constraints (NOT NULL, UNIQUE, CHECK, FOREIGN KEY) protect data better than app code.",
+      "SQL is declarative: say what you want, not how.",
+      "Use `IS NULL` and `COALESCE` to handle unknowns."
+     ]
     },
     {
      "id": "s4m4l2",
@@ -2138,7 +2746,45 @@
      "resource": {
       "title": "SQLBolt: Queries with joins",
       "url": "https://sqlbolt.com/lesson/select_queries_with_joins"
-     }
+     },
+     "video": {
+      "id": "aY7z4HcHm5M",
+      "title": "SQL Joins Basics (Visually Explained)"
+     },
+     "why": "Real questions span tables: orders per customer, revenue by month. Joins and aggregation answer them, and avoiding double counting keeps the numbers right.",
+     "terms": [
+      {
+       "t": "Inner join",
+       "d": "Keeps only rows with a match in both tables."
+      },
+      {
+       "t": "Left join",
+       "d": "Keeps every row from the left table, with NULLs where nothing matches."
+      },
+      {
+       "t": "GROUP BY",
+       "d": "Collapses rows into groups for COUNT, SUM, AVG, MIN, MAX."
+      },
+      {
+       "t": "HAVING",
+       "d": "Filters groups after aggregation; WHERE filters rows before."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "I can join orders and tickets to customers and SUM order totals.",
+       "right": "Joining two one-to-many tables multiplies rows, so totals are counted repeatedly. Aggregate each in a subquery first."
+      },
+      {
+       "wrong": "A left join with a WHERE on the right table still keeps unmatched rows.",
+       "right": "WHERE removes the NULL rows. Put that condition in the ON clause instead."
+      }
+     ],
+     "takeaways": [
+      "Inner join drops non-matches; left join keeps them.",
+      "WHERE filters rows, HAVING filters groups.",
+      "Joins multiply rows: aggregate before joining when in doubt."
+     ]
     },
     {
      "id": "s4m4l3",
@@ -2239,7 +2885,45 @@
      "resource": {
       "title": "CMU 15-445/645 Database Systems",
       "url": "https://15445.courses.cs.cmu.edu/"
-     }
+     },
+     "video": {
+      "id": "YZSHpDn7GP4",
+      "title": "PostgreSQL Indexes and B-Trees (and an introduction to EXPLAIN)"
+     },
+     "why": "The difference between a 2 ms and a 2 s query is usually an index. Reading query plans lets you fix slow pages with evidence instead of guesses.",
+     "terms": [
+      {
+       "t": "Sequential scan",
+       "d": "Reading every row of a table."
+      },
+      {
+       "t": "B-tree index",
+       "d": "A sorted, shallow tree that finds a value in a few page reads."
+      },
+      {
+       "t": "Composite index",
+       "d": "An index on several columns; usable for leading-column queries."
+      },
+      {
+       "t": "EXPLAIN ANALYZE",
+       "d": "Runs the query and shows the plan with real timings."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "More indexes always make the database faster.",
+       "right": "Each index slows inserts, updates and deletes and uses space. Add the ones your queries need."
+      },
+      {
+       "wrong": "An index on (a, b) helps queries filtering only on b.",
+       "right": "It's sorted by a first, so it helps queries on a, or on a and b, not b alone."
+      }
+     ],
+     "takeaways": [
+      "Index columns used in WHERE, JOIN and ORDER BY on large tables.",
+      "Column order matters in composite indexes.",
+      "Check plans with EXPLAIN ANALYZE, and compare estimates with actual rows."
+     ]
     },
     {
      "id": "s4m4l4",
@@ -2349,7 +3033,45 @@
      "resource": {
       "title": "PostgreSQL docs: Transaction Isolation",
       "url": "https://www.postgresql.org/docs/current/transaction-iso.html"
-     }
+     },
+     "video": {
+      "id": "iD_Yk5AhNGc",
+      "title": "ACID: Isolation, Transactions and what can go wrong with your data"
+     },
+     "why": "Concurrent requests can silently corrupt data, like overselling the last item. Transactions and the right fix keep data correct under load.",
+     "terms": [
+      {
+       "t": "Transaction",
+       "d": "Statements that succeed or fail together: BEGIN … COMMIT or ROLLBACK."
+      },
+      {
+       "t": "ACID",
+       "d": "Atomicity, consistency, isolation, durability."
+      },
+      {
+       "t": "Lost update",
+       "d": "Two transactions read the same value and one's write overwrites the other's."
+      },
+      {
+       "t": "Isolation level",
+       "d": "Read Committed (Postgres default), Repeatable Read, Serializable."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Wrapping code in a transaction prevents all concurrency bugs.",
+       "right": "At Read Committed, read-then-write in app code can still lose updates. Use an atomic UPDATE, a row lock or a stricter level."
+      },
+      {
+       "wrong": "Serializable isolation never fails.",
+       "right": "It can abort transactions with serialization errors; your code must retry them."
+      }
+     ],
+     "takeaways": [
+      "Group related writes in one transaction.",
+      "Prefer atomic statements like `SET stock = stock - 1 WHERE stock > 0`.",
+      "Use `SELECT … FOR UPDATE` or Serializable with retries for read-then-write logic."
+     ]
     },
     {
      "id": "s4m4l5",
@@ -2450,7 +3172,45 @@
      "resource": {
       "title": "PostgreSQL docs: Constraints",
       "url": "https://www.postgresql.org/docs/current/ddl-constraints.html"
-     }
+     },
+     "video": {
+      "id": "GFQaEYEc8_8",
+      "title": "Learn Database Normalization - 1NF, 2NF, 3NF, 4NF, 5NF"
+     },
+     "why": "Schemas outlive the code that first used them. Good design and safe migrations let you change a live product without downtime or data loss.",
+     "terms": [
+      {
+       "t": "Normalisation",
+       "d": "Storing each fact once and referencing it by key."
+      },
+      {
+       "t": "Join table",
+       "d": "A table linking two entities in a many-to-many relationship."
+      },
+      {
+       "t": "Migration",
+       "d": "A versioned, ordered script that changes the schema."
+      },
+      {
+       "t": "N+1 query",
+       "d": "One query for a list, then one more per item, often hidden by an ORM."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "I can rename a column in one deploy.",
+       "right": "Old code still running will break. Expand (add new), migrate data and code, then contract (remove old)."
+      },
+      {
+       "wrong": "ORMs make SQL knowledge unnecessary.",
+       "right": "They hide queries like N+1. You still need to read the SQL they generate."
+      }
+     ],
+     "takeaways": [
+      "Model entities and relationships before tables.",
+      "Never change production schemas by hand; use migrations.",
+      "Watch ORMs for N+1 queries and use eager loading or joins."
+     ]
     }
    ],
    "project": {
@@ -2666,7 +3426,45 @@
      "resource": {
       "title": "Martin Fowler: The Practical Test Pyramid",
       "url": "https://martinfowler.com/articles/practical-test-pyramid.html"
-     }
+     },
+     "video": {
+      "id": "VO0Qbl-wzOQ",
+      "title": "Testing Pyramid - Unit Test, Integration Test, and E2E Test"
+     },
+     "why": "Tests let you change code without fear. Choosing the right level means fast feedback for most bugs and a few slow tests for the journeys that matter most.",
+     "terms": [
+      {
+       "t": "Unit test",
+       "d": "Checks one function or module in isolation, in milliseconds."
+      },
+      {
+       "t": "Integration test",
+       "d": "Checks several pieces working together, like an API with a real database."
+      },
+      {
+       "t": "End-to-end test",
+       "d": "Drives the real app through a browser like a user."
+      },
+      {
+       "t": "Test pyramid",
+       "d": "Many unit tests, fewer integration tests, a handful of e2e tests."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "End-to-end tests are best because they test everything.",
+       "right": "They're slow, flaky and vague about the cause. Use the cheapest level that would catch the bug."
+      },
+      {
+       "wrong": "Tests should check private helper functions directly.",
+       "right": "Test behaviour through public interfaces so you can refactor freely."
+      }
+     ],
+     "takeaways": [
+      "Ask: what's the cheapest test that would have caught this bug?",
+      "Arrange, act, assert, with one behaviour per test.",
+      "Keep e2e tests for critical journeys like sign-up and payment."
+     ]
     },
     {
      "id": "s4m5l2",
@@ -2772,7 +3570,45 @@
      "resource": {
       "title": "Martin Fowler: Test Driven Development",
       "url": "https://martinfowler.com/bliki/TestDrivenDevelopment.html"
-     }
+     },
+     "video": {
+      "id": "pzLJ1cMhnc8",
+      "title": "Test Driven Development in Node - Write a Bug Fix Unit-Test First"
+     },
+     "why": "A bug with a test is a bug that can't come back. Writing the failing test first also proves you've understood the bug before you fix it.",
+     "terms": [
+      {
+       "t": "Failing test first",
+       "d": "Reproduce the bug as a red test before changing code."
+      },
+      {
+       "t": "Minimal reproduction",
+       "d": "The smallest concrete input that still shows the bug."
+      },
+      {
+       "t": "Red–green–refactor",
+       "d": "Failing test, simplest fix, then clean up with tests passing."
+      },
+      {
+       "t": "Regression test",
+       "d": "A test that guards against a fixed bug returning."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "I'll fix the bug first, then write a test.",
+       "right": "A test written after may not fail on the old code, so it proves nothing. See it fail first."
+      },
+      {
+       "wrong": "Assert that the function I suspect is called with certain arguments.",
+       "right": "Assert on the behaviour the user cares about, like the total, so the test survives rewrites."
+      }
+     ],
+     "takeaways": [
+      "Turn the report into a concrete failing test.",
+      "Fix, see it pass, then test neighbouring cases.",
+      "Keep the test forever as a regression guard."
+     ]
     },
     {
      "id": "s4m5l3",
@@ -2873,7 +3709,45 @@
      "resource": {
       "title": "Vitest: Mocking",
       "url": "https://vitest.dev/guide/mocking"
-     }
+     },
+     "video": {
+      "id": "XcoTYFdq_L0",
+      "title": "Test Doubles - Designing for and using Stubs, Fakes, Mocks, and Spies"
+     },
+     "why": "Tests that hit real networks, clocks and randomness are slow and flaky. Replacing just those boundaries keeps tests fast without making them meaningless.",
+     "terms": [
+      {
+       "t": "Test double",
+       "d": "A stand-in for a real dependency in tests."
+      },
+      {
+       "t": "Stub / mock / spy / fake",
+       "d": "Canned answers / verifies calls / records calls / a working simplified version."
+      },
+      {
+       "t": "Dependency injection",
+       "d": "Passing dependencies in so tests can supply doubles."
+      },
+      {
+       "t": "Boundary",
+       "d": "Where your system meets the outside world: network, clock, randomness, third-party APIs."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Mock every collaborator to isolate the unit.",
+       "right": "Then tests only prove the code calls your mocks as written. Mock only at system boundaries."
+      },
+      {
+       "wrong": "I need a mocking library to use test doubles.",
+       "right": "Passing a plain object or function with the same interface is often simpler and clearer."
+      }
+     ],
+     "takeaways": [
+      "Inject dependencies like `{ users, mailer, now }`.",
+      "Fakes (an in-memory store) often beat mocks for realism.",
+      "Mock the network and the clock, not your own modules."
+     ]
     },
     {
      "id": "s4m5l4",
@@ -2978,7 +3852,45 @@
      "resource": {
       "title": "Full Stack Open: Testing the backend",
       "url": "https://fullstackopen.com/en/part4/testing_the_backend"
-     }
+     },
+     "video": {
+      "id": "r5L1XRZaCR0",
+      "title": "Testing Express REST API With Jest & Supertest"
+     },
+     "why": "API tests catch the bugs users actually hit: wrong status codes, missing auth checks, constraint violations. They're the best value tests for a backend.",
+     "terms": [
+      {
+       "t": "Supertest",
+       "d": "Sends HTTP requests to an Express app in tests without a real port."
+      },
+      {
+       "t": "Test database",
+       "d": "A separate database of the same engine as production, reset between tests."
+      },
+      {
+       "t": "Unhappy path",
+       "d": "Errors and edge cases: no session, wrong user, invalid input, duplicates."
+      },
+      {
+       "t": "Fixture",
+       "d": "Known data set up before a test."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "SQLite in tests is fine for a Postgres app.",
+       "right": "Types, constraints and SQL differ. Test against the same engine you run in production."
+      },
+      {
+       "wrong": "Testing the happy path is enough.",
+       "right": "Most real bugs are in error handling and authorization. Test 401, 404, 422 and 409 cases."
+      }
+     ],
+     "takeaways": [
+      "Export the app without `listen` so tests can drive it.",
+      "Reset the database between tests so they're independent.",
+      "Cover authentication and authorization failures explicitly."
+     ]
     },
     {
      "id": "s4m5l5",
@@ -3084,7 +3996,45 @@
      "resource": {
       "title": "GitHub Docs: GitHub Actions",
       "url": "https://docs.github.com/en/actions"
-     }
+     },
+     "video": {
+      "id": "9KVCxMrshIk",
+      "title": "Running NodeJS Tests/CI with GitHub Actions"
+     },
+     "why": "CI runs your tests on every change, on a clean machine, before it merges. It's the safety net that lets teams move fast without breaking main.",
+     "terms": [
+      {
+       "t": "Continuous integration",
+       "d": "Building and testing every change automatically."
+      },
+      {
+       "t": "Workflow / job / step",
+       "d": "A YAML file with triggers, jobs that run on runners, and steps within jobs."
+      },
+      {
+       "t": "Service container",
+       "d": "A database like Postgres started for a job's tests."
+      },
+      {
+       "t": "Branch protection",
+       "d": "A rule requiring passing checks before merging to main."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "CI that runs but doesn't block merging is enough.",
+       "right": "Make the check required with branch protection, or failures get merged anyway."
+      },
+      {
+       "wrong": "Putting API keys directly in the workflow file is fine for private repos.",
+       "right": "Use encrypted secrets; workflow files are code and get copied, forked and logged."
+      }
+     ],
+     "takeaways": [
+      "Trigger on push and pull_request; install, lint and test.",
+      "Cache dependencies to keep runs fast.",
+      "Require the CI check before merging to main."
+     ]
     }
    ],
    "project": {
@@ -3308,7 +4258,45 @@
      "resource": {
       "title": "MIT Missing Semester: Command-line Environment",
       "url": "https://missing.csail.mit.edu/2020/command-line/"
-     }
+     },
+     "video": {
+      "id": "fgaFm_GyEUo",
+      "title": "Secure SSH Key Setup"
+     },
+     "why": "Most production software runs on Linux servers you reach over SSH. Basic hardening and systemd keep your app running and your server safe.",
+     "terms": [
+      {
+       "t": "SSH key pair",
+       "d": "A private key you keep and a public key you put on the server."
+      },
+      {
+       "t": "Hardening",
+       "d": "Non-root user, no password or root login, firewall, automatic updates."
+      },
+      {
+       "t": "systemd unit",
+       "d": "A file describing a service: command, user, environment, restart policy."
+      },
+      {
+       "t": "journalctl",
+       "d": "Reads service logs collected by systemd."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Logging in as root with a password is fine for a small server.",
+       "right": "Bots try passwords on every public server constantly. Use keys, a non-root user and disable password login."
+      },
+      {
+       "wrong": "Running the app with `nohup` in an SSH session is a deployment.",
+       "right": "It dies on reboot and nobody restarts it. Use a systemd service with `Restart=`."
+      }
+     ],
+     "takeaways": [
+      "Use ed25519 keys and disable password logins.",
+      "Run apps as systemd services, not in a terminal.",
+      "Read logs with `journalctl -u <service>`."
+     ]
     },
     {
      "id": "s4m6l2",
@@ -3410,7 +4398,45 @@
      "resource": {
       "title": "Docker Docs: Get started",
       "url": "https://docs.docker.com/get-started/"
-     }
+     },
+     "video": {
+      "id": "gAkwW2tuIqE",
+      "title": "Learn Docker in 7 Easy Steps - Full Beginner's Tutorial"
+     },
+     "why": "Containers make 'works on my machine' work everywhere. Docker is the standard way to package and run services in development and production.",
+     "terms": [
+      {
+       "t": "Image",
+       "d": "A read-only template built from a Dockerfile, made of layers."
+      },
+      {
+       "t": "Container",
+       "d": "A running, isolated process created from an image, sharing the host kernel."
+      },
+      {
+       "t": "Layer cache",
+       "d": "Unchanged instructions reuse cached layers; order Dockerfiles from least to most frequently changed."
+      },
+      {
+       "t": "Docker Compose",
+       "d": "Runs several containers together, like an app and Postgres, from one file."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "A container is a lightweight virtual machine with its own kernel.",
+       "right": "It's an isolated process using the host's kernel."
+      },
+      {
+       "wrong": "Copying the whole project before `npm install` is fine.",
+       "right": "Any code change then invalidates the install layer. Copy `package*.json`, install, then copy the rest."
+      }
+     ],
+     "takeaways": [
+      "Order instructions so dependencies are cached.",
+      "Use slim bases, multi-stage builds and a non-root user.",
+      "Compose wires up your app and its database for local development."
+     ]
     },
     {
      "id": "s4m6l3",
@@ -3507,7 +4533,45 @@
      "resource": {
       "title": "The Twelve-Factor App: Config",
       "url": "https://12factor.net/config"
-     }
+     },
+     "video": {
+      "id": "QBSKSihFt-I",
+      "title": "Principles every developer should know (The Twelve-Factor App)"
+     },
+     "why": "Leaked secrets are one of the most common causes of breaches. Validated, environment-based config makes deploys repeatable and secrets easy to rotate.",
+     "terms": [
+      {
+       "t": "Twelve-factor config",
+       "d": "Anything that differs between deploys lives in environment variables."
+      },
+      {
+       "t": "Config validation",
+       "d": "Parsing and checking all settings once at startup, failing fast."
+      },
+      {
+       "t": "Secret",
+       "d": "A credential such as a database password, API key or signing key."
+      },
+      {
+       "t": "Rotation",
+       "d": "Replacing a secret with a new one, especially after a leak."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Environment variables are typed values.",
+       "right": "They're always strings. Parse numbers and booleans explicitly; `\"false\"` is truthy."
+      },
+      {
+       "wrong": "If a secret is committed, deleting it in the next commit is enough.",
+       "right": "It's still in the history. Rotate it immediately."
+      }
+     ],
+     "takeaways": [
+      "Read config in one module and validate it at startup.",
+      "Keep `.env` out of Git, images and the browser.",
+      "Never log secrets; rotate any that leak."
+     ]
     },
     {
      "id": "s4m6l4",
@@ -3613,7 +4677,45 @@
      "resource": {
       "title": "Google SRE Book: Monitoring Distributed Systems",
       "url": "https://sre.google/sre-book/monitoring-distributed-systems/"
-     }
+     },
+     "video": {
+      "id": "hGYNW8-_c3U",
+      "title": "Deploy to Production - Node, Postgres, Redis, React - with Render"
+     },
+     "why": "Shipping is only half the job; knowing it's working is the other half. Health checks, structured logs and alerts tell you about problems before users do.",
+     "terms": [
+      {
+       "t": "Build / release / run",
+       "d": "Make an artifact, combine it with config and migrations, run it."
+      },
+      {
+       "t": "Health check",
+       "d": "An endpoint like `/healthz` the platform uses to route traffic only to working instances."
+      },
+      {
+       "t": "Structured logs",
+       "d": "One JSON object per event with level, request id and duration."
+      },
+      {
+       "t": "Four golden signals",
+       "d": "Latency, traffic, errors, saturation."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Running a destructive migration in the same deploy as the code change is fine.",
+       "right": "Old instances may still be running. Make migrations backward compatible and split risky changes."
+      },
+      {
+       "wrong": "Logs with `console.log` strings are enough.",
+       "right": "Free-text logs are hard to search. Structured JSON with a request id makes one request traceable."
+      }
+     ],
+     "takeaways": [
+      "Make deploys boring: health checks, migrations as a release step, easy rollback.",
+      "Log structured events with request ids.",
+      "Add error tracking and an external uptime check that alerts you."
+     ]
     },
     {
      "id": "s4m6l5",
@@ -3725,7 +4827,45 @@
      "resource": {
       "title": "OWASP Top Ten",
       "url": "https://owasp.org/www-project-top-ten/"
-     }
+     },
+     "video": {
+      "id": "Jzr0Jdnq_EI",
+      "title": "OWASP Top 10 2025: Your complete guide to securing your applications"
+     },
+     "why": "A handful of mistakes cause most web breaches. Knowing the defences for injection, XSS and CSRF protects your users with small, reliable habits.",
+     "terms": [
+      {
+       "t": "SQL injection",
+       "d": "User input changing the structure of a query; prevented with parameterised queries."
+      },
+      {
+       "t": "XSS",
+       "d": "Untrusted input running as script in another user's browser; prevented by escaping output."
+      },
+      {
+       "t": "CSRF",
+       "d": "Another site making the user's browser send a request with their cookies; prevented with SameSite cookies or tokens."
+      },
+      {
+       "t": "Content-Security-Policy",
+       "d": "A header restricting where scripts can load from, limiting XSS damage."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Escaping quotes in user input prevents SQL injection.",
+       "right": "Hand-escaping misses cases. Use parameterised queries so data can never become SQL."
+      },
+      {
+       "wrong": "Setting `innerHTML` with user text is safe if it looks harmless.",
+       "right": "Use `textContent` or a framework's escaping; only insert HTML you've sanitised."
+      }
+     ],
+     "takeaways": [
+      "Parameterise every query.",
+      "Escape output by default; use CSP as a second line of defence.",
+      "Use SameSite cookies and CSRF tokens for state-changing requests, and check against the OWASP Top 10."
+     ]
     }
    ],
    "project": {

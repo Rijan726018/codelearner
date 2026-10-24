@@ -1,1250 +1,1590 @@
 {
-  "id": "s8",
-  "modules": [
+ "id": "s8",
+ "modules": [
+  {
+   "id": "s8m1",
+   "title": "Leverage",
+   "summary": "You choose problems worth years of effort, turn them into designs others can review, and lead people and projects you do not control to a result others depend on.",
+   "lessons": [
     {
-      "id": "s8m1",
-      "title": "Leverage",
-      "summary": "You choose problems worth years of effort, turn them into designs others can review, and lead people and projects you do not control to a result others depend on.",
-      "lessons": [
-        {
-          "id": "s8m1l1",
-          "title": "Choosing hard, important problems",
-          "minutes": 90,
-          "objective": "By the end you can produce a written, scored list of the important problems in your area and pick one with a plausible attack, a reason it is tractable now, and a reason you are well placed to do it.",
-          "concept": [
-            "Richard Hamming asked colleagues at Bell Labs: what are the important problems of your field, and why aren't you working on them? His point was blunt: if you do not work on important problems, it is unlikely you will do important work. But importance is not size. Hamming separates them by the **attack**: a problem matters for your career only if you have a reasonable way in. Time travel is enormous and has no attack, so it is not, in his sense, an important problem.",
-            "Hamming observed that great scientists keep a list of roughly 10 to 20 important problems in mind. When a new tool, result or dataset appears, they notice which problem it unlocks and move quickly. For an engineer, high-leverage problems compound: eliminating a whole class of bugs, cutting a feedback loop from 40 minutes to 4, building a primitive many teams build on. Score each candidate on impact if solved, probability the attack works, your comparative advantage, and **why now**: what changed that makes it tractable this year.",
-            "Important problems fail more often, so structure the work so partial progress is valuable on its own: a faster test runner is useful even if the full build-system rewrite never lands. Hamming also argued for the open door: working with your door closed gets more done this year, but the open door tells you which problems matter. And he described knowledge as compounding like interest; a little more effort, sustained for years, produces a large difference in output."
-          ],
-          "visual": {
-            "type": "table",
-            "title": "Scoring candidate problems",
-            "headers": [
-              "Candidate",
-              "Impact",
-              "Attack",
-              "Why you, why now",
-              "Verdict"
-            ],
-            "rows": [
-              [
-                "Rewrite the monolith from scratch",
-                "High",
-                "Vague",
-                "Nothing changed",
-                "Not yet: no attack"
-              ],
-              [
-                "Cut CI from 40 to 8 minutes",
-                "High, every engineer daily",
-                "Profiling shows 3 hot spots",
-                "You own the build; new cache service",
-                "Strong"
-              ],
-              [
-                "Fix flaky tests one by one",
-                "Low per fix",
-                "Clear",
-                "Anyone can do it",
-                "Routine work"
-              ],
-              [
-                "Make the service memory-safe",
-                "Very high",
-                "Unclear for 2M lines",
-                "New language interop",
-                "Find a smaller slice"
-              ]
-            ]
-          },
-          "tryit": "Write your own list of 10 important problems in your area. For each, write one line each on impact, attack, why you and why now, and score it 1 to 5 on each. Pick the top one and define the smallest experiment, two weeks at most, whose result would tell you whether the attack works. Share the list with one person whose judgement you trust and ask which problem they would cut first and why.",
-          "questions": [
-            {
-              "id": "s8m1l1q1",
-              "level": 1,
-              "type": "mcq",
-              "prompt": "In Hamming's sense, what makes a problem important rather than just big?",
-              "options": [
-                "It is famous in the field",
-                "It would take a lifetime to solve",
-                "It matters and you have a reasonable attack on it",
-                "Your manager has assigned it"
-              ],
-              "answer": 2,
-              "explain": "Hamming is explicit that importance depends on having an attack. A famous or enormous problem with no way in, like time travel, is not one you should work on yet; assignment by a manager says nothing about importance."
-            },
-            {
-              "id": "s8m1l1q2",
-              "level": 2,
-              "type": "mcq",
-              "prompt": "You have six months. Which project best fits Hamming's advice?",
-              "options": [
-                "Solving general program verification, with no concrete approach yet",
-                "Cutting your company's CI time from 40 to 8 minutes: profiling found three hot spots, and a new caching service makes it tractable",
-                "Answering every open ticket in your team's backlog",
-                "Rewriting your favourite library in a new language for fun"
-              ],
-              "answer": 1,
-              "explain": "The CI project has high, compounding impact, a concrete attack and a reason it is tractable now. The verification problem is important but has no attack; backlog work and a fun rewrite are useful or enjoyable but not leveraged."
-            },
-            {
-              "id": "s8m1l1q3",
-              "level": 3,
-              "type": "mcq",
-              "prompt": "You plan a 12-month project to replace your company's build system. Which plan best manages the risk Hamming warns about?",
-              "options": [
-                "Work in secret until the whole system is finished, then reveal it",
-                "Sequence the work so each stage ships value on its own, such as remote caching first, then hermetic tests, then the new build graph",
-                "Ask for a large team on day one so it finishes sooner",
-                "Keep the scope vague so it can adapt"
-              ],
-              "answer": 1,
-              "explain": "Important problems often fail; staging the work so each step pays off alone means a failure later still leaves real value. Secrecy removes feedback, a big team early adds coordination before the approach is proven, and vague scope makes progress unmeasurable."
-            },
-            {
-              "id": "s8m1l1q4",
-              "level": 2,
-              "type": "mcq",
-              "prompt": "Why does Hamming argue for keeping your door open, despite the interruptions?",
-              "options": [
-                "Managers can watch you work",
-                "It is required by company policy",
-                "Interruptions keep you connected to what problems matter, even though you get less done in the short term",
-                "Open doors improve ventilation and focus"
-              ],
-              "answer": 2,
-              "explain": "Hamming acknowledges the closed door gives more focused work now, but says those who keep the door open tend to work on the right problems later, because they hear what others need. It is about direction, not supervision or policy."
-            }
-          ],
-          "resource": {
-            "title": "Richard Hamming: You and Your Research",
-            "url": "https://www.cs.virginia.edu/~robins/YouAndYourResearch.html"
-          }
-        },
-        {
-          "id": "s8m1l2",
-          "title": "Design docs and RFCs",
-          "minutes": 90,
-          "objective": "By the end you can write a design doc with explicit goals and non-goals, real alternatives and cross-cutting concerns, and run it through a review that ends in a recorded decision.",
-          "concept": [
-            "A **design doc** is a tool for finding the flaws in a plan while they are cheap: an hour of review instead of a month of rework. It is written before building, and it also makes the decision legible to whoever inherits the system. If the solution is obvious, small and easy to reverse, with no real trade-offs, skip it and write a good pull request description instead. A doc nobody needs is just ceremony.",
-            "A widely used structure: **context and scope**; **goals and non-goals**, where a non-goal is something that could reasonably be a goal but you are explicitly not doing, like 'no multi-region writes in v1'; **the design**, with APIs, data and diagrams detailed enough for reviewers to find problems; **alternatives considered**, each with why it lost; and **cross-cutting concerns**: security, privacy, observability, migration and rollback. Use numbers instead of adjectives: 'p95 search latency under 150 ms at 2,000 QPS', not 'fast search'.",
-            "Open-source projects and large organisations formalise this as an **RFC** process, such as Rust's RFCs or Python's PEPs: a draft, early review by a few people, a public comment period, a final comment period, and a recorded decision of accept, reject or postpone. Put the decision you need and the deadline at the top. Address the strongest objection in the doc itself. Separate one-way doors, choices hard to reverse like a storage format, from two-way doors, and spend review time on the first kind."
-          ],
-          "visual": {
-            "type": "steps",
-            "title": "From idea to recorded decision",
-            "steps": [
-              {
-                "label": "Problem statement",
-                "detail": "one page: context, why now, what decision is needed"
-              },
-              {
-                "label": "Draft + 2 early reviewers",
-                "detail": "catch fatal flaws before a wide audience sees it"
-              },
-              {
-                "label": "Wide review",
-                "detail": "comment period with a clear deadline"
-              },
-              {
-                "label": "Decision recorded",
-                "detail": "who decided, what, why, and what was rejected"
-              },
-              {
-                "label": "Build, then update",
-                "detail": "note where reality diverged from the doc"
-              }
-            ]
-          },
-          "example": {
-            "lang": "markdown",
-            "code": "# Remote build cache\nStatus: In review, decision by 2026-11-06 (DRI: A. Rivera)\n\n## Context and scope\n## Goals\n- p50 CI time from 40 min to under 10 min\n## Non-goals\n- Replacing the build tool\n- Caching for local developer builds in v1\n## Design\n## Alternatives considered\n## Security, observability, rollback\n## Risks and open questions",
-            "explain": "The status line tells a reader in five seconds what is being decided, by whom and by when. Goals carry numbers, and the non-goals block the two most likely kinds of scope creep before anyone proposes them."
-          },
-          "tryit": "Pick a real decision in your current work and write a mini design doc of at most three pages with numeric goals, at least two non-goals, at least two genuine alternatives and a rollback plan. Send it to the two people most likely to disagree and ask each a single question: what would make this fail? Revise the doc and add a short section on what changed because of their answers.",
-          "questions": [
-            {
-              "id": "s8m1l2q1",
-              "level": 1,
-              "type": "mcq",
-              "prompt": "In a design doc, what is a non-goal?",
-              "options": [
-                "A goal the team failed to meet",
-                "Something that could reasonably be a goal but the project explicitly chooses not to do",
-                "A task assigned to another team",
-                "A bug that will not be fixed"
-              ],
-              "answer": 1,
-              "explain": "Non-goals are deliberate scope boundaries for things readers might otherwise assume are included. They are not failures, hand-offs or bug triage; their job is to prevent scope creep and misread expectations."
-            },
-            {
-              "id": "s8m1l2q2",
-              "level": 2,
-              "type": "mcq",
-              "prompt": "A draft states the goal as 'Make search fast and reliable.' Which rewrite is most useful to reviewers?",
-              "options": [
-                "Make search much faster and very reliable",
-                "Use the best possible search technology",
-                "p95 latency under 150 ms and 99.9% monthly availability at 2,000 queries per second",
-                "Search should feel instant to users"
-              ],
-              "answer": 2,
-              "explain": "Only the numeric version can be tested, designed against and argued about. The others restate the vague goal in different words and give reviewers nothing to check."
-            },
-            {
-              "id": "s8m1l2q3",
-              "level": 3,
-              "type": "mcq",
-              "prompt": "A design doc has 60 comments, and two senior engineers have argued the same point back and forth for a week. What is the best next step?",
-              "options": [
-                "Keep replying until one of them gives up",
-                "Delete the thread and proceed with your design",
-                "Hold a short meeting with both and the decision owner, decide, then record the decision and its reasoning in the doc",
-                "Start a new doc without the contested section"
-              ],
-              "answer": 2,
-              "explain": "Written threads are poor at resolving a deadlocked trade-off; a short synchronous conversation with the decision owner is better, and writing the outcome back keeps the doc the record of truth. Ignoring or hiding the disagreement leaves it to resurface later."
-            },
-            {
-              "id": "s8m1l2q4",
-              "level": 2,
-              "type": "mcq",
-              "prompt": "When is writing a full design doc not worth it?",
-              "options": [
-                "When the change touches more than one team",
-                "When the solution is clear, small and easy to reverse, with no meaningful trade-offs",
-                "When the change involves a database schema migration",
-                "When senior engineers will review the code anyway"
-              ],
-              "answer": 1,
-              "explain": "Docs pay off when there are real alternatives or the decision is costly to reverse. Cross-team changes and schema migrations usually are exactly those cases; code review alone happens too late to change direction cheaply."
-            }
-          ],
-          "resource": {
-            "title": "Malte Ubl: Design Docs at Google",
-            "url": "https://www.industrialempathy.com/posts/design-docs-at-google/"
-          }
-        },
-        {
-          "id": "s8m1l3",
-          "title": "Technical leadership without authority",
-          "minutes": 75,
-          "objective": "By the end you can plan a cross-team change using a stakeholder map, pre-wired one-on-ones and an explicit decision owner, and handle a decision that goes against you.",
-          "concept": [
-            "As a senior individual contributor you can rarely order anyone to do anything. Your influence runs on other currencies: **credibility**, a track record of being right in writing; **clarity**, being the person who states the problem crisply; **relationships**, having helped people before you need them; **sponsorship**, a leader who backs the direction; and **making it easy**, removing the work others would have to do to follow you. Borrowed authority is fragile. Earned credibility compounds across projects.",
-            "Mechanics that work: **pre-wire** big decisions by talking to each key stakeholder one-on-one before the meeting, learning their objection and changing the proposal or addressing it, so nothing in the room is a surprise. Make the decision explicit: who owns it, by when, and what input is needed. Lead by doing the first hard slice yourself, such as migrating one service and writing the guide. Once a decision is made, **disagree and commit**: support it fully, and raise new evidence openly through the same channel.",
-            "Tanya Reilly's talk *Being Glue* names the work that holds teams together: onboarding, unblocking, noticing gaps between teams, writing the missing doc, chasing the dependency. It is essential and often invisible at promotion time. Do it deliberately rather than by default, make its impact visible in writing, and talk to your manager about whether it is the role they expect from you. Watch that it is shared across the team instead of quietly landing on the same people."
-          ],
-          "visual": {
-            "type": "boxes",
-            "title": "Sources of influence without authority",
-            "items": [
-              {
-                "label": "Credibility",
-                "detail": "past calls that were right, in writing"
-              },
-              {
-                "label": "Clarity",
-                "detail": "you frame the problem everyone else is circling"
-              },
-              {
-                "label": "Relationships",
-                "detail": "help given before you ask for anything"
-              },
-              {
-                "label": "Sponsorship",
-                "detail": "a leader who will back the direction"
-              },
-              {
-                "label": "Making it easy",
-                "detail": "you do the first migration, the guide, the tooling"
-              }
-            ]
-          },
-          "tryit": "Choose a cross-team change you want to make. Draw a stakeholder map: for each person, what they care about, their likely objection, and what evidence would change their mind. Hold three one-on-ones before proposing anything formally, and write down how the proposal changed after each. Finish by naming the decision owner and the date the decision will be made.",
-          "questions": [
-            {
-              "id": "s8m1l3q1",
-              "level": 1,
-              "type": "mcq",
-              "prompt": "What does pre-wiring a decision mean?",
-              "options": [
-                "Making the decision alone before anyone else is told",
-                "Talking with key stakeholders individually before the group meeting, so objections surface and are addressed in advance",
-                "Writing the code before the design doc",
-                "Booking the meeting room early"
-              ],
-              "answer": 1,
-              "explain": "Pre-wiring is about one-on-one conversations ahead of the group discussion. It does not mean deciding alone; the point is that people's concerns shape the proposal before it is presented."
-            },
-            {
-              "id": "s8m1l3q2",
-              "level": 2,
-              "type": "mcq",
-              "prompt": "You want six teams to adopt a new structured logging library. You have no authority over them. What is the strongest first move?",
-              "options": [
-                "Email all six teams announcing that the old library is deprecated",
-                "Ask a VP to mandate it",
-                "Migrate one team's service yourself, measure the result, and write a short migration guide using that real example",
-                "Wait until every team requests it"
-              ],
-              "answer": 2,
-              "explain": "Doing the first slice proves it works, produces real numbers and makes adoption cheap for everyone else. A deprecation email you have no authority to send creates resistance, a mandate before proof spends sponsorship you may need later, and waiting does nothing."
-            },
-            {
-              "id": "s8m1l3q3",
-              "level": 3,
-              "type": "mcq",
-              "prompt": "Your team chose design B over your design A. Two weeks into building, you find load-test data showing B will exceed the memory budget at peak. What should you do?",
-              "options": [
-                "Quietly build A on the side to have it ready",
-                "Say nothing; you agreed to commit",
-                "Share the data in writing with the decision owner and the team, state the risk, and ask whether it changes the decision",
-                "Refuse to work on B until the team switches"
-              ],
-              "answer": 2,
-              "explain": "Disagree and commit means supporting the decision while still raising new evidence openly through the normal channel. Silence hides a real risk, a secret parallel build undermines the team, and refusing turns a technical question into a standoff."
-            },
-            {
-              "id": "s8m1l3q4",
-              "level": 2,
-              "type": "mcq",
-              "prompt": "You spend about 60% of your time on onboarding, unblocking and cross-team coordination, and your promotion packet looks thin on technical output. What is the best step?",
-              "options": [
-                "Stop all glue work immediately",
-                "Write up the outcomes of that work and discuss explicitly with your manager whether this is the role they expect and how it will be recognised",
-                "Do the glue work at night so your daytime looks technical",
-                "Assume it will be noticed eventually"
-              ],
-              "answer": 1,
-              "explain": "Glue work is valuable but becomes a career problem when invisible or unacknowledged. Making the impact legible and aligning with your manager turns it into a deliberate choice. Dropping it abruptly hurts the team, and hoping it gets noticed rarely works."
-            }
-          ],
-          "resource": {
-            "title": "Tanya Reilly: Being Glue",
-            "url": "https://noidea.dog/glue"
-          }
-        },
-        {
-          "id": "s8m1l4",
-          "title": "Maintaining open source people depend on",
-          "minutes": 90,
-          "objective": "By the end you can version releases with semantic versioning, run a deprecation, handle a security report privately, and reduce the maintenance load on a project others depend on.",
-          "concept": [
-            "Once others depend on your code, its interface is a promise. **Hyrum's Law** warns that with enough users, every observable behaviour of your system will be depended on by somebody, including error message text, ordering and timing. **Semantic Versioning** makes your promises explicit as MAJOR.MINOR.PATCH: an incompatible change to the public API bumps MAJOR, a backward-compatible feature bumps MINOR, and a backward-compatible fix bumps PATCH. Versions starting with `0.` signal that anything may still change.",
-            "Remove things by **deprecation**, not surprise. In one release, add the replacement, keep the old API working and emit a deprecation warning that names the replacement; remove the old API only in the next major release. Keep a changelog with a section per release. For security, publish a `SECURITY.md` with a private reporting channel, fix the issue privately, and release the patch before or together with the public advisory. Never discuss an unfixed vulnerability in a public issue.",
-            "The scarcest resource in a project is maintainer attention. Spend less of it per contribution with CI, automatic formatting, issue templates, a `CONTRIBUTING.md` and labels such as `good first issue`. Every merged feature is maintenance forever, so say no early and kindly to features outside the project's scope, and suggest extension points or a plugin instead. Raise the bus factor: write down the release process and give commit rights to reliable repeat contributors before you burn out."
-          ],
-          "visual": {
-            "type": "table",
-            "title": "Semantic versioning from 2.3.1",
-            "headers": [
-              "Change",
-              "Next version"
-            ],
-            "rows": [
-              [
-                "Fix a crash; no API change",
-                "2.3.2"
-              ],
-              [
-                "Add an optional parameter, old calls still work",
-                "2.4.0"
-              ],
-              [
-                "Deprecate a function, still works, warns",
-                "2.4.0"
-              ],
-              [
-                "Remove that deprecated function",
-                "3.0.0"
-              ],
-              [
-                "Rename a public function without an alias",
-                "3.0.0"
-              ]
-            ]
-          },
-          "tryit": "Audit a project you maintain or one you depend on heavily. Check for a README with usage, `CONTRIBUTING.md`, `SECURITY.md`, a changelog, CI on pull requests, a written release process, and how many people can publish a release. Write down the three fixes with the most leverage, ranked, and complete the first one this week as a pull request.",
-          "questions": [
-            {
-              "id": "s8m1l4q1",
-              "level": 1,
-              "type": "mcq",
-              "prompt": "Under Semantic Versioning, your library is at 2.3.1 and you add a backward-compatible feature. What is the next version?",
-              "options": [
-                "2.3.2",
-                "2.4.0",
-                "3.0.0",
-                "2.3.1-feature"
-              ],
-              "answer": 1,
-              "explain": "New backward-compatible functionality bumps MINOR and resets PATCH to 0. PATCH is for compatible fixes and MAJOR for breaking changes."
-            },
-            {
-              "id": "s8m1l4q2",
-              "level": 2,
-              "type": "mcq",
-              "prompt": "In a patch release you reworded an error message for clarity. A popular downstream tool parsed that text and broke. What does Hyrum's Law suggest you do?",
-              "options": [
-                "Nothing; message text is not part of the API",
-                "Restore the old text in another patch release, then offer a stable machine-readable error code and announce the text change for a future major release",
-                "Tell the downstream project to pin an old version forever",
-                "Remove error messages entirely"
-              ],
-              "answer": 1,
-              "explain": "With enough users, observable behaviour becomes a de facto interface. Restoring compatibility quickly and providing a supported alternative respects that. Insisting it was never the API is technically arguable but leaves users broken, and pinning or removing messages makes things worse."
-            },
-            {
-              "id": "s8m1l4q3",
-              "level": 3,
-              "type": "mcq",
-              "prompt": "A large company opens a pull request adding a big feature only they need. It would add a heavy dependency and a code path you would maintain indefinitely. What is the best response?",
-              "options": [
-                "Merge it to keep a major user happy",
-                "Close it without comment",
-                "Thank them, explain that it is out of scope because of the long-term maintenance cost, and propose an extension point so they can maintain the feature in their own package",
-                "Ask them to pay to have it merged"
-              ],
-              "answer": 2,
-              "explain": "Each merged feature becomes permanent maintenance load. A clear, kind no plus an extension point solves their problem without moving the burden onto you. Silent closure damages trust, and merging for goodwill trades a short-term favour for long-term cost."
-            },
-            {
-              "id": "s8m1l4q4",
-              "level": 2,
-              "type": "mcq",
-              "prompt": "Someone opens a public GitHub issue describing a remote code execution bug in your library, with a working exploit. What should you do first?",
-              "options": [
-                "Discuss the fix openly in the issue thread",
-                "Hide or delete the details publicly, move the conversation to your private security channel, and prepare a patched release before publishing an advisory",
-                "Close the issue as invalid",
-                "Publish an advisory immediately before fixing it"
-              ],
-              "answer": 1,
-              "explain": "Every hour the exploit stays public exposes all users. Limit further disclosure, coordinate privately, ship the fix, then publish an advisory so users know to upgrade. Discussing it openly or announcing before a patch exists helps attackers more than users."
-            }
-          ],
-          "resource": {
-            "title": "Open Source Guides: Best practices for maintainers",
-            "url": "https://opensource.guide/best-practices/"
-          }
-        },
-        {
-          "id": "s8m1l5",
-          "title": "Estimating and managing risk in large projects",
-          "minutes": 90,
-          "objective": "By the end you can give an estimate as a range with a confidence level, maintain a risk register, order work to retire the biggest risk first, and respond to a slipping schedule.",
-          "concept": [
-            "Point estimates hide uncertainty; give a **range with confidence**: '8 to 12 weeks, 80% confident'. Estimates are driven by unknowns, so break the work into pieces of a few days at most, and check against a **reference class**: how long did similar past projects take compared with their original estimates? Joel Spolsky's *Evidence-Based Scheduling* uses each developer's historical ratio of estimated to actual time and a Monte Carlo simulation to turn task estimates into a probability distribution of ship dates.",
-            "Order work by risk, not by comfort. Identify the riskiest assumption, such as whether the new database handles peak write load or whether another team will deliver its API on time, and attack it first with a spike or prototype. Keep a **risk register**: each risk with its likelihood, impact, an early warning signal, a mitigation and an owner. Review it weekly with the team; a risk with no early signal is one you will only notice when it hits.",
-            "Define milestones as working, demoable software, never '80% of the backend'. **Brooks's Law**: adding people to a late software project makes it later, because of ramp-up time and the communication paths each new person adds. When you slip, the real levers are cutting scope and moving the date; adding people helps only early and on separable work. Report bad news as soon as you know it. Make risky changes reversible with feature flags, dual writes and staged rollouts."
-          ],
-          "visual": {
-            "type": "table",
-            "title": "A risk register, first week",
-            "headers": [
-              "Risk",
-              "Likelihood",
-              "Impact",
-              "Early signal",
-              "Mitigation, owner"
-            ],
-            "rows": [
-              [
-                "New DB cannot sustain peak writes",
-                "Medium",
-                "High",
-                "Load test at 2x peak in week 1",
-                "Spike now; fallback is sharding the old DB (Kim)"
-              ],
-              [
-                "Payments team API ships late",
-                "High",
-                "Medium",
-                "Their milestone 2 demo slips",
-                "Build against a stub; weekly sync (Ade)"
-              ],
-              [
-                "Data migration corrupts rows",
-                "Low",
-                "High",
-                "Checksum mismatches in dry run",
-                "Dual writes plus nightly diff (Sam)"
-              ],
-              [
-                "Key engineer leaves",
-                "Low",
-                "High",
-                "Single reviewer on core module",
-                "Pair on core module now (Lee)"
-              ]
-            ]
-          },
-          "tryit": "For the project behind your design doc, write an estimate as a range with a confidence level, and justify it with one reference-class comparison from past work. Build a risk register with at least five risks, each with an early signal and an owner. Decide which risk gets a spike in week 1, and define three milestones that are each a working demo.",
-          "questions": [
-            {
-              "id": "s8m1l5q1",
-              "level": 1,
-              "type": "mcq",
-              "prompt": "What does Brooks's Law state?",
-              "options": [
-                "Work expands to fill the time available",
-                "Adding people to a late software project makes it later",
-                "The last 10% of the work takes 90% of the time",
-                "Any system mirrors the communication structure of its organisation"
-              ],
-              "answer": 1,
-              "explain": "Brooks's Law, from *The Mythical Man-Month*, is about adding people to a late project. The others are real but different ideas: Parkinson's Law, the ninety-ninety rule, and Conway's Law."
-            },
-            {
-              "id": "s8m1l5q2",
-              "level": 2,
-              "type": "mcq",
-              "prompt": "Which status update gives leadership the most useful estimate?",
-              "options": [
-                "We will ship on 1 March",
-                "It is hard to say; software is unpredictable",
-                "8 to 12 weeks, 80% confident; the biggest unknown is the database's write throughput, which a load test will settle by week 2",
-                "We are 80% done"
-              ],
-              "answer": 2,
-              "explain": "It gives a range, a confidence level, the main source of uncertainty and when that uncertainty will shrink. A single date hides risk, refusing to estimate is unhelpful, and percent complete is notoriously unreliable."
-            },
-            {
-              "id": "s8m1l5q3",
-              "level": 3,
-              "type": "mcq",
-              "prompt": "In week 6 of a 10-week project, two of five milestones are done. A director offers four more engineers who do not know the codebase. What is the best response?",
-              "options": [
-                "Accept all four immediately to recover the schedule",
-                "Present options: cut the two lowest-value milestones to ship on time, or keep scope and move the date by about four weeks; accept extra people only for a separable task with little ramp-up",
-                "Ask the existing team to work weekends until it is back on track",
-                "Keep the date and say nothing until week 9"
-              ],
-              "answer": 1,
-              "explain": "Late in a project, new people add ramp-up and coordination costs before they help, which is Brooks's Law. Scope and date are the real levers, and stakeholders need the options now. Sustained overtime erodes quality, and delaying bad news removes everyone's ability to plan."
-            },
-            {
-              "id": "s8m1l5q4",
-              "level": 2,
-              "type": "mcq",
-              "prompt": "You are migrating a service to a new database. Which task should come first?",
-              "options": [
-                "Building the admin dashboard for the new database",
-                "Load-testing the new database at twice your peak write rate",
-                "Writing the final migration runbook",
-                "Renaming tables to match the new conventions"
-              ],
-              "answer": 1,
-              "explain": "Whether the database can handle the load is the assumption that could sink the whole project, so retire it first while changing course is cheap. The other tasks are needed eventually but are wasted if the database fails the test."
-            }
-          ],
-          "resource": {
-            "title": "Joel Spolsky: Evidence Based Scheduling",
-            "url": "https://www.joelonsoftware.com/2007/10/26/evidence-based-scheduling/"
-          }
-        }
+     "id": "s8m1l1",
+     "title": "Choosing hard, important problems",
+     "minutes": 90,
+     "objective": "By the end you can produce a written, scored list of the important problems in your area and pick one with a plausible attack, a reason it is tractable now, and a reason you are well placed to do it.",
+     "concept": [
+      "Richard Hamming asked colleagues at Bell Labs: what are the important problems of your field, and why aren't you working on them? His point was blunt: if you do not work on important problems, it is unlikely you will do important work. But importance is not size. Hamming separates them by the **attack**: a problem matters for your career only if you have a reasonable way in. Time travel is enormous and has no attack, so it is not, in his sense, an important problem.",
+      "Hamming observed that great scientists keep a list of roughly 10 to 20 important problems in mind. When a new tool, result or dataset appears, they notice which problem it unlocks and move quickly. For an engineer, high-leverage problems compound: eliminating a whole class of bugs, cutting a feedback loop from 40 minutes to 4, building a primitive many teams build on. Score each candidate on impact if solved, probability the attack works, your comparative advantage, and **why now**: what changed that makes it tractable this year.",
+      "Important problems fail more often, so structure the work so partial progress is valuable on its own: a faster test runner is useful even if the full build-system rewrite never lands. Hamming also argued for the open door: working with your door closed gets more done this year, but the open door tells you which problems matter. And he described knowledge as compounding like interest; a little more effort, sustained for years, produces a large difference in output."
+     ],
+     "visual": {
+      "type": "table",
+      "title": "Scoring candidate problems",
+      "headers": [
+       "Candidate",
+       "Impact",
+       "Attack",
+       "Why you, why now",
+       "Verdict"
       ],
-      "project": {
-        "title": "Write and circulate a real design doc",
-        "brief": "Pick a significant problem in your organisation or an open-source project you depend on, and take it from scored problem list to a design doc with a recorded decision. It uses every lesson: problem choice, doc structure, influence without authority, compatibility for dependents, and estimation with risk.",
-        "milestones": [
-          "Score at least five candidate problems on impact, attack, why you and why now, and choose one with a written justification",
-          "Draft the doc: context, numeric goals, non-goals, design, at least two real alternatives, cross-cutting concerns, estimate as a range and a risk register",
-          "Pre-wire with at least three stakeholders and record how each conversation changed the doc",
-          "Circulate to at least five reviewers, including one you expect to disagree, with a decision owner and a deadline at the top",
-          "Resolve every comment as accepted, rejected with a reason, or an open question, and record the final decision in the doc",
-          "Four weeks after the decision, add a short retrospective comparing what happened with the estimate and the risk register"
-        ],
-        "stretch": "Propose the same change, or a related one, as a public RFC in an open-source project and take it through that project's process to a decision."
-      },
-      "exam": [
-        {
-          "id": "s8m1e1",
-          "level": 3,
-          "type": "mcq",
-          "prompt": "Your RFC proposes removing a widely used function from a library at 4.2.0 with about 4,000 dependents. Which plan is best?",
-          "options": [
-            "Remove it in 4.2.1 with a changelog note",
-            "Add the replacement and a deprecation warning in 4.3.0, document the migration in the RFC, and remove the old function in 5.0.0",
-            "Remove it in 5.0.0 with no prior warning",
-            "Keep both forever to avoid any breakage"
-          ],
-          "answer": 1,
-          "explain": "Removal is a breaking change and belongs in a major release, and dependents need a release where both work and a warning points to the replacement. A patch removal breaks semantic versioning, an unannounced major is a surprise, and keeping both forever multiplies maintenance."
-        },
-        {
-          "id": "s8m1e2",
-          "level": 2,
-          "type": "mcq",
-          "prompt": "You must pick one item to put first in your project plan. Which reflects both Hamming's advice and risk-first ordering?",
-          "options": [
-            "The most enjoyable part of the system",
-            "A two-week spike on the assumption that, if false, makes the whole approach fail",
-            "The user interface, so stakeholders see progress",
-            "Documentation, so others can start contributing"
-          ],
-          "answer": 1,
-          "explain": "Testing the attack early is how you find out whether the important problem is actually tractable, and it retires the biggest risk while changing course is cheap. The others feel productive but can all be wasted if the core assumption fails."
-        },
-        {
-          "id": "s8m1e3",
-          "level": 3,
-          "type": "mcq",
-          "prompt": "Your design doc review is scheduled for Thursday with six teams. On Monday you learn the platform team's lead strongly opposes it. What is the best action?",
-          "options": [
-            "Present on Thursday and win the argument in the room",
-            "Cancel the review indefinitely",
-            "Meet the lead before Thursday to understand the objection, then change the design or add a section that addresses it, and tell them what you changed",
-            "Ask their manager to tell them to support it"
-          ],
-          "answer": 2,
-          "explain": "This is pre-wiring: a surprise confrontation in a six-team meeting hardens positions. Understanding the objection first either improves the design or lets you address it directly. Going over their head spends credibility, and cancelling avoids the issue."
-        },
-        {
-          "id": "s8m1e4",
-          "level": 2,
-          "type": "mcq",
-          "prompt": "Which goal statement gives your estimate and risk register something concrete to work against?",
-          "options": [
-            "Improve developer productivity substantially",
-            "Median CI time from 40 minutes to under 10 minutes for the main repository by the end of Q2",
-            "Make CI best in class",
-            "Reduce CI pain points"
-          ],
-          "answer": 1,
-          "explain": "A number, a scope and a date make it possible to estimate the work, detect slippage and know when you are done. The other three cannot be estimated or verified."
-        },
-        {
-          "id": "s8m1e5",
-          "level": 3,
-          "type": "mcq",
-          "prompt": "Leadership asks why your two-year build-system project should continue after a failed milestone. Which project structure gives the strongest answer?",
-          "options": [
-            "One big switch-over at the end of year two",
-            "Stages that each ship value alone: remote caching, cutting CI time by 40%, already in production, then hermetic tests, then the new build graph",
-            "A plan that adds more people every quarter",
-            "A plan with no milestones so it can adapt"
-          ],
-          "answer": 1,
-          "explain": "When partial results already deliver value, a failed later milestone does not erase the project's payoff. A big-bang plan delivers nothing until the end, adding people is not a risk strategy, and no milestones means no evidence."
-        },
-        {
-          "id": "s8m1e6",
-          "level": 3,
-          "type": "mcq",
-          "prompt": "Before a large refactor of a module that dependents use in undocumented ways, which step best limits the risk, using what you learned about testing in earlier stages?",
-          "options": [
-            "Rely on code review to catch behaviour changes",
-            "Write characterisation tests that pin down the module's current observable behaviour, including odd edge cases, before changing anything",
-            "Refactor first, then write tests for the new code",
-            "Ask users to report any breakage after release"
-          ],
-          "answer": 1,
-          "explain": "Hyrum's Law means dependents rely on behaviour nobody documented. Characterisation tests capture what the code does today so the refactor can be checked against it. Reviewers cannot see every behaviour, tests written afterwards only test the new code, and user reports arrive after the damage."
-        },
-        {
-          "id": "s8m1e7",
-          "level": 2,
-          "type": "mcq",
-          "prompt": "A teammate does most of the coordination and onboarding for your project, and you notice the design doc credits only the people who wrote code. What should you do as tech lead?",
-          "options": [
-            "Nothing; code is what matters",
-            "Name their coordination work and its outcomes in the doc's acknowledgements and in your feedback to their manager",
-            "Tell them to stop the coordination and write more code",
-            "Take the coordination work yourself without telling anyone"
-          ],
-          "answer": 1,
-          "explain": "Glue work is essential and often invisible. A lead can make it visible and recognised, which keeps the work happening and is fair. Ignoring it or stopping it harms the project, and silently absorbing it just moves the invisibility to you."
-        }
+      "rows": [
+       [
+        "Rewrite the monolith from scratch",
+        "High",
+        "Vague",
+        "Nothing changed",
+        "Not yet: no attack"
+       ],
+       [
+        "Cut CI from 40 to 8 minutes",
+        "High, every engineer daily",
+        "Profiling shows 3 hot spots",
+        "You own the build; new cache service",
+        "Strong"
+       ],
+       [
+        "Fix flaky tests one by one",
+        "Low per fix",
+        "Clear",
+        "Anyone can do it",
+        "Routine work"
+       ],
+       [
+        "Make the service memory-safe",
+        "Very high",
+        "Unclear for 2M lines",
+        "New language interop",
+        "Find a smaller slice"
+       ]
       ]
+     },
+     "tryit": "Write your own list of 10 important problems in your area. For each, write one line each on impact, attack, why you and why now, and score it 1 to 5 on each. Pick the top one and define the smallest experiment, two weeks at most, whose result would tell you whether the attack works. Share the list with one person whose judgement you trust and ask which problem they would cut first and why.",
+     "questions": [
+      {
+       "id": "s8m1l1q1",
+       "level": 1,
+       "type": "mcq",
+       "prompt": "In Hamming's sense, what makes a problem important rather than just big?",
+       "options": [
+        "It is famous in the field",
+        "It would take a lifetime to solve",
+        "It matters and you have a reasonable attack on it",
+        "Your manager has assigned it"
+       ],
+       "answer": 2,
+       "explain": "Hamming is explicit that importance depends on having an attack. A famous or enormous problem with no way in, like time travel, is not one you should work on yet; assignment by a manager says nothing about importance."
+      },
+      {
+       "id": "s8m1l1q2",
+       "level": 2,
+       "type": "mcq",
+       "prompt": "You have six months. Which project best fits Hamming's advice?",
+       "options": [
+        "Solving general program verification, with no concrete approach yet",
+        "Cutting your company's CI time from 40 to 8 minutes: profiling found three hot spots, and a new caching service makes it tractable",
+        "Answering every open ticket in your team's backlog",
+        "Rewriting your favourite library in a new language for fun"
+       ],
+       "answer": 1,
+       "explain": "The CI project has high, compounding impact, a concrete attack and a reason it is tractable now. The verification problem is important but has no attack; backlog work and a fun rewrite are useful or enjoyable but not leveraged."
+      },
+      {
+       "id": "s8m1l1q3",
+       "level": 3,
+       "type": "mcq",
+       "prompt": "You plan a 12-month project to replace your company's build system. Which plan best manages the risk Hamming warns about?",
+       "options": [
+        "Work in secret until the whole system is finished, then reveal it",
+        "Sequence the work so each stage ships value on its own, such as remote caching first, then hermetic tests, then the new build graph",
+        "Ask for a large team on day one so it finishes sooner",
+        "Keep the scope vague so it can adapt"
+       ],
+       "answer": 1,
+       "explain": "Important problems often fail; staging the work so each step pays off alone means a failure later still leaves real value. Secrecy removes feedback, a big team early adds coordination before the approach is proven, and vague scope makes progress unmeasurable."
+      },
+      {
+       "id": "s8m1l1q4",
+       "level": 2,
+       "type": "mcq",
+       "prompt": "Why does Hamming argue for keeping your door open, despite the interruptions?",
+       "options": [
+        "Managers can watch you work",
+        "It is required by company policy",
+        "Interruptions keep you connected to what problems matter, even though you get less done in the short term",
+        "Open doors improve ventilation and focus"
+       ],
+       "answer": 2,
+       "explain": "Hamming acknowledges the closed door gives more focused work now, but says those who keep the door open tend to work on the right problems later, because they hear what others need. It is about direction, not supervision or policy."
+      }
+     ],
+     "resource": {
+      "title": "Richard Hamming: You and Your Research",
+      "url": "https://www.cs.virginia.edu/~robins/YouAndYourResearch.html"
+     },
+     "why": "Skill applied to unimportant problems produces unimportant results. Deliberately choosing important, tractable problems is what separates great careers from good ones.",
+     "terms": [
+      {
+       "t": "Important problem",
+       "d": "One whose solution would matter a lot to your field or users."
+      },
+      {
+       "t": "Attack",
+       "d": "A plausible way in: a method, tool or insight that makes progress possible."
+      },
+      {
+       "t": "Why now",
+       "d": "What changed (a new tool, dataset or result) that makes it tractable today."
+      },
+      {
+       "t": "Problem list",
+       "d": "10 to 20 important problems you keep in mind and revisit."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "The most important problem is always the right one to work on.",
+       "right": "Without a plausible attack you'll make no progress. Importance and tractability both matter."
+      },
+      {
+       "wrong": "Ambitious projects are all-or-nothing.",
+       "right": "Structure them so partial progress is valuable on its own."
+      }
+     ],
+     "takeaways": [
+      "Keep a written, scored list of important problems.",
+      "Pick one with an attack and a reason it's tractable now.",
+      "Plan milestones that are useful even if the full goal fails."
+     ]
     },
     {
-      "id": "s8m2",
-      "title": "Compounding",
-      "summary": "You turn your expertise into other people's growth, public ideas and continued learning, and plan the next five years so the effort compounds.",
-      "lessons": [
-        {
-          "id": "s8m2l1",
-          "title": "Teaching and mentoring",
-          "minutes": 75,
-          "objective": "By the end you can adapt your teaching to a mentee's expertise level using the expertise-reversal effect, check for understanding without leading questions, and give specific feedback using situation-behaviour-impact.",
-          "concept": [
-            "The **expertise-reversal effect**, studied by Kalyuga, Sweller and colleagues, says instructional methods that help novices, such as complete worked examples, step-by-step guidance and integrated explanations, become redundant or even harmful as learners gain expertise. Experienced learners learn more from solving problems with less guidance. So mentoring must change as the mentee grows: full worked examples for a beginner, then partly completed ones to finish, then problems first with hints, then 'what do you think?'. This map follows the same fade from stage 0 to stage 8.",
-            "The **curse of knowledge** means you no longer remember what not knowing felt like, so you skip steps that seem obvious. Counter it by asking the mentee to predict before you show, or to explain back in their own words. Avoid asking 'Does that make sense?', because nearly everyone says yes. Let them hold the keyboard while you talk. Measure your mentoring by how quickly the mentee stops needing you for a given kind of problem.",
-            "Good feedback is specific, timely, about the work rather than the person, and actionable. **Situation-Behaviour-Impact** gives it shape: 'In yesterday's review (situation), you rewrote the author's function inside a comment (behaviour); she told me she felt the change was no longer hers (impact).' Then ask for their view and agree a next step together. In code review, label comments as blocking or as a nit. Praise specifically, so the mentee knows exactly what to repeat."
-          ],
-          "visual": {
-            "type": "compare",
-            "title": "Same mentor, different mentee",
-            "left": {
-              "title": "Novice mentee",
-              "points": [
-                "Complete worked examples first",
-                "Explicit steps and checklists",
-                "Small, well-scoped tasks",
-                "Frequent, short feedback"
-              ]
-            },
-            "right": {
-              "title": "Experienced mentee",
-              "points": [
-                "Problem first, hints only when stuck",
-                "Socratic questions about trade-offs",
-                "Ambiguous projects with ownership",
-                "Feedback on judgement, not syntax"
-              ]
-            }
-          },
-          "example": {
-            "lang": "text",
-            "code": "Situation: In Tuesday's design review,\nBehaviour: you answered every question aimed at Priya before she could respond.\nImpact: She told me afterwards she felt she could not defend her own design.\nAsk: How did the meeting look from your side?\nNext step: Next review, count to five before answering a question addressed to someone else.",
-            "explain": "Each line is observable and specific: no judgement about character, just what happened and its effect. Asking for their view comes before the next step, so the agreed change is shared rather than imposed."
-          },
-          "tryit": "Take one concept from stage 1 of this map and write three versions of teaching it: a complete worked example, a faded version with the key lines blanked out, and a problem-first version with a single hint. Note which mentee profile each one suits. Then write one real piece of situation-behaviour-impact feedback for a recent situation at work and deliver it within a week.",
-          "questions": [
-            {
-              "id": "s8m2l1q1",
-              "level": 1,
-              "type": "mcq",
-              "prompt": "What is the expertise-reversal effect?",
-              "options": [
-                "Experts forget the basics of their field over time",
-                "Teaching methods that help novices, such as detailed worked examples, become ineffective or harmful for more experienced learners",
-                "Novices learn better from problem-solving than from examples",
-                "Experts learn slower than novices"
-              ],
-              "answer": 1,
-              "explain": "The effect is about instruction losing its benefit, or backfiring, as expertise grows. Novices typically benefit from worked examples rather than unguided problems, so the third option has it backwards."
-            },
-            {
-              "id": "s8m2l1q2",
-              "level": 2,
-              "type": "mcq",
-              "prompt": "A mentee with three years of experience says your step-by-step walkthroughs are slow and they are not learning much. What change fits the research?",
-              "options": [
-                "Make the walkthroughs even more detailed",
-                "Give them the problem first, let them attempt it, and offer hints only when they are stuck",
-                "Stop meeting with them",
-                "Ask them to watch beginner tutorials to fill gaps"
-              ],
-              "answer": 1,
-              "explain": "For a more experienced learner, full guidance is redundant and can interfere with learning; problem-first with targeted hints is the faded approach. More detail or beginner material moves in the wrong direction."
-            },
-            {
-              "id": "s8m2l1q3",
-              "level": 3,
-              "type": "mcq",
-              "prompt": "Which feedback is most likely to change behaviour?",
-              "options": [
-                "You need to be a better team player",
-                "Great job on the release!",
-                "In Monday's incident call, you posted the root cause in chat but did not say it aloud, and the on-call lead spent 20 more minutes on the wrong service. Next time, interrupt and say it",
-                "Some people think you are too quiet"
-              ],
-              "answer": 2,
-              "explain": "It names the situation, the behaviour and the impact, and suggests a concrete next action. The others are vague, about personality, or second-hand, so the person cannot tell what to repeat or change."
-            },
-            {
-              "id": "s8m2l1q4",
-              "level": 2,
-              "type": "mcq",
-              "prompt": "After explaining how the cache invalidation works, which question best checks your mentee's understanding?",
-              "options": [
-                "Does that make sense?",
-                "Any questions?",
-                "If we update the price but the cache entry is 30 seconds old, what does the next request see, and why?",
-                "You got that, right?"
-              ],
-              "answer": 2,
-              "explain": "A question that requires applying the idea to a new case reveals whether they understood it. The others invite a polite yes, which tells you nothing."
-            }
-          ],
-          "resource": {
-            "title": "Greg Wilson: Teaching Tech Together",
-            "url": "https://teachtogether.tech/"
-          }
-        },
-        {
-          "id": "s8m2l2",
-          "title": "Public writing and talks",
-          "minutes": 90,
-          "objective": "By the end you can turn a piece of work into a long-form post or talk with one central claim, a defined reader, and evidence, test it on a real reader, and publish it.",
-          "concept": [
-            "Hamming was emphatic that doing good work is not enough: you have to sell it, and he named three ways, writing clearly, giving formal talks and giving informal talks. Public writing scales your thinking past the room you are in, lets strangers find and build on your work, and forces clarity, because gaps that hide in your head are obvious on the page. Many senior engineers' best opportunities trace back to a single useful post.",
-            "A strong long-form post has **one central claim**, stated in the first paragraph, and a **specific reader**, such as 'a backend engineer who has never used CRDTs'. Back the claim with concrete examples, code and numbers, including what you tried that failed. The first draft is too long; cut about a third. Before publishing, give it to one person from the target audience and ask where they got lost or bored. Publish on a domain you control, then share it where your readers already are.",
-            "A talk also carries **one idea**, told as a story: the problem, what failed, the insight, the results, and what the audience can do on Monday. Slides support your speech; they are not a document, so one point per slide in large type. Rehearse out loud at least three times with a timer, and record one run. If you plan a live demo, keep a pre-recorded video as backup. Start at a local meetup, then submit to conferences with an abstract stating the takeaway."
-          ],
-          "visual": {
-            "type": "steps",
-            "title": "From work to published idea",
-            "steps": [
-              {
-                "label": "One claim, one reader",
-                "detail": "write both down before drafting"
-              },
-              {
-                "label": "Fast draft",
-                "detail": "get everything out, with real examples and numbers"
-              },
-              {
-                "label": "Cut a third",
-                "detail": "remove everything the reader does not need"
-              },
-              {
-                "label": "Test reader",
-                "detail": "one person from the audience marks where they got lost"
-              },
-              {
-                "label": "Publish and share",
-                "detail": "your own domain, then where readers already are"
-              }
-            ]
-          },
-          "tryit": "Write a title, a one-sentence claim, a one-sentence description of your target reader, and an abstract of at most 150 words for the post or talk in this module's project. Send the abstract to two people in that target audience and ask what they would expect to learn. Revise the claim until their expectations match what you intend to deliver.",
-          "questions": [
-            {
-              "id": "s8m2l2q1",
-              "level": 1,
-              "type": "mcq",
-              "prompt": "Which three ways of selling your work does Hamming describe?",
-              "options": [
-                "Patents, papers and products",
-                "Writing clearly, giving formal talks and giving informal talks",
-                "Social media, newsletters and podcasts",
-                "Networking, mentoring and managing"
-              ],
-              "answer": 1,
-              "explain": "In *You and Your Research*, Hamming lists writing, formal talks and informal talks as the skills of selling your work. The other lists are modern channels or unrelated activities he does not name."
-            },
-            {
-              "id": "s8m2l2q2",
-              "level": 2,
-              "type": "mcq",
-              "prompt": "Which opening paragraph is strongest for a post aimed at backend engineers?",
-              "options": [
-                "In this post I will talk about some things I learned about caching",
-                "Caching is a fascinating and deep topic with a long history",
-                "We cut p99 latency from 900 ms to 120 ms by deleting our cache. Here is why the cache was the bottleneck, and how to tell if yours is too",
-                "First, some background on our company and team structure"
-              ],
-              "answer": 2,
-              "explain": "It states the claim and the evidence immediately and tells the reader what they will get. The others delay the point with announcements, generalities or background the reader did not come for."
-            },
-            {
-              "id": "s8m2l2q3",
-              "level": 3,
-              "type": "mcq",
-              "prompt": "Your talk runs 32 minutes in rehearsal and the slot is 25 minutes. What is the best fix?",
-              "options": [
-                "Speak faster",
-                "Remove the entire weakest section that does not serve the main idea, then rehearse again with a timer",
-                "Skip the conclusion if you run out of time",
-                "Put more text on each slide so you can talk less"
-              ],
-              "answer": 1,
-              "explain": "Cutting a whole section keeps the remaining material at a pace the audience can follow and protects the one idea. Speaking faster lowers comprehension, dropping the conclusion loses the takeaway, and dense slides split the audience's attention."
-            },
-            {
-              "id": "s8m2l2q4",
-              "level": 2,
-              "type": "mcq",
-              "prompt": "You plan a live demo that depends on conference Wi-Fi. What is the best precaution?",
-              "options": [
-                "Hope the Wi-Fi works",
-                "Pre-record the demo and be ready to switch to the video instantly",
-                "Cancel the demo",
-                "Ask the audience to turn off their phones"
-              ],
-              "answer": 1,
-              "explain": "A recorded backup keeps the demo's value even if the network fails, at almost no cost. Cancelling throws away what makes the talk concrete, and hoping is not a plan."
-            }
-          ],
-          "resource": {
-            "title": "Paul Graham: How to Write Usefully",
-            "url": "https://paulgraham.com/useful.html"
-          }
-        },
-        {
-          "id": "s8m2l3",
-          "title": "Learning across fields: math, hardware, product",
-          "minutes": 75,
-          "objective": "By the end you can choose an adjacent field by its leverage on a real problem you have, and write a 12-week plan to learn it by building something and teaching it.",
-          "concept": [
-            "Depth eventually yields diminishing returns, and many advances come from importing ideas across fields: probability into systems design through tail latency, linear algebra into machine learning, hardware awareness into data structures, product sense into deciding what to build. Aim for a **T shape**: keep deepening your specialty, and add two or three adjacent fields chosen because they give leverage on problems you actually face, not because they are fashionable.",
-            "**Math**: probability and statistics, linear algebra, discrete math. A concrete sign you need statistics is being unable to tell whether an A/B result is noise. **Hardware**: know the memory hierarchy in orders of magnitude, roughly 1 ns for an L1 cache hit, about 100 ns for main memory, and about 100 µs for an SSD read. Two O(n) loops can differ several times over in speed because an array is contiguous and a linked list is not. **Product**: talk to users monthly and read support tickets.",
-            "Learn a field by building, not only reading. Pick one classic course or text, implement a toy version of its core idea, such as a tiny CPU simulator, a matrix library, or a feature shipped to ten real users, then teach it in a post. Budget about three hours a week per field for three to six months. Attach the study to a **spike problem** from your real work that the field should help with; that keeps the learning honest and shows when it has paid off."
-          ],
-          "visual": {
-            "type": "boxes",
-            "title": "A T-shaped specialist",
-            "items": [
-              {
-                "label": "Your specialty (the vertical)",
-                "detail": "keep deepening: papers, source code, hard problems"
-              },
-              {
-                "label": "Math",
-                "detail": "statistics for experiments, linear algebra for ML, probability for tail latency"
-              },
-              {
-                "label": "Hardware",
-                "detail": "caches, memory bandwidth, storage latency in orders of magnitude"
-              },
-              {
-                "label": "Product",
-                "detail": "users, support tickets, the metric your work moves"
-              }
-            ]
-          },
-          "tryit": "Choose one adjacent field and write a 12-week plan: one course or text, one toy you will build by week 8, one real problem at work it should help with, and one post you will publish by week 12. Book the weekly hours in your calendar. Complete week 1 today and log what you learned in your learning log.",
-          "questions": [
-            {
-              "id": "s8m2l3q1",
-              "level": 1,
-              "type": "mcq",
-              "prompt": "Roughly how much slower is a main-memory access than an L1 cache hit?",
-              "options": [
-                "About 2 times",
-                "About 100 times",
-                "About 1,000,000 times",
-                "They take the same time"
-              ],
-              "answer": 1,
-              "explain": "Typical figures are around 1 ns for L1 and around 100 ns for main memory, about two orders of magnitude. A million times is closer to the gap between L1 and a spinning disk seek."
-            },
-            {
-              "id": "s8m2l3q2",
-              "level": 2,
-              "type": "mcq",
-              "prompt": "You sum one million integers stored in a contiguous array and the same integers stored in a linked list. Both loops are O(n). Why is the array version usually much faster?",
-              "options": [
-                "Arrays use less memory for integers, so the CPU does less arithmetic",
-                "The array's elements sit next to each other, so each cache line fetched brings in many useful values and the prefetcher can predict accesses; the list chases pointers to scattered memory",
-                "Linked lists are O(n squared) to traverse",
-                "The compiler cannot compile linked lists"
-              ],
-              "answer": 1,
-              "explain": "Big-O ignores constant factors, and memory access patterns dominate those constants. Contiguous data uses caches and prefetching well; pointer chasing causes frequent misses. Traversal of a list is still O(n), so the third option is wrong."
-            },
-            {
-              "id": "s8m2l3q3",
-              "level": 3,
-              "type": "mcq",
-              "prompt": "Your team argues every week about A/B test dashboards; results flip between weeks and nobody trusts them. You are a backend specialist with three hours a week for learning. Which adjacent field gives the most leverage?",
-              "options": [
-                "GPU architecture",
-                "Statistics: experimental design, variance and statistical power",
-                "A new frontend framework",
-                "Compiler construction"
-              ],
-              "answer": 1,
-              "explain": "The real problem is deciding whether observed differences are signal or noise, which is exactly what statistics addresses. The others may be interesting but do not touch the problem your team is stuck on."
-            }
-          ],
-          "resource": {
-            "title": "MIT 18.05: Introduction to Probability and Statistics",
-            "url": "https://ocw.mit.edu/courses/18-05-introduction-to-probability-and-statistics-spring-2014/"
-          }
-        },
-        {
-          "id": "s8m2l4",
-          "title": "Avoiding plateaus",
-          "minutes": 75,
-          "objective": "By the end you can identify where your skill has plateaued, design a deliberate-practice drill with fast feedback for it, and set up sources of harder feedback than you currently get.",
-          "concept": [
-            "Experience is not expertise. Research on expert performance, led by Anders Ericsson, finds that once a skill becomes automatic, more years of ordinary practice barely improve it. **Deliberate practice** is different: it targets a specific weakness just beyond your current ability, gives immediate feedback, demands full concentration, and repeats with refinement. It is uncomfortable by design. A senior engineer doing the same kind of work for a fifth year is often practising nothing at all.",
-            "Find your edge by listing recent mistakes, your slowest kinds of tasks and the work you avoid. Then build drills with fast feedback. Take past incidents from postmortems, debug them blind from the original alerts and compare with the real root cause. Design a known system on paper, then compare with its published architecture. Re-implement a tool you use, such as a hash map, a rate limiter or a log-structured store, in a timed session, then read the real implementation.",
-            "Feedback gets scarcer and softer as you become senior, because people defer to you. Counter it by asking specific questions such as 'What is the weakest part of this design?', finding reviewers stronger than you outside your organisation, and publishing to expert audiences. Make **predictions** about estimates, incident causes and design outcomes, then score them. Dan Luu argues that most people never practise deliberately, so steady deliberate effort alone can take you surprisingly far."
-          ],
-          "visual": {
-            "type": "compare",
-            "title": "More hours vs better hours",
-            "left": {
-              "title": "Ordinary practice",
-              "points": [
-                "More of your usual work",
-                "Comfortable and automatic",
-                "Feedback weeks later, if ever",
-                "Experience grows, skill flattens"
-              ]
-            },
-            "right": {
-              "title": "Deliberate practice",
-              "points": [
-                "One named weakness",
-                "Just beyond your ability",
-                "Feedback within minutes",
-                "Reflect, adjust, repeat"
-              ]
-            }
-          },
-          "tryit": "Keep a prediction log for two weeks: before each estimate, design choice or debugging session, write your prediction and your confidence, then record the outcome. At the end, find the area where your calibration is worst. Design one weekly 60-minute drill for it with feedback that arrives within the session, and run it for the next four weeks.",
-          "questions": [
-            {
-              "id": "s8m2l4q1",
-              "level": 1,
-              "type": "mcq",
-              "prompt": "Which set of features defines deliberate practice?",
-              "options": [
-                "Many hours, repetition and enjoyment",
-                "Targeting a specific weakness just beyond current ability, with immediate feedback, full concentration and refinement",
-                "Practising only what you are already good at",
-                "Working on as many different projects as possible"
-              ],
-              "answer": 1,
-              "explain": "Deliberate practice is defined by its target and its feedback, not by hours or enjoyment. Repeating what you are good at is comfortable practice, and variety without feedback does not fix specific weaknesses."
-            },
-            {
-              "id": "s8m2l4q2",
-              "level": 2,
-              "type": "mcq",
-              "prompt": "You want to get better at debugging production incidents. Which activity is the best deliberate practice?",
-              "options": [
-                "Reading general articles about debugging",
-                "Taking past incidents, working from only the original alerts and logs under a time limit, then comparing your conclusion with the postmortem's root cause",
-                "Volunteering for more on-call shifts and handling them as usual",
-                "Watching a colleague debug"
-              ],
-              "answer": 1,
-              "explain": "It isolates the skill, stretches you, and gives exact feedback straight away from the known answer. More on-call shifts give experience with slow, noisy feedback; reading and watching are passive."
-            },
-            {
-              "id": "s8m2l4q3",
-              "level": 3,
-              "type": "mcq",
-              "prompt": "For a year, reviewers have approved your pull requests with no comments. What is the best interpretation and response?",
-              "options": [
-                "Your code is perfect; stop asking for review",
-                "Reviewers may be deferring to your seniority, so the feedback channel has stopped working; ask specific questions, and seek reviewers stronger than you, such as maintainers of projects you use",
-                "Lower your standards to match the team",
-                "Stop requesting reviews to save everyone time"
-              ],
-              "answer": 1,
-              "explain": "Silence from reviewers is weak evidence of quality when there is a seniority gap. Specific questions and stronger outside reviewers restore real feedback. The other options remove feedback entirely or misread the signal."
-            }
-          ],
-          "resource": {
-            "title": "Dan Luu: 95%-ile isn't that good",
-            "url": "https://danluu.com/p95-skill/"
-          }
-        },
-        {
-          "id": "s8m2l5",
-          "title": "A personal 5-year plan",
-          "minutes": 90,
-          "objective": "By the end you have a one-page 5-year plan with a direction, two or three bets with kill criteria, leading indicators you control, and a scheduled review cadence.",
-          "concept": [
-            "Five years of full-time work is roughly another 10,000 hours, a whole second lap of this map. The question is what those hours compound into. Plan **directions, not destinations**: choose a theme such as 'the person who makes our data platform ten times cheaper' or 'maintainer of a library thousands depend on'. Use your list of important problems from module 1 as input, and pick two or three **bets**, each with the skills and relationships it needs.",
-            "Lay the plan out from far to near: a year-5 picture of what work you do, what you are known for and who you work with; outcomes for each year; three commitments this quarter; and weekly habits such as deliberate-practice hours, writing and mentoring. Track **leading indicators** you control, such as posts published, talks given, mentees helped and practice hours, alongside lagging ones like title and salary. Lagging indicators tell you the result; leading ones tell you what to do this week.",
-            "Review the plan for an hour every quarter: what did I learn, what moved, what should I drop? Rewrite it once a year. Give each bet a **kill criterion** written in advance, such as 'If no team outside mine uses the library by Q4, stop and write up what I learned.' Share the plan with a mentor or peer who will ask hard questions. Leave slack for luck; Hamming quotes Pasteur, 'luck favors the prepared mind', and the plan is how you prepare."
-          ],
-          "visual": {
-            "type": "table",
-            "title": "Horizons of the plan",
-            "headers": [
-              "Horizon",
-              "Question",
-              "Example"
-            ],
-            "rows": [
-              [
-                "5 years",
-                "What am I known for, doing what, with whom?",
-                "Lead maintainer of a widely used query engine"
-              ],
-              [
-                "1 year",
-                "What outcomes prove progress?",
-                "Two external companies run it in production"
-              ],
-              [
-                "Quarter",
-                "Which three commitments?",
-                "Ship v0.3, give one talk, mentor one contributor"
-              ],
-              [
-                "Week",
-                "Which habits?",
-                "4 h deliberate practice, 1 h writing, 1 mentoring call"
-              ],
-              [
-                "Each bet",
-                "When do I stop?",
-                "No external user by Q4 means write it up and move on"
-              ]
-            ]
-          },
-          "example": {
-            "lang": "markdown",
-            "code": "# 5-year plan, v1 (2026-10)\nDirection: make large-scale data systems cheap enough for small teams\n\n## Bets\n1. Open-source query engine: kill if no external production user by 2027-Q4\n2. Storage-format expertise: one paper or RFC accepted by 2028\n\n## This quarter\n- Ship v0.3 with a benchmark suite\n- Give one meetup talk on the benchmark results\n- Mentor one new contributor through their first three PRs\n\n## Weekly\n- 4 h deliberate practice, 1 h writing, 1 mentoring call\n\nReviews: first Sunday of Jan, Apr, Jul, Oct",
-            "explain": "The direction is broad, but every bet has a dated kill criterion and every quarterly item is checkable. The review dates are fixed in advance, so the plan gets revisited rather than forgotten."
-          },
-          "tryit": "Write a one-page version 1 of your own 5-year plan using the five horizons, with two or three bets that each have a dated kill criterion. Book four quarterly review sessions in your calendar now. Send the plan to a mentor or peer, ask them which bet they would kill first and why, and add their answer to the plan.",
-          "questions": [
-            {
-              "id": "s8m2l5q1",
-              "level": 1,
-              "type": "mcq",
-              "prompt": "Which of these is a leading indicator you control?",
-              "options": [
-                "Your job title",
-                "Your salary",
-                "The number of deliberate-practice hours you log each week",
-                "Your company's stock price"
-              ],
-              "answer": 2,
-              "explain": "Practice hours are an input you choose each week and that predicts later results. Title, salary and stock price are lagging outcomes that depend on many factors outside your control."
-            },
-            {
-              "id": "s8m2l5q2",
-              "level": 2,
-              "type": "mcq",
-              "prompt": "Which is the best kill criterion for a bet on building an open-source tool?",
-              "options": [
-                "Stop when it feels like it is not working",
-                "If no team outside mine runs it in production by the end of 2027-Q4, stop and publish a write-up of what I learned",
-                "Never stop; persistence always wins",
-                "Stop if anyone criticises it"
-              ],
-              "answer": 1,
-              "explain": "A good kill criterion is specific, measurable, dated and decided in advance, so sunk costs and mood cannot move it. The other options are vague, absent or triggered by noise."
-            },
-            {
-              "id": "s8m2l5q3",
-              "level": 3,
-              "type": "mcq",
-              "prompt": "Eighteen months into your plan you got the promotion you targeted, but your log shows no posts, no talks and no mentoring since the plan began, and two of your three bets have not moved. What is the best revision?",
-              "options": [
-                "Declare the plan a success because of the promotion",
-                "Abandon planning; it does not work",
-                "Use the quarterly review to find what crowded out the weekly habits, drop or kill the stalled bet whose criterion has been met, and reschedule the habits with fixed times you can actually protect",
-                "Add three more bets to compensate"
-              ],
-              "answer": 2,
-              "explain": "The lagging indicator moved, but the leading indicators show the plan's compounding parts have stopped. A review should diagnose why, apply the kill criteria honestly, and make the habits realistic. Celebrating hides the problem, abandoning planning loses the feedback loop, and more bets spread effort even thinner."
-            }
-          ],
-          "resource": {
-            "title": "Peter Norvig: Teach Yourself Programming in Ten Years",
-            "url": "https://norvig.com/21-days.html"
-          }
-        }
-      ],
-      "project": {
-        "title": "Mentor through stage 1, then publish",
-        "brief": "Mentor one person through stage 1 of this map, adapting your approach as they gain skill, then publish a talk or long-form post about what you learned. It combines the expertise-reversal effect, specific feedback, public writing and your own deliberate practice as a teacher.",
-        "milestones": [
-          "Agree with a mentee on goals, a weekly 45-minute session and the stage 1 timeline, and write these down together",
-          "Keep a mentoring log: for each session, which level of guidance you used (worked example, faded, problem-first) and what the mentee could then do alone",
-          "Give situation-behaviour-impact feedback at least twice, and ask the mentee for feedback on your mentoring at least twice, recording what you changed",
-          "Support the mentee to finish the stage 1 project themselves, with you writing none of its code",
-          "Write a post or talk with one central claim about teaching programming, test it on one reader from the target audience, and publish it",
-          "Share it where your audience is and record the most useful responses in your 5-year plan's next quarterly review"
-        ],
-        "stretch": "Turn the post into a conference talk accepted by a call for papers, or publish your adapted stage 1 materials as an open-source resource others can reuse."
-      },
-      "exam": [
-        {
-          "id": "s8m2e1",
-          "level": 3,
-          "type": "mcq",
-          "prompt": "Week 1: your mentee, new to programming, struggles with a problem-first exercise. Week 6: they breeze through your worked examples and seem bored. What should you do in each week?",
-          "options": [
-            "Problem-first both weeks, to build resilience",
-            "Worked examples both weeks, for consistency",
-            "Week 1: switch to a complete worked example, then a similar problem; week 6: give problems first with hints only when they are stuck",
-            "Week 1: let them struggle alone for hours; week 6: give harder worked examples"
-          ],
-          "answer": 2,
-          "explain": "The expertise-reversal effect says the right level of guidance depends on the learner's current expertise, so it should change between weeks. Novices benefit from worked examples, and more expert learners from problem-solving. Fixed approaches or unguided struggle ignore that."
-        },
-        {
-          "id": "s8m2e2",
-          "level": 2,
-          "type": "mcq",
-          "prompt": "You want your post to change how other teams run design reviews. Which draft plan best combines this module and the design doc lesson?",
-          "options": [
-            "A survey of every design review process ever used",
-            "One claim: 'Put the decision owner and deadline at the top of every design doc.' Target reader: tech leads. Evidence: before-and-after review times from your own team",
-            "A story about your career",
-            "A list of 25 tips"
-          ],
-          "answer": 1,
-          "explain": "One claim, a named reader and real evidence is the structure that makes posts useful, and the claim itself applies the design doc lesson. Surveys and tip lists dilute the point, and a career story serves the writer more than the reader."
-        },
-        {
-          "id": "s8m2e3",
-          "level": 3,
-          "type": "mcq",
-          "prompt": "Your mentee keeps asking you to fix their bugs, and you have been doing it to save time. By the stage 1 project they cannot debug alone. Which change best follows this module?",
-          "options": [
-            "Keep fixing bugs; they will learn by watching",
-            "Stop answering questions entirely",
-            "Teach the 20-minute struggle rule, ask them to predict what the program will do and where it diverges, and give hints rather than fixes",
-            "Give them a debugging book and cancel sessions"
-          ],
-          "answer": 2,
-          "explain": "Your goal is their independence. Questions that make them predict and locate the divergence, with hints only when needed, build the skill your fixes were skipping. Watching is passive, and cutting off support entirely is the opposite mistake."
-        },
-        {
-          "id": "s8m2e4",
-          "level": 2,
-          "type": "mcq",
-          "prompt": "You have three hours a week. Which allocation best supports a 5-year direction of 'make our data platform ten times cheaper'?",
-          "options": [
-            "Three hours on whatever is trending online that week",
-            "Two hours of deliberate practice on storage-engine internals with a timed re-implementation drill, one hour of statistics applied to your team's cost experiments",
-            "Three hours answering other people's questions in chat",
-            "Three hours re-reading notes from past courses"
-          ],
-          "answer": 1,
-          "explain": "It aligns the hours with the direction, uses deliberate practice with feedback, and adds an adjacent field with leverage on a real problem. The others are reactive, unfocused or passive."
-        },
-        {
-          "id": "s8m2e5",
-          "level": 3,
-          "type": "mcq",
-          "prompt": "You give a mentee this feedback: 'Your PRs are sloppy.' They become defensive and nothing changes. Which rewrite is best?",
-          "options": [
-            "Your PRs are really sloppy and need work",
-            "Everyone thinks your PRs are sloppy",
-            "In your last three PRs (situation), the description was empty and tests were missing (behaviour), so reviewers spent an extra day asking what each change did (impact). What would help you include those? Let's try a PR template next week",
-            "Never mind, they are fine"
-          ],
-          "answer": 2,
-          "explain": "Situation-behaviour-impact makes the issue concrete and about the work, and asking for their view leads to a shared next step. The other options are vague, second-hand or withdraw the feedback."
-        },
-        {
-          "id": "s8m2e6",
-          "level": 3,
-          "type": "mcq",
-          "prompt": "Connecting to module 1: you are deciding which project to bet on in your 5-year plan. Which reasoning is strongest?",
-          "options": [
-            "Choose the one that sounds most impressive",
-            "Choose the problem from your scored list with a real attack, a clear why-now, and stages that each deliver value, and attach a dated kill criterion",
-            "Choose whatever your manager is excited about this quarter",
-            "Choose the hardest problem, regardless of attack"
-          ],
-          "answer": 1,
-          "explain": "Hamming's test of an attack, staging work so partial results matter, and a kill criterion together make a bet worth years and safe to stop. Impressiveness, someone else's short-term enthusiasm, or raw difficulty do not guarantee importance or tractability."
-        },
-        {
-          "id": "s8m2e7",
-          "level": 2,
-          "type": "mcq",
-          "prompt": "After your talk, the only feedback you got was 'great talk!' from three friends. How do you get feedback that will actually improve the next one?",
-          "options": [
-            "Accept it; the talk was great",
-            "Watch your recording against a short checklist, and ask two experienced speakers specifically: where did attention drop, and which slide would you cut?",
-            "Never give a talk again",
-            "Ask the audience to rate it out of 10"
-          ],
-          "answer": 1,
-          "explain": "Specific questions to stronger practitioners, plus your own review of the recording, produce feedback you can act on. Polite praise from friends and single scores carry little information about what to change."
-        }
+     "id": "s8m1l2",
+     "title": "Design docs and RFCs",
+     "minutes": 90,
+     "objective": "By the end you can write a design doc with explicit goals and non-goals, real alternatives and cross-cutting concerns, and run it through a review that ends in a recorded decision.",
+     "concept": [
+      "A **design doc** is a tool for finding the flaws in a plan while they are cheap: an hour of review instead of a month of rework. It is written before building, and it also makes the decision legible to whoever inherits the system. If the solution is obvious, small and easy to reverse, with no real trade-offs, skip it and write a good pull request description instead. A doc nobody needs is just ceremony.",
+      "A widely used structure: **context and scope**; **goals and non-goals**, where a non-goal is something that could reasonably be a goal but you are explicitly not doing, like 'no multi-region writes in v1'; **the design**, with APIs, data and diagrams detailed enough for reviewers to find problems; **alternatives considered**, each with why it lost; and **cross-cutting concerns**: security, privacy, observability, migration and rollback. Use numbers instead of adjectives: 'p95 search latency under 150 ms at 2,000 QPS', not 'fast search'.",
+      "Open-source projects and large organisations formalise this as an **RFC** process, such as Rust's RFCs or Python's PEPs: a draft, early review by a few people, a public comment period, a final comment period, and a recorded decision of accept, reject or postpone. Put the decision you need and the deadline at the top. Address the strongest objection in the doc itself. Separate one-way doors, choices hard to reverse like a storage format, from two-way doors, and spend review time on the first kind."
+     ],
+     "visual": {
+      "type": "steps",
+      "title": "From idea to recorded decision",
+      "steps": [
+       {
+        "label": "Problem statement",
+        "detail": "one page: context, why now, what decision is needed"
+       },
+       {
+        "label": "Draft + 2 early reviewers",
+        "detail": "catch fatal flaws before a wide audience sees it"
+       },
+       {
+        "label": "Wide review",
+        "detail": "comment period with a clear deadline"
+       },
+       {
+        "label": "Decision recorded",
+        "detail": "who decided, what, why, and what was rejected"
+       },
+       {
+        "label": "Build, then update",
+        "detail": "note where reality diverged from the doc"
+       }
       ]
+     },
+     "example": {
+      "lang": "markdown",
+      "code": "# Remote build cache\nStatus: In review, decision by 2026-11-06 (DRI: A. Rivera)\n\n## Context and scope\n## Goals\n- p50 CI time from 40 min to under 10 min\n## Non-goals\n- Replacing the build tool\n- Caching for local developer builds in v1\n## Design\n## Alternatives considered\n## Security, observability, rollback\n## Risks and open questions",
+      "explain": "The status line tells a reader in five seconds what is being decided, by whom and by when. Goals carry numbers, and the non-goals block the two most likely kinds of scope creep before anyone proposes them."
+     },
+     "tryit": "Pick a real decision in your current work and write a mini design doc of at most three pages with numeric goals, at least two non-goals, at least two genuine alternatives and a rollback plan. Send it to the two people most likely to disagree and ask each a single question: what would make this fail? Revise the doc and add a short section on what changed because of their answers.",
+     "questions": [
+      {
+       "id": "s8m1l2q1",
+       "level": 1,
+       "type": "mcq",
+       "prompt": "In a design doc, what is a non-goal?",
+       "options": [
+        "A goal the team failed to meet",
+        "Something that could reasonably be a goal but the project explicitly chooses not to do",
+        "A task assigned to another team",
+        "A bug that will not be fixed"
+       ],
+       "answer": 1,
+       "explain": "Non-goals are deliberate scope boundaries for things readers might otherwise assume are included. They are not failures, hand-offs or bug triage; their job is to prevent scope creep and misread expectations."
+      },
+      {
+       "id": "s8m1l2q2",
+       "level": 2,
+       "type": "mcq",
+       "prompt": "A draft states the goal as 'Make search fast and reliable.' Which rewrite is most useful to reviewers?",
+       "options": [
+        "Make search much faster and very reliable",
+        "Use the best possible search technology",
+        "p95 latency under 150 ms and 99.9% monthly availability at 2,000 queries per second",
+        "Search should feel instant to users"
+       ],
+       "answer": 2,
+       "explain": "Only the numeric version can be tested, designed against and argued about. The others restate the vague goal in different words and give reviewers nothing to check."
+      },
+      {
+       "id": "s8m1l2q3",
+       "level": 3,
+       "type": "mcq",
+       "prompt": "A design doc has 60 comments, and two senior engineers have argued the same point back and forth for a week. What is the best next step?",
+       "options": [
+        "Keep replying until one of them gives up",
+        "Delete the thread and proceed with your design",
+        "Hold a short meeting with both and the decision owner, decide, then record the decision and its reasoning in the doc",
+        "Start a new doc without the contested section"
+       ],
+       "answer": 2,
+       "explain": "Written threads are poor at resolving a deadlocked trade-off; a short synchronous conversation with the decision owner is better, and writing the outcome back keeps the doc the record of truth. Ignoring or hiding the disagreement leaves it to resurface later."
+      },
+      {
+       "id": "s8m1l2q4",
+       "level": 2,
+       "type": "mcq",
+       "prompt": "When is writing a full design doc not worth it?",
+       "options": [
+        "When the change touches more than one team",
+        "When the solution is clear, small and easy to reverse, with no meaningful trade-offs",
+        "When the change involves a database schema migration",
+        "When senior engineers will review the code anyway"
+       ],
+       "answer": 1,
+       "explain": "Docs pay off when there are real alternatives or the decision is costly to reverse. Cross-team changes and schema migrations usually are exactly those cases; code review alone happens too late to change direction cheaply."
+      }
+     ],
+     "resource": {
+      "title": "Malte Ubl: Design Docs at Google",
+      "url": "https://www.industrialempathy.com/posts/design-docs-at-google/"
+     },
+     "why": "A design doc finds flaws while they're cheap: an hour of review instead of a month of rework. It's also how senior engineers align teams without meetings.",
+     "terms": [
+      {
+       "t": "Design doc",
+       "d": "A written plan reviewed before building."
+      },
+      {
+       "t": "Goals and non-goals",
+       "d": "What you'll achieve and what you explicitly won't."
+      },
+      {
+       "t": "Alternatives considered",
+       "d": "Real options you rejected, and why."
+      },
+      {
+       "t": "RFC",
+       "d": "A formal proposal and review process, like Rust RFCs or Python PEPs."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "A design doc should describe the implementation in full detail.",
+       "right": "Focus on decisions, trade-offs and risks; code details belong in code review."
+      },
+      {
+       "wrong": "Listing alternatives is a formality.",
+       "right": "Real alternatives show the decision was thought through and invite better ideas."
+      }
+     ],
+     "takeaways": [
+      "Write context, goals, non-goals, design, alternatives and cross-cutting concerns.",
+      "Non-goals prevent scope creep.",
+      "End review with a recorded decision and owner."
+     ]
+    },
+    {
+     "id": "s8m1l3",
+     "title": "Technical leadership without authority",
+     "minutes": 75,
+     "objective": "By the end you can plan a cross-team change using a stakeholder map, pre-wired one-on-ones and an explicit decision owner, and handle a decision that goes against you.",
+     "concept": [
+      "As a senior individual contributor you can rarely order anyone to do anything. Your influence runs on other currencies: **credibility**, a track record of being right in writing; **clarity**, being the person who states the problem crisply; **relationships**, having helped people before you need them; **sponsorship**, a leader who backs the direction; and **making it easy**, removing the work others would have to do to follow you. Borrowed authority is fragile. Earned credibility compounds across projects.",
+      "Mechanics that work: **pre-wire** big decisions by talking to each key stakeholder one-on-one before the meeting, learning their objection and changing the proposal or addressing it, so nothing in the room is a surprise. Make the decision explicit: who owns it, by when, and what input is needed. Lead by doing the first hard slice yourself, such as migrating one service and writing the guide. Once a decision is made, **disagree and commit**: support it fully, and raise new evidence openly through the same channel.",
+      "Tanya Reilly's talk *Being Glue* names the work that holds teams together: onboarding, unblocking, noticing gaps between teams, writing the missing doc, chasing the dependency. It is essential and often invisible at promotion time. Do it deliberately rather than by default, make its impact visible in writing, and talk to your manager about whether it is the role they expect from you. Watch that it is shared across the team instead of quietly landing on the same people."
+     ],
+     "visual": {
+      "type": "boxes",
+      "title": "Sources of influence without authority",
+      "items": [
+       {
+        "label": "Credibility",
+        "detail": "past calls that were right, in writing"
+       },
+       {
+        "label": "Clarity",
+        "detail": "you frame the problem everyone else is circling"
+       },
+       {
+        "label": "Relationships",
+        "detail": "help given before you ask for anything"
+       },
+       {
+        "label": "Sponsorship",
+        "detail": "a leader who will back the direction"
+       },
+       {
+        "label": "Making it easy",
+        "detail": "you do the first migration, the guide, the tooling"
+       }
+      ]
+     },
+     "tryit": "Choose a cross-team change you want to make. Draw a stakeholder map: for each person, what they care about, their likely objection, and what evidence would change their mind. Hold three one-on-ones before proposing anything formally, and write down how the proposal changed after each. Finish by naming the decision owner and the date the decision will be made.",
+     "questions": [
+      {
+       "id": "s8m1l3q1",
+       "level": 1,
+       "type": "mcq",
+       "prompt": "What does pre-wiring a decision mean?",
+       "options": [
+        "Making the decision alone before anyone else is told",
+        "Talking with key stakeholders individually before the group meeting, so objections surface and are addressed in advance",
+        "Writing the code before the design doc",
+        "Booking the meeting room early"
+       ],
+       "answer": 1,
+       "explain": "Pre-wiring is about one-on-one conversations ahead of the group discussion. It does not mean deciding alone; the point is that people's concerns shape the proposal before it is presented."
+      },
+      {
+       "id": "s8m1l3q2",
+       "level": 2,
+       "type": "mcq",
+       "prompt": "You want six teams to adopt a new structured logging library. You have no authority over them. What is the strongest first move?",
+       "options": [
+        "Email all six teams announcing that the old library is deprecated",
+        "Ask a VP to mandate it",
+        "Migrate one team's service yourself, measure the result, and write a short migration guide using that real example",
+        "Wait until every team requests it"
+       ],
+       "answer": 2,
+       "explain": "Doing the first slice proves it works, produces real numbers and makes adoption cheap for everyone else. A deprecation email you have no authority to send creates resistance, a mandate before proof spends sponsorship you may need later, and waiting does nothing."
+      },
+      {
+       "id": "s8m1l3q3",
+       "level": 3,
+       "type": "mcq",
+       "prompt": "Your team chose design B over your design A. Two weeks into building, you find load-test data showing B will exceed the memory budget at peak. What should you do?",
+       "options": [
+        "Quietly build A on the side to have it ready",
+        "Say nothing; you agreed to commit",
+        "Share the data in writing with the decision owner and the team, state the risk, and ask whether it changes the decision",
+        "Refuse to work on B until the team switches"
+       ],
+       "answer": 2,
+       "explain": "Disagree and commit means supporting the decision while still raising new evidence openly through the normal channel. Silence hides a real risk, a secret parallel build undermines the team, and refusing turns a technical question into a standoff."
+      },
+      {
+       "id": "s8m1l3q4",
+       "level": 2,
+       "type": "mcq",
+       "prompt": "You spend about 60% of your time on onboarding, unblocking and cross-team coordination, and your promotion packet looks thin on technical output. What is the best step?",
+       "options": [
+        "Stop all glue work immediately",
+        "Write up the outcomes of that work and discuss explicitly with your manager whether this is the role they expect and how it will be recognised",
+        "Do the glue work at night so your daytime looks technical",
+        "Assume it will be noticed eventually"
+       ],
+       "answer": 1,
+       "explain": "Glue work is valuable but becomes a career problem when invisible or unacknowledged. Making the impact legible and aligning with your manager turns it into a deliberate choice. Dropping it abruptly hurts the team, and hoping it gets noticed rarely works."
+      }
+     ],
+     "resource": {
+      "title": "Tanya Reilly: Being Glue",
+      "url": "https://noidea.dog/glue"
+     },
+     "why": "Senior engineers rarely have authority over the people they need. Influence through credibility, relationships and clarity is how cross-team change happens.",
+     "terms": [
+      {
+       "t": "Credibility",
+       "d": "A track record of being right and following through."
+      },
+      {
+       "t": "Pre-wiring",
+       "d": "Talking to each stakeholder one-on-one before the decision meeting."
+      },
+      {
+       "t": "Decision owner",
+       "d": "The one person who makes the final call."
+      },
+      {
+       "t": "Disagree and commit",
+       "d": "Stating your objection, then fully supporting the decision once made."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "A good proposal wins on its merits in the meeting.",
+       "right": "Objections surface late and harden in public. Pre-wire and adjust beforehand."
+      },
+      {
+       "wrong": "If the decision goes against me, I should keep arguing.",
+       "right": "Make your case clearly, then commit. Revisit only with new evidence."
+      }
+     ],
+     "takeaways": [
+      "Map stakeholders and their concerns.",
+      "Pre-wire important decisions one-on-one.",
+      "Name the decision owner and disagree and commit."
+     ]
+    },
+    {
+     "id": "s8m1l4",
+     "title": "Maintaining open source people depend on",
+     "minutes": 90,
+     "objective": "By the end you can version releases with semantic versioning, run a deprecation, handle a security report privately, and reduce the maintenance load on a project others depend on.",
+     "concept": [
+      "Once others depend on your code, its interface is a promise. **Hyrum's Law** warns that with enough users, every observable behaviour of your system will be depended on by somebody, including error message text, ordering and timing. **Semantic Versioning** makes your promises explicit as MAJOR.MINOR.PATCH: an incompatible change to the public API bumps MAJOR, a backward-compatible feature bumps MINOR, and a backward-compatible fix bumps PATCH. Versions starting with `0.` signal that anything may still change.",
+      "Remove things by **deprecation**, not surprise. In one release, add the replacement, keep the old API working and emit a deprecation warning that names the replacement; remove the old API only in the next major release. Keep a changelog with a section per release. For security, publish a `SECURITY.md` with a private reporting channel, fix the issue privately, and release the patch before or together with the public advisory. Never discuss an unfixed vulnerability in a public issue.",
+      "The scarcest resource in a project is maintainer attention. Spend less of it per contribution with CI, automatic formatting, issue templates, a `CONTRIBUTING.md` and labels such as `good first issue`. Every merged feature is maintenance forever, so say no early and kindly to features outside the project's scope, and suggest extension points or a plugin instead. Raise the bus factor: write down the release process and give commit rights to reliable repeat contributors before you burn out."
+     ],
+     "visual": {
+      "type": "table",
+      "title": "Semantic versioning from 2.3.1",
+      "headers": [
+       "Change",
+       "Next version"
+      ],
+      "rows": [
+       [
+        "Fix a crash; no API change",
+        "2.3.2"
+       ],
+       [
+        "Add an optional parameter, old calls still work",
+        "2.4.0"
+       ],
+       [
+        "Deprecate a function, still works, warns",
+        "2.4.0"
+       ],
+       [
+        "Remove that deprecated function",
+        "3.0.0"
+       ],
+       [
+        "Rename a public function without an alias",
+        "3.0.0"
+       ]
+      ]
+     },
+     "tryit": "Audit a project you maintain or one you depend on heavily. Check for a README with usage, `CONTRIBUTING.md`, `SECURITY.md`, a changelog, CI on pull requests, a written release process, and how many people can publish a release. Write down the three fixes with the most leverage, ranked, and complete the first one this week as a pull request.",
+     "questions": [
+      {
+       "id": "s8m1l4q1",
+       "level": 1,
+       "type": "mcq",
+       "prompt": "Under Semantic Versioning, your library is at 2.3.1 and you add a backward-compatible feature. What is the next version?",
+       "options": [
+        "2.3.2",
+        "2.4.0",
+        "3.0.0",
+        "2.3.1-feature"
+       ],
+       "answer": 1,
+       "explain": "New backward-compatible functionality bumps MINOR and resets PATCH to 0. PATCH is for compatible fixes and MAJOR for breaking changes."
+      },
+      {
+       "id": "s8m1l4q2",
+       "level": 2,
+       "type": "mcq",
+       "prompt": "In a patch release you reworded an error message for clarity. A popular downstream tool parsed that text and broke. What does Hyrum's Law suggest you do?",
+       "options": [
+        "Nothing; message text is not part of the API",
+        "Restore the old text in another patch release, then offer a stable machine-readable error code and announce the text change for a future major release",
+        "Tell the downstream project to pin an old version forever",
+        "Remove error messages entirely"
+       ],
+       "answer": 1,
+       "explain": "With enough users, observable behaviour becomes a de facto interface. Restoring compatibility quickly and providing a supported alternative respects that. Insisting it was never the API is technically arguable but leaves users broken, and pinning or removing messages makes things worse."
+      },
+      {
+       "id": "s8m1l4q3",
+       "level": 3,
+       "type": "mcq",
+       "prompt": "A large company opens a pull request adding a big feature only they need. It would add a heavy dependency and a code path you would maintain indefinitely. What is the best response?",
+       "options": [
+        "Merge it to keep a major user happy",
+        "Close it without comment",
+        "Thank them, explain that it is out of scope because of the long-term maintenance cost, and propose an extension point so they can maintain the feature in their own package",
+        "Ask them to pay to have it merged"
+       ],
+       "answer": 2,
+       "explain": "Each merged feature becomes permanent maintenance load. A clear, kind no plus an extension point solves their problem without moving the burden onto you. Silent closure damages trust, and merging for goodwill trades a short-term favour for long-term cost."
+      },
+      {
+       "id": "s8m1l4q4",
+       "level": 2,
+       "type": "mcq",
+       "prompt": "Someone opens a public GitHub issue describing a remote code execution bug in your library, with a working exploit. What should you do first?",
+       "options": [
+        "Discuss the fix openly in the issue thread",
+        "Hide or delete the details publicly, move the conversation to your private security channel, and prepare a patched release before publishing an advisory",
+        "Close the issue as invalid",
+        "Publish an advisory immediately before fixing it"
+       ],
+       "answer": 1,
+       "explain": "Every hour the exploit stays public exposes all users. Limit further disclosure, coordinate privately, ship the fix, then publish an advisory so users know to upgrade. Discussing it openly or announcing before a patch exists helps attackers more than users."
+      }
+     ],
+     "resource": {
+      "title": "Open Source Guides: Best practices for maintainers",
+      "url": "https://opensource.guide/best-practices/"
+     },
+     "why": "Code others depend on is a promise. Versioning, deprecation and security handling protect your users and keep maintenance sustainable.",
+     "terms": [
+      {
+       "t": "Semantic versioning",
+       "d": "MAJOR.MINOR.PATCH: breaking changes bump MAJOR."
+      },
+      {
+       "t": "Hyrum's Law",
+       "d": "With enough users, every observable behaviour is depended on by someone."
+      },
+      {
+       "t": "Deprecation",
+       "d": "Add the replacement, warn on the old API, remove it in a later major release."
+      },
+      {
+       "t": "Private disclosure",
+       "d": "Receiving and fixing security reports before announcing them."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "If it's not documented, I can change it freely.",
+       "right": "Hyrum's Law says someone depends on it. Treat observable behaviour changes carefully."
+      },
+      {
+       "wrong": "Security issues should be discussed in public issues.",
+       "right": "Provide a private reporting channel, fix, release, then disclose."
+      }
+     ],
+     "takeaways": [
+      "Follow semver and keep a changelog.",
+      "Deprecate before removing, naming the replacement.",
+      "Reduce maintainer load with CI, templates and clear contribution rules."
+     ]
+    },
+    {
+     "id": "s8m1l5",
+     "title": "Estimating and managing risk in large projects",
+     "minutes": 90,
+     "objective": "By the end you can give an estimate as a range with a confidence level, maintain a risk register, order work to retire the biggest risk first, and respond to a slipping schedule.",
+     "concept": [
+      "Point estimates hide uncertainty; give a **range with confidence**: '8 to 12 weeks, 80% confident'. Estimates are driven by unknowns, so break the work into pieces of a few days at most, and check against a **reference class**: how long did similar past projects take compared with their original estimates? Joel Spolsky's *Evidence-Based Scheduling* uses each developer's historical ratio of estimated to actual time and a Monte Carlo simulation to turn task estimates into a probability distribution of ship dates.",
+      "Order work by risk, not by comfort. Identify the riskiest assumption, such as whether the new database handles peak write load or whether another team will deliver its API on time, and attack it first with a spike or prototype. Keep a **risk register**: each risk with its likelihood, impact, an early warning signal, a mitigation and an owner. Review it weekly with the team; a risk with no early signal is one you will only notice when it hits.",
+      "Define milestones as working, demoable software, never '80% of the backend'. **Brooks's Law**: adding people to a late software project makes it later, because of ramp-up time and the communication paths each new person adds. When you slip, the real levers are cutting scope and moving the date; adding people helps only early and on separable work. Report bad news as soon as you know it. Make risky changes reversible with feature flags, dual writes and staged rollouts."
+     ],
+     "visual": {
+      "type": "table",
+      "title": "A risk register, first week",
+      "headers": [
+       "Risk",
+       "Likelihood",
+       "Impact",
+       "Early signal",
+       "Mitigation, owner"
+      ],
+      "rows": [
+       [
+        "New DB cannot sustain peak writes",
+        "Medium",
+        "High",
+        "Load test at 2x peak in week 1",
+        "Spike now; fallback is sharding the old DB (Kim)"
+       ],
+       [
+        "Payments team API ships late",
+        "High",
+        "Medium",
+        "Their milestone 2 demo slips",
+        "Build against a stub; weekly sync (Ade)"
+       ],
+       [
+        "Data migration corrupts rows",
+        "Low",
+        "High",
+        "Checksum mismatches in dry run",
+        "Dual writes plus nightly diff (Sam)"
+       ],
+       [
+        "Key engineer leaves",
+        "Low",
+        "High",
+        "Single reviewer on core module",
+        "Pair on core module now (Lee)"
+       ]
+      ]
+     },
+     "tryit": "For the project behind your design doc, write an estimate as a range with a confidence level, and justify it with one reference-class comparison from past work. Build a risk register with at least five risks, each with an early signal and an owner. Decide which risk gets a spike in week 1, and define three milestones that are each a working demo.",
+     "questions": [
+      {
+       "id": "s8m1l5q1",
+       "level": 1,
+       "type": "mcq",
+       "prompt": "What does Brooks's Law state?",
+       "options": [
+        "Work expands to fill the time available",
+        "Adding people to a late software project makes it later",
+        "The last 10% of the work takes 90% of the time",
+        "Any system mirrors the communication structure of its organisation"
+       ],
+       "answer": 1,
+       "explain": "Brooks's Law, from *The Mythical Man-Month*, is about adding people to a late project. The others are real but different ideas: Parkinson's Law, the ninety-ninety rule, and Conway's Law."
+      },
+      {
+       "id": "s8m1l5q2",
+       "level": 2,
+       "type": "mcq",
+       "prompt": "Which status update gives leadership the most useful estimate?",
+       "options": [
+        "We will ship on 1 March",
+        "It is hard to say; software is unpredictable",
+        "8 to 12 weeks, 80% confident; the biggest unknown is the database's write throughput, which a load test will settle by week 2",
+        "We are 80% done"
+       ],
+       "answer": 2,
+       "explain": "It gives a range, a confidence level, the main source of uncertainty and when that uncertainty will shrink. A single date hides risk, refusing to estimate is unhelpful, and percent complete is notoriously unreliable."
+      },
+      {
+       "id": "s8m1l5q3",
+       "level": 3,
+       "type": "mcq",
+       "prompt": "In week 6 of a 10-week project, two of five milestones are done. A director offers four more engineers who do not know the codebase. What is the best response?",
+       "options": [
+        "Accept all four immediately to recover the schedule",
+        "Present options: cut the two lowest-value milestones to ship on time, or keep scope and move the date by about four weeks; accept extra people only for a separable task with little ramp-up",
+        "Ask the existing team to work weekends until it is back on track",
+        "Keep the date and say nothing until week 9"
+       ],
+       "answer": 1,
+       "explain": "Late in a project, new people add ramp-up and coordination costs before they help, which is Brooks's Law. Scope and date are the real levers, and stakeholders need the options now. Sustained overtime erodes quality, and delaying bad news removes everyone's ability to plan."
+      },
+      {
+       "id": "s8m1l5q4",
+       "level": 2,
+       "type": "mcq",
+       "prompt": "You are migrating a service to a new database. Which task should come first?",
+       "options": [
+        "Building the admin dashboard for the new database",
+        "Load-testing the new database at twice your peak write rate",
+        "Writing the final migration runbook",
+        "Renaming tables to match the new conventions"
+       ],
+       "answer": 1,
+       "explain": "Whether the database can handle the load is the assumption that could sink the whole project, so retire it first while changing course is cheap. The other tasks are needed eventually but are wasted if the database fails the test."
+      }
+     ],
+     "resource": {
+      "title": "Joel Spolsky: Evidence Based Scheduling",
+      "url": "https://www.joelonsoftware.com/2007/10/26/evidence-based-scheduling/"
+     },
+     "why": "Large projects fail from unmanaged risk more than from slow coding. Honest estimates and retiring the biggest risk first keep them on track.",
+     "terms": [
+      {
+       "t": "Range estimate",
+       "d": "'8 to 12 weeks, 80% confident' instead of a single number."
+      },
+      {
+       "t": "Reference class",
+       "d": "Similar past projects used to calibrate an estimate."
+      },
+      {
+       "t": "Risk register",
+       "d": "A list of risks with likelihood, impact, owner and mitigation."
+      },
+      {
+       "t": "Brooks's Law",
+       "d": "Adding people to a late project makes it later."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "A single date estimate is more professional.",
+       "right": "It hides uncertainty. Give a range with a confidence level."
+      },
+      {
+       "wrong": "Do the familiar parts first to build momentum.",
+       "right": "Tackle the riskiest assumption first, so surprises arrive early."
+      }
+     ],
+     "takeaways": [
+      "Estimate in ranges, calibrated against past projects.",
+      "Order work to retire the biggest risk first.",
+      "Define milestones as working, demoable software."
+     ]
     }
-  ]
+   ],
+   "project": {
+    "title": "Write and circulate a real design doc",
+    "brief": "Pick a significant problem in your organisation or an open-source project you depend on, and take it from scored problem list to a design doc with a recorded decision. It uses every lesson: problem choice, doc structure, influence without authority, compatibility for dependents, and estimation with risk.",
+    "milestones": [
+     "Score at least five candidate problems on impact, attack, why you and why now, and choose one with a written justification",
+     "Draft the doc: context, numeric goals, non-goals, design, at least two real alternatives, cross-cutting concerns, estimate as a range and a risk register",
+     "Pre-wire with at least three stakeholders and record how each conversation changed the doc",
+     "Circulate to at least five reviewers, including one you expect to disagree, with a decision owner and a deadline at the top",
+     "Resolve every comment as accepted, rejected with a reason, or an open question, and record the final decision in the doc",
+     "Four weeks after the decision, add a short retrospective comparing what happened with the estimate and the risk register"
+    ],
+    "stretch": "Propose the same change, or a related one, as a public RFC in an open-source project and take it through that project's process to a decision."
+   },
+   "exam": [
+    {
+     "id": "s8m1e1",
+     "level": 3,
+     "type": "mcq",
+     "prompt": "Your RFC proposes removing a widely used function from a library at 4.2.0 with about 4,000 dependents. Which plan is best?",
+     "options": [
+      "Remove it in 4.2.1 with a changelog note",
+      "Add the replacement and a deprecation warning in 4.3.0, document the migration in the RFC, and remove the old function in 5.0.0",
+      "Remove it in 5.0.0 with no prior warning",
+      "Keep both forever to avoid any breakage"
+     ],
+     "answer": 1,
+     "explain": "Removal is a breaking change and belongs in a major release, and dependents need a release where both work and a warning points to the replacement. A patch removal breaks semantic versioning, an unannounced major is a surprise, and keeping both forever multiplies maintenance."
+    },
+    {
+     "id": "s8m1e2",
+     "level": 2,
+     "type": "mcq",
+     "prompt": "You must pick one item to put first in your project plan. Which reflects both Hamming's advice and risk-first ordering?",
+     "options": [
+      "The most enjoyable part of the system",
+      "A two-week spike on the assumption that, if false, makes the whole approach fail",
+      "The user interface, so stakeholders see progress",
+      "Documentation, so others can start contributing"
+     ],
+     "answer": 1,
+     "explain": "Testing the attack early is how you find out whether the important problem is actually tractable, and it retires the biggest risk while changing course is cheap. The others feel productive but can all be wasted if the core assumption fails."
+    },
+    {
+     "id": "s8m1e3",
+     "level": 3,
+     "type": "mcq",
+     "prompt": "Your design doc review is scheduled for Thursday with six teams. On Monday you learn the platform team's lead strongly opposes it. What is the best action?",
+     "options": [
+      "Present on Thursday and win the argument in the room",
+      "Cancel the review indefinitely",
+      "Meet the lead before Thursday to understand the objection, then change the design or add a section that addresses it, and tell them what you changed",
+      "Ask their manager to tell them to support it"
+     ],
+     "answer": 2,
+     "explain": "This is pre-wiring: a surprise confrontation in a six-team meeting hardens positions. Understanding the objection first either improves the design or lets you address it directly. Going over their head spends credibility, and cancelling avoids the issue."
+    },
+    {
+     "id": "s8m1e4",
+     "level": 2,
+     "type": "mcq",
+     "prompt": "Which goal statement gives your estimate and risk register something concrete to work against?",
+     "options": [
+      "Improve developer productivity substantially",
+      "Median CI time from 40 minutes to under 10 minutes for the main repository by the end of Q2",
+      "Make CI best in class",
+      "Reduce CI pain points"
+     ],
+     "answer": 1,
+     "explain": "A number, a scope and a date make it possible to estimate the work, detect slippage and know when you are done. The other three cannot be estimated or verified."
+    },
+    {
+     "id": "s8m1e5",
+     "level": 3,
+     "type": "mcq",
+     "prompt": "Leadership asks why your two-year build-system project should continue after a failed milestone. Which project structure gives the strongest answer?",
+     "options": [
+      "One big switch-over at the end of year two",
+      "Stages that each ship value alone: remote caching, cutting CI time by 40%, already in production, then hermetic tests, then the new build graph",
+      "A plan that adds more people every quarter",
+      "A plan with no milestones so it can adapt"
+     ],
+     "answer": 1,
+     "explain": "When partial results already deliver value, a failed later milestone does not erase the project's payoff. A big-bang plan delivers nothing until the end, adding people is not a risk strategy, and no milestones means no evidence."
+    },
+    {
+     "id": "s8m1e6",
+     "level": 3,
+     "type": "mcq",
+     "prompt": "Before a large refactor of a module that dependents use in undocumented ways, which step best limits the risk, using what you learned about testing in earlier stages?",
+     "options": [
+      "Rely on code review to catch behaviour changes",
+      "Write characterisation tests that pin down the module's current observable behaviour, including odd edge cases, before changing anything",
+      "Refactor first, then write tests for the new code",
+      "Ask users to report any breakage after release"
+     ],
+     "answer": 1,
+     "explain": "Hyrum's Law means dependents rely on behaviour nobody documented. Characterisation tests capture what the code does today so the refactor can be checked against it. Reviewers cannot see every behaviour, tests written afterwards only test the new code, and user reports arrive after the damage."
+    },
+    {
+     "id": "s8m1e7",
+     "level": 2,
+     "type": "mcq",
+     "prompt": "A teammate does most of the coordination and onboarding for your project, and you notice the design doc credits only the people who wrote code. What should you do as tech lead?",
+     "options": [
+      "Nothing; code is what matters",
+      "Name their coordination work and its outcomes in the doc's acknowledgements and in your feedback to their manager",
+      "Tell them to stop the coordination and write more code",
+      "Take the coordination work yourself without telling anyone"
+     ],
+     "answer": 1,
+     "explain": "Glue work is essential and often invisible. A lead can make it visible and recognised, which keeps the work happening and is fair. Ignoring it or stopping it harms the project, and silently absorbing it just moves the invisibility to you."
+    }
+   ]
+  },
+  {
+   "id": "s8m2",
+   "title": "Compounding",
+   "summary": "You turn your expertise into other people's growth, public ideas and continued learning, and plan the next five years so the effort compounds.",
+   "lessons": [
+    {
+     "id": "s8m2l1",
+     "title": "Teaching and mentoring",
+     "minutes": 75,
+     "objective": "By the end you can adapt your teaching to a mentee's expertise level using the expertise-reversal effect, check for understanding without leading questions, and give specific feedback using situation-behaviour-impact.",
+     "concept": [
+      "The **expertise-reversal effect**, studied by Kalyuga, Sweller and colleagues, says instructional methods that help novices, such as complete worked examples, step-by-step guidance and integrated explanations, become redundant or even harmful as learners gain expertise. Experienced learners learn more from solving problems with less guidance. So mentoring must change as the mentee grows: full worked examples for a beginner, then partly completed ones to finish, then problems first with hints, then 'what do you think?'. This map follows the same fade from stage 0 to stage 8.",
+      "The **curse of knowledge** means you no longer remember what not knowing felt like, so you skip steps that seem obvious. Counter it by asking the mentee to predict before you show, or to explain back in their own words. Avoid asking 'Does that make sense?', because nearly everyone says yes. Let them hold the keyboard while you talk. Measure your mentoring by how quickly the mentee stops needing you for a given kind of problem.",
+      "Good feedback is specific, timely, about the work rather than the person, and actionable. **Situation-Behaviour-Impact** gives it shape: 'In yesterday's review (situation), you rewrote the author's function inside a comment (behaviour); she told me she felt the change was no longer hers (impact).' Then ask for their view and agree a next step together. In code review, label comments as blocking or as a nit. Praise specifically, so the mentee knows exactly what to repeat."
+     ],
+     "visual": {
+      "type": "compare",
+      "title": "Same mentor, different mentee",
+      "left": {
+       "title": "Novice mentee",
+       "points": [
+        "Complete worked examples first",
+        "Explicit steps and checklists",
+        "Small, well-scoped tasks",
+        "Frequent, short feedback"
+       ]
+      },
+      "right": {
+       "title": "Experienced mentee",
+       "points": [
+        "Problem first, hints only when stuck",
+        "Socratic questions about trade-offs",
+        "Ambiguous projects with ownership",
+        "Feedback on judgement, not syntax"
+       ]
+      }
+     },
+     "example": {
+      "lang": "text",
+      "code": "Situation: In Tuesday's design review,\nBehaviour: you answered every question aimed at Priya before she could respond.\nImpact: She told me afterwards she felt she could not defend her own design.\nAsk: How did the meeting look from your side?\nNext step: Next review, count to five before answering a question addressed to someone else.",
+      "explain": "Each line is observable and specific: no judgement about character, just what happened and its effect. Asking for their view comes before the next step, so the agreed change is shared rather than imposed."
+     },
+     "tryit": "Take one concept from stage 1 of this map and write three versions of teaching it: a complete worked example, a faded version with the key lines blanked out, and a problem-first version with a single hint. Note which mentee profile each one suits. Then write one real piece of situation-behaviour-impact feedback for a recent situation at work and deliver it within a week.",
+     "questions": [
+      {
+       "id": "s8m2l1q1",
+       "level": 1,
+       "type": "mcq",
+       "prompt": "What is the expertise-reversal effect?",
+       "options": [
+        "Experts forget the basics of their field over time",
+        "Teaching methods that help novices, such as detailed worked examples, become ineffective or harmful for more experienced learners",
+        "Novices learn better from problem-solving than from examples",
+        "Experts learn slower than novices"
+       ],
+       "answer": 1,
+       "explain": "The effect is about instruction losing its benefit, or backfiring, as expertise grows. Novices typically benefit from worked examples rather than unguided problems, so the third option has it backwards."
+      },
+      {
+       "id": "s8m2l1q2",
+       "level": 2,
+       "type": "mcq",
+       "prompt": "A mentee with three years of experience says your step-by-step walkthroughs are slow and they are not learning much. What change fits the research?",
+       "options": [
+        "Make the walkthroughs even more detailed",
+        "Give them the problem first, let them attempt it, and offer hints only when they are stuck",
+        "Stop meeting with them",
+        "Ask them to watch beginner tutorials to fill gaps"
+       ],
+       "answer": 1,
+       "explain": "For a more experienced learner, full guidance is redundant and can interfere with learning; problem-first with targeted hints is the faded approach. More detail or beginner material moves in the wrong direction."
+      },
+      {
+       "id": "s8m2l1q3",
+       "level": 3,
+       "type": "mcq",
+       "prompt": "Which feedback is most likely to change behaviour?",
+       "options": [
+        "You need to be a better team player",
+        "Great job on the release!",
+        "In Monday's incident call, you posted the root cause in chat but did not say it aloud, and the on-call lead spent 20 more minutes on the wrong service. Next time, interrupt and say it",
+        "Some people think you are too quiet"
+       ],
+       "answer": 2,
+       "explain": "It names the situation, the behaviour and the impact, and suggests a concrete next action. The others are vague, about personality, or second-hand, so the person cannot tell what to repeat or change."
+      },
+      {
+       "id": "s8m2l1q4",
+       "level": 2,
+       "type": "mcq",
+       "prompt": "After explaining how the cache invalidation works, which question best checks your mentee's understanding?",
+       "options": [
+        "Does that make sense?",
+        "Any questions?",
+        "If we update the price but the cache entry is 30 seconds old, what does the next request see, and why?",
+        "You got that, right?"
+       ],
+       "answer": 2,
+       "explain": "A question that requires applying the idea to a new case reveals whether they understood it. The others invite a polite yes, which tells you nothing."
+      }
+     ],
+     "resource": {
+      "title": "Greg Wilson: Teaching Tech Together",
+      "url": "https://teachtogether.tech/"
+     },
+     "why": "Teaching multiplies your impact and deepens your own understanding. Adapting to the learner's level is what makes it work.",
+     "terms": [
+      {
+       "t": "Expertise-reversal effect",
+       "d": "Methods that help novices, like full worked examples, can hinder experts."
+      },
+      {
+       "t": "Curse of knowledge",
+       "d": "Forgetting what not knowing felt like, so you skip steps."
+      },
+      {
+       "t": "Checking understanding",
+       "d": "Asking for predictions or explanations rather than 'does that make sense?'"
+      },
+      {
+       "t": "Situation–Behaviour–Impact",
+       "d": "A feedback structure: when, what they did, what effect it had."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Asking 'does that make sense?' checks understanding.",
+       "right": "People say yes to be polite. Ask them to predict, explain or apply."
+      },
+      {
+       "wrong": "The same explanation works for everyone.",
+       "right": "Give novices worked examples and structure; give experts problems and room."
+      }
+     ],
+     "takeaways": [
+      "Match guidance to the mentee's level and fade it as they grow.",
+      "Check understanding with predictions, not yes/no questions.",
+      "Make feedback specific, timely and about the work."
+     ]
+    },
+    {
+     "id": "s8m2l2",
+     "title": "Public writing and talks",
+     "minutes": 90,
+     "objective": "By the end you can turn a piece of work into a long-form post or talk with one central claim, a defined reader, and evidence, test it on a real reader, and publish it.",
+     "concept": [
+      "Hamming was emphatic that doing good work is not enough: you have to sell it, and he named three ways, writing clearly, giving formal talks and giving informal talks. Public writing scales your thinking past the room you are in, lets strangers find and build on your work, and forces clarity, because gaps that hide in your head are obvious on the page. Many senior engineers' best opportunities trace back to a single useful post.",
+      "A strong long-form post has **one central claim**, stated in the first paragraph, and a **specific reader**, such as 'a backend engineer who has never used CRDTs'. Back the claim with concrete examples, code and numbers, including what you tried that failed. The first draft is too long; cut about a third. Before publishing, give it to one person from the target audience and ask where they got lost or bored. Publish on a domain you control, then share it where your readers already are.",
+      "A talk also carries **one idea**, told as a story: the problem, what failed, the insight, the results, and what the audience can do on Monday. Slides support your speech; they are not a document, so one point per slide in large type. Rehearse out loud at least three times with a timer, and record one run. If you plan a live demo, keep a pre-recorded video as backup. Start at a local meetup, then submit to conferences with an abstract stating the takeaway."
+     ],
+     "visual": {
+      "type": "steps",
+      "title": "From work to published idea",
+      "steps": [
+       {
+        "label": "One claim, one reader",
+        "detail": "write both down before drafting"
+       },
+       {
+        "label": "Fast draft",
+        "detail": "get everything out, with real examples and numbers"
+       },
+       {
+        "label": "Cut a third",
+        "detail": "remove everything the reader does not need"
+       },
+       {
+        "label": "Test reader",
+        "detail": "one person from the audience marks where they got lost"
+       },
+       {
+        "label": "Publish and share",
+        "detail": "your own domain, then where readers already are"
+       }
+      ]
+     },
+     "tryit": "Write a title, a one-sentence claim, a one-sentence description of your target reader, and an abstract of at most 150 words for the post or talk in this module's project. Send the abstract to two people in that target audience and ask what they would expect to learn. Revise the claim until their expectations match what you intend to deliver.",
+     "questions": [
+      {
+       "id": "s8m2l2q1",
+       "level": 1,
+       "type": "mcq",
+       "prompt": "Which three ways of selling your work does Hamming describe?",
+       "options": [
+        "Patents, papers and products",
+        "Writing clearly, giving formal talks and giving informal talks",
+        "Social media, newsletters and podcasts",
+        "Networking, mentoring and managing"
+       ],
+       "answer": 1,
+       "explain": "In *You and Your Research*, Hamming lists writing, formal talks and informal talks as the skills of selling your work. The other lists are modern channels or unrelated activities he does not name."
+      },
+      {
+       "id": "s8m2l2q2",
+       "level": 2,
+       "type": "mcq",
+       "prompt": "Which opening paragraph is strongest for a post aimed at backend engineers?",
+       "options": [
+        "In this post I will talk about some things I learned about caching",
+        "Caching is a fascinating and deep topic with a long history",
+        "We cut p99 latency from 900 ms to 120 ms by deleting our cache. Here is why the cache was the bottleneck, and how to tell if yours is too",
+        "First, some background on our company and team structure"
+       ],
+       "answer": 2,
+       "explain": "It states the claim and the evidence immediately and tells the reader what they will get. The others delay the point with announcements, generalities or background the reader did not come for."
+      },
+      {
+       "id": "s8m2l2q3",
+       "level": 3,
+       "type": "mcq",
+       "prompt": "Your talk runs 32 minutes in rehearsal and the slot is 25 minutes. What is the best fix?",
+       "options": [
+        "Speak faster",
+        "Remove the entire weakest section that does not serve the main idea, then rehearse again with a timer",
+        "Skip the conclusion if you run out of time",
+        "Put more text on each slide so you can talk less"
+       ],
+       "answer": 1,
+       "explain": "Cutting a whole section keeps the remaining material at a pace the audience can follow and protects the one idea. Speaking faster lowers comprehension, dropping the conclusion loses the takeaway, and dense slides split the audience's attention."
+      },
+      {
+       "id": "s8m2l2q4",
+       "level": 2,
+       "type": "mcq",
+       "prompt": "You plan a live demo that depends on conference Wi-Fi. What is the best precaution?",
+       "options": [
+        "Hope the Wi-Fi works",
+        "Pre-record the demo and be ready to switch to the video instantly",
+        "Cancel the demo",
+        "Ask the audience to turn off their phones"
+       ],
+       "answer": 1,
+       "explain": "A recorded backup keeps the demo's value even if the network fails, at almost no cost. Cancelling throws away what makes the talk concrete, and hoping is not a plan."
+      }
+     ],
+     "resource": {
+      "title": "Paul Graham: How to Write Usefully",
+      "url": "https://paulgraham.com/useful.html"
+     },
+     "why": "Good work that nobody hears about has limited impact. Clear writing and talks spread your ideas and open doors.",
+     "terms": [
+      {
+       "t": "Central claim",
+       "d": "The one idea the piece argues, stated early."
+      },
+      {
+       "t": "Specific reader",
+       "d": "A defined audience, like 'a backend engineer new to CRDTs'."
+      },
+      {
+       "t": "Evidence",
+       "d": "Code, data or examples that support the claim."
+      },
+      {
+       "t": "Talk as story",
+       "d": "Problem, what failed, insight, results, what to do on Monday."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "A post should cover everything I know about the topic.",
+       "right": "One claim for one reader beats a survey. Cut what doesn't support the claim."
+      },
+      {
+       "wrong": "Slides should contain everything I'll say.",
+       "right": "Slides support your speech; dense slides compete with you for attention."
+      }
+     ],
+     "takeaways": [
+      "State the claim in the first paragraph.",
+      "Test drafts on a real reader before publishing.",
+      "Tell talks as a story with one idea."
+     ]
+    },
+    {
+     "id": "s8m2l3",
+     "title": "Learning across fields: math, hardware, product",
+     "minutes": 75,
+     "objective": "By the end you can choose an adjacent field by its leverage on a real problem you have, and write a 12-week plan to learn it by building something and teaching it.",
+     "concept": [
+      "Depth eventually yields diminishing returns, and many advances come from importing ideas across fields: probability into systems design through tail latency, linear algebra into machine learning, hardware awareness into data structures, product sense into deciding what to build. Aim for a **T shape**: keep deepening your specialty, and add two or three adjacent fields chosen because they give leverage on problems you actually face, not because they are fashionable.",
+      "**Math**: probability and statistics, linear algebra, discrete math. A concrete sign you need statistics is being unable to tell whether an A/B result is noise. **Hardware**: know the memory hierarchy in orders of magnitude, roughly 1 ns for an L1 cache hit, about 100 ns for main memory, and about 100 µs for an SSD read. Two O(n) loops can differ several times over in speed because an array is contiguous and a linked list is not. **Product**: talk to users monthly and read support tickets.",
+      "Learn a field by building, not only reading. Pick one classic course or text, implement a toy version of its core idea, such as a tiny CPU simulator, a matrix library, or a feature shipped to ten real users, then teach it in a post. Budget about three hours a week per field for three to six months. Attach the study to a **spike problem** from your real work that the field should help with; that keeps the learning honest and shows when it has paid off."
+     ],
+     "visual": {
+      "type": "boxes",
+      "title": "A T-shaped specialist",
+      "items": [
+       {
+        "label": "Your specialty (the vertical)",
+        "detail": "keep deepening: papers, source code, hard problems"
+       },
+       {
+        "label": "Math",
+        "detail": "statistics for experiments, linear algebra for ML, probability for tail latency"
+       },
+       {
+        "label": "Hardware",
+        "detail": "caches, memory bandwidth, storage latency in orders of magnitude"
+       },
+       {
+        "label": "Product",
+        "detail": "users, support tickets, the metric your work moves"
+       }
+      ]
+     },
+     "tryit": "Choose one adjacent field and write a 12-week plan: one course or text, one toy you will build by week 8, one real problem at work it should help with, and one post you will publish by week 12. Book the weekly hours in your calendar. Complete week 1 today and log what you learned in your learning log.",
+     "questions": [
+      {
+       "id": "s8m2l3q1",
+       "level": 1,
+       "type": "mcq",
+       "prompt": "Roughly how much slower is a main-memory access than an L1 cache hit?",
+       "options": [
+        "About 2 times",
+        "About 100 times",
+        "About 1,000,000 times",
+        "They take the same time"
+       ],
+       "answer": 1,
+       "explain": "Typical figures are around 1 ns for L1 and around 100 ns for main memory, about two orders of magnitude. A million times is closer to the gap between L1 and a spinning disk seek."
+      },
+      {
+       "id": "s8m2l3q2",
+       "level": 2,
+       "type": "mcq",
+       "prompt": "You sum one million integers stored in a contiguous array and the same integers stored in a linked list. Both loops are O(n). Why is the array version usually much faster?",
+       "options": [
+        "Arrays use less memory for integers, so the CPU does less arithmetic",
+        "The array's elements sit next to each other, so each cache line fetched brings in many useful values and the prefetcher can predict accesses; the list chases pointers to scattered memory",
+        "Linked lists are O(n squared) to traverse",
+        "The compiler cannot compile linked lists"
+       ],
+       "answer": 1,
+       "explain": "Big-O ignores constant factors, and memory access patterns dominate those constants. Contiguous data uses caches and prefetching well; pointer chasing causes frequent misses. Traversal of a list is still O(n), so the third option is wrong."
+      },
+      {
+       "id": "s8m2l3q3",
+       "level": 3,
+       "type": "mcq",
+       "prompt": "Your team argues every week about A/B test dashboards; results flip between weeks and nobody trusts them. You are a backend specialist with three hours a week for learning. Which adjacent field gives the most leverage?",
+       "options": [
+        "GPU architecture",
+        "Statistics: experimental design, variance and statistical power",
+        "A new frontend framework",
+        "Compiler construction"
+       ],
+       "answer": 1,
+       "explain": "The real problem is deciding whether observed differences are signal or noise, which is exactly what statistics addresses. The others may be interesting but do not touch the problem your team is stuck on."
+      }
+     ],
+     "resource": {
+      "title": "MIT 18.05: Introduction to Probability and Statistics",
+      "url": "https://ocw.mit.edu/courses/18-05-introduction-to-probability-and-statistics-spring-2014/"
+     },
+     "why": "Many breakthroughs come from importing ideas across fields. A deliberate adjacent field, learned by building, extends what you can do.",
+     "terms": [
+      {
+       "t": "T shape",
+       "d": "Broad knowledge plus deep expertise in one area."
+      },
+      {
+       "t": "Adjacent field",
+       "d": "Maths, hardware or product, chosen for leverage on a real problem."
+      },
+      {
+       "t": "Spike problem",
+       "d": "A concrete problem that forces you into the new field."
+      },
+      {
+       "t": "Learn by building",
+       "d": "Implementing a toy version of the field's core idea."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "I should learn whatever seems interesting.",
+       "right": "Choose by leverage on a problem you actually have, so the learning gets used."
+      },
+      {
+       "wrong": "Reading a textbook is enough to learn a field.",
+       "right": "Build something small and teach it; that's where understanding forms."
+      }
+     ],
+     "takeaways": [
+      "Pick the field by its leverage on a real problem.",
+      "Write a 12-week plan: one text, one build, one explanation.",
+      "Probability, linear algebra and product sense pay off widely."
+     ]
+    },
+    {
+     "id": "s8m2l4",
+     "title": "Avoiding plateaus",
+     "minutes": 75,
+     "objective": "By the end you can identify where your skill has plateaued, design a deliberate-practice drill with fast feedback for it, and set up sources of harder feedback than you currently get.",
+     "concept": [
+      "Experience is not expertise. Research on expert performance, led by Anders Ericsson, finds that once a skill becomes automatic, more years of ordinary practice barely improve it. **Deliberate practice** is different: it targets a specific weakness just beyond your current ability, gives immediate feedback, demands full concentration, and repeats with refinement. It is uncomfortable by design. A senior engineer doing the same kind of work for a fifth year is often practising nothing at all.",
+      "Find your edge by listing recent mistakes, your slowest kinds of tasks and the work you avoid. Then build drills with fast feedback. Take past incidents from postmortems, debug them blind from the original alerts and compare with the real root cause. Design a known system on paper, then compare with its published architecture. Re-implement a tool you use, such as a hash map, a rate limiter or a log-structured store, in a timed session, then read the real implementation.",
+      "Feedback gets scarcer and softer as you become senior, because people defer to you. Counter it by asking specific questions such as 'What is the weakest part of this design?', finding reviewers stronger than you outside your organisation, and publishing to expert audiences. Make **predictions** about estimates, incident causes and design outcomes, then score them. Dan Luu argues that most people never practise deliberately, so steady deliberate effort alone can take you surprisingly far."
+     ],
+     "visual": {
+      "type": "compare",
+      "title": "More hours vs better hours",
+      "left": {
+       "title": "Ordinary practice",
+       "points": [
+        "More of your usual work",
+        "Comfortable and automatic",
+        "Feedback weeks later, if ever",
+        "Experience grows, skill flattens"
+       ]
+      },
+      "right": {
+       "title": "Deliberate practice",
+       "points": [
+        "One named weakness",
+        "Just beyond your ability",
+        "Feedback within minutes",
+        "Reflect, adjust, repeat"
+       ]
+      }
+     },
+     "tryit": "Keep a prediction log for two weeks: before each estimate, design choice or debugging session, write your prediction and your confidence, then record the outcome. At the end, find the area where your calibration is worst. Design one weekly 60-minute drill for it with feedback that arrives within the session, and run it for the next four weeks.",
+     "questions": [
+      {
+       "id": "s8m2l4q1",
+       "level": 1,
+       "type": "mcq",
+       "prompt": "Which set of features defines deliberate practice?",
+       "options": [
+        "Many hours, repetition and enjoyment",
+        "Targeting a specific weakness just beyond current ability, with immediate feedback, full concentration and refinement",
+        "Practising only what you are already good at",
+        "Working on as many different projects as possible"
+       ],
+       "answer": 1,
+       "explain": "Deliberate practice is defined by its target and its feedback, not by hours or enjoyment. Repeating what you are good at is comfortable practice, and variety without feedback does not fix specific weaknesses."
+      },
+      {
+       "id": "s8m2l4q2",
+       "level": 2,
+       "type": "mcq",
+       "prompt": "You want to get better at debugging production incidents. Which activity is the best deliberate practice?",
+       "options": [
+        "Reading general articles about debugging",
+        "Taking past incidents, working from only the original alerts and logs under a time limit, then comparing your conclusion with the postmortem's root cause",
+        "Volunteering for more on-call shifts and handling them as usual",
+        "Watching a colleague debug"
+       ],
+       "answer": 1,
+       "explain": "It isolates the skill, stretches you, and gives exact feedback straight away from the known answer. More on-call shifts give experience with slow, noisy feedback; reading and watching are passive."
+      },
+      {
+       "id": "s8m2l4q3",
+       "level": 3,
+       "type": "mcq",
+       "prompt": "For a year, reviewers have approved your pull requests with no comments. What is the best interpretation and response?",
+       "options": [
+        "Your code is perfect; stop asking for review",
+        "Reviewers may be deferring to your seniority, so the feedback channel has stopped working; ask specific questions, and seek reviewers stronger than you, such as maintainers of projects you use",
+        "Lower your standards to match the team",
+        "Stop requesting reviews to save everyone time"
+       ],
+       "answer": 1,
+       "explain": "Silence from reviewers is weak evidence of quality when there is a seniority gap. Specific questions and stronger outside reviewers restore real feedback. The other options remove feedback entirely or misread the signal."
+      }
+     ],
+     "resource": {
+      "title": "Dan Luu: 95%-ile isn't that good",
+      "url": "https://danluu.com/p95-skill/"
+     },
+     "why": "Years of experience don't guarantee improvement. Once a skill is automatic, only deliberate practice with honest feedback moves it further.",
+     "terms": [
+      {
+       "t": "Plateau",
+       "d": "A level where more ordinary practice stops improving performance."
+      },
+      {
+       "t": "Edge of ability",
+       "d": "Tasks just beyond what you can do comfortably."
+      },
+      {
+       "t": "Prediction practice",
+       "d": "Predict outcomes, then check, to build calibrated judgement."
+      },
+      {
+       "t": "Harder feedback",
+       "d": "Sources that don't defer to you: benchmarks, experts, postmortems."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "More years of experience means more expertise.",
+       "right": "Automatic performance plateaus. Improvement needs targeted, effortful practice."
+      },
+      {
+       "wrong": "If nobody criticises my work, it's excellent.",
+       "right": "Seniority makes feedback scarcer and softer. Ask specific questions and seek blunt sources."
+      }
+     ],
+     "takeaways": [
+      "List recent mistakes, slow tasks and avoided work to find your edge.",
+      "Build drills with fast feedback, like replaying past incidents.",
+      "Ask 'what's the weakest part of this?'"
+     ]
+    },
+    {
+     "id": "s8m2l5",
+     "title": "A personal 5-year plan",
+     "minutes": 90,
+     "objective": "By the end you have a one-page 5-year plan with a direction, two or three bets with kill criteria, leading indicators you control, and a scheduled review cadence.",
+     "concept": [
+      "Five years of full-time work is roughly another 10,000 hours, a whole second lap of this map. The question is what those hours compound into. Plan **directions, not destinations**: choose a theme such as 'the person who makes our data platform ten times cheaper' or 'maintainer of a library thousands depend on'. Use your list of important problems from module 1 as input, and pick two or three **bets**, each with the skills and relationships it needs.",
+      "Lay the plan out from far to near: a year-5 picture of what work you do, what you are known for and who you work with; outcomes for each year; three commitments this quarter; and weekly habits such as deliberate-practice hours, writing and mentoring. Track **leading indicators** you control, such as posts published, talks given, mentees helped and practice hours, alongside lagging ones like title and salary. Lagging indicators tell you the result; leading ones tell you what to do this week.",
+      "Review the plan for an hour every quarter: what did I learn, what moved, what should I drop? Rewrite it once a year. Give each bet a **kill criterion** written in advance, such as 'If no team outside mine uses the library by Q4, stop and write up what I learned.' Share the plan with a mentor or peer who will ask hard questions. Leave slack for luck; Hamming quotes Pasteur, 'luck favors the prepared mind', and the plan is how you prepare."
+     ],
+     "visual": {
+      "type": "table",
+      "title": "Horizons of the plan",
+      "headers": [
+       "Horizon",
+       "Question",
+       "Example"
+      ],
+      "rows": [
+       [
+        "5 years",
+        "What am I known for, doing what, with whom?",
+        "Lead maintainer of a widely used query engine"
+       ],
+       [
+        "1 year",
+        "What outcomes prove progress?",
+        "Two external companies run it in production"
+       ],
+       [
+        "Quarter",
+        "Which three commitments?",
+        "Ship v0.3, give one talk, mentor one contributor"
+       ],
+       [
+        "Week",
+        "Which habits?",
+        "4 h deliberate practice, 1 h writing, 1 mentoring call"
+       ],
+       [
+        "Each bet",
+        "When do I stop?",
+        "No external user by Q4 means write it up and move on"
+       ]
+      ]
+     },
+     "example": {
+      "lang": "markdown",
+      "code": "# 5-year plan, v1 (2026-10)\nDirection: make large-scale data systems cheap enough for small teams\n\n## Bets\n1. Open-source query engine: kill if no external production user by 2027-Q4\n2. Storage-format expertise: one paper or RFC accepted by 2028\n\n## This quarter\n- Ship v0.3 with a benchmark suite\n- Give one meetup talk on the benchmark results\n- Mentor one new contributor through their first three PRs\n\n## Weekly\n- 4 h deliberate practice, 1 h writing, 1 mentoring call\n\nReviews: first Sunday of Jan, Apr, Jul, Oct",
+      "explain": "The direction is broad, but every bet has a dated kill criterion and every quarterly item is checkable. The review dates are fixed in advance, so the plan gets revisited rather than forgotten."
+     },
+     "tryit": "Write a one-page version 1 of your own 5-year plan using the five horizons, with two or three bets that each have a dated kill criterion. Book four quarterly review sessions in your calendar now. Send the plan to a mentor or peer, ask them which bet they would kill first and why, and add their answer to the plan.",
+     "questions": [
+      {
+       "id": "s8m2l5q1",
+       "level": 1,
+       "type": "mcq",
+       "prompt": "Which of these is a leading indicator you control?",
+       "options": [
+        "Your job title",
+        "Your salary",
+        "The number of deliberate-practice hours you log each week",
+        "Your company's stock price"
+       ],
+       "answer": 2,
+       "explain": "Practice hours are an input you choose each week and that predicts later results. Title, salary and stock price are lagging outcomes that depend on many factors outside your control."
+      },
+      {
+       "id": "s8m2l5q2",
+       "level": 2,
+       "type": "mcq",
+       "prompt": "Which is the best kill criterion for a bet on building an open-source tool?",
+       "options": [
+        "Stop when it feels like it is not working",
+        "If no team outside mine runs it in production by the end of 2027-Q4, stop and publish a write-up of what I learned",
+        "Never stop; persistence always wins",
+        "Stop if anyone criticises it"
+       ],
+       "answer": 1,
+       "explain": "A good kill criterion is specific, measurable, dated and decided in advance, so sunk costs and mood cannot move it. The other options are vague, absent or triggered by noise."
+      },
+      {
+       "id": "s8m2l5q3",
+       "level": 3,
+       "type": "mcq",
+       "prompt": "Eighteen months into your plan you got the promotion you targeted, but your log shows no posts, no talks and no mentoring since the plan began, and two of your three bets have not moved. What is the best revision?",
+       "options": [
+        "Declare the plan a success because of the promotion",
+        "Abandon planning; it does not work",
+        "Use the quarterly review to find what crowded out the weekly habits, drop or kill the stalled bet whose criterion has been met, and reschedule the habits with fixed times you can actually protect",
+        "Add three more bets to compensate"
+       ],
+       "answer": 2,
+       "explain": "The lagging indicator moved, but the leading indicators show the plan's compounding parts have stopped. A review should diagnose why, apply the kill criteria honestly, and make the habits realistic. Celebrating hides the problem, abandoning planning loses the feedback loop, and more bets spread effort even thinner."
+      }
+     ],
+     "resource": {
+      "title": "Peter Norvig: Teach Yourself Programming in Ten Years",
+      "url": "https://norvig.com/21-days.html"
+     },
+     "why": "The next five years are roughly another 10,000 hours. A plan with directions, bets and review points makes those hours compound instead of drift.",
+     "terms": [
+      {
+       "t": "Direction, not destination",
+       "d": "A heading you can adjust, rather than a fixed job title."
+      },
+      {
+       "t": "Bet",
+       "d": "A time-boxed attempt at something with uncertain payoff."
+      },
+      {
+       "t": "Kill criterion",
+       "d": "A pre-written condition for stopping a bet."
+      },
+      {
+       "t": "Leading indicator",
+       "d": "Something you control that predicts the outcome, like hours of deliberate practice."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "A five-year plan should fix my exact role and title.",
+       "right": "Too much changes. Set a direction and revise it."
+      },
+      {
+       "wrong": "Track outcomes like promotions to see progress.",
+       "right": "Outcomes lag and depend on others. Track leading indicators you control."
+      }
+     ],
+     "takeaways": [
+      "Write a one-page plan: year-5 picture, yearly outcomes, this quarter's commitments.",
+      "Run two or three bets with kill criteria.",
+      "Review quarterly and rewrite yearly."
+     ]
+    }
+   ],
+   "project": {
+    "title": "Mentor through stage 1, then publish",
+    "brief": "Mentor one person through stage 1 of this map, adapting your approach as they gain skill, then publish a talk or long-form post about what you learned. It combines the expertise-reversal effect, specific feedback, public writing and your own deliberate practice as a teacher.",
+    "milestones": [
+     "Agree with a mentee on goals, a weekly 45-minute session and the stage 1 timeline, and write these down together",
+     "Keep a mentoring log: for each session, which level of guidance you used (worked example, faded, problem-first) and what the mentee could then do alone",
+     "Give situation-behaviour-impact feedback at least twice, and ask the mentee for feedback on your mentoring at least twice, recording what you changed",
+     "Support the mentee to finish the stage 1 project themselves, with you writing none of its code",
+     "Write a post or talk with one central claim about teaching programming, test it on one reader from the target audience, and publish it",
+     "Share it where your audience is and record the most useful responses in your 5-year plan's next quarterly review"
+    ],
+    "stretch": "Turn the post into a conference talk accepted by a call for papers, or publish your adapted stage 1 materials as an open-source resource others can reuse."
+   },
+   "exam": [
+    {
+     "id": "s8m2e1",
+     "level": 3,
+     "type": "mcq",
+     "prompt": "Week 1: your mentee, new to programming, struggles with a problem-first exercise. Week 6: they breeze through your worked examples and seem bored. What should you do in each week?",
+     "options": [
+      "Problem-first both weeks, to build resilience",
+      "Worked examples both weeks, for consistency",
+      "Week 1: switch to a complete worked example, then a similar problem; week 6: give problems first with hints only when they are stuck",
+      "Week 1: let them struggle alone for hours; week 6: give harder worked examples"
+     ],
+     "answer": 2,
+     "explain": "The expertise-reversal effect says the right level of guidance depends on the learner's current expertise, so it should change between weeks. Novices benefit from worked examples, and more expert learners from problem-solving. Fixed approaches or unguided struggle ignore that."
+    },
+    {
+     "id": "s8m2e2",
+     "level": 2,
+     "type": "mcq",
+     "prompt": "You want your post to change how other teams run design reviews. Which draft plan best combines this module and the design doc lesson?",
+     "options": [
+      "A survey of every design review process ever used",
+      "One claim: 'Put the decision owner and deadline at the top of every design doc.' Target reader: tech leads. Evidence: before-and-after review times from your own team",
+      "A story about your career",
+      "A list of 25 tips"
+     ],
+     "answer": 1,
+     "explain": "One claim, a named reader and real evidence is the structure that makes posts useful, and the claim itself applies the design doc lesson. Surveys and tip lists dilute the point, and a career story serves the writer more than the reader."
+    },
+    {
+     "id": "s8m2e3",
+     "level": 3,
+     "type": "mcq",
+     "prompt": "Your mentee keeps asking you to fix their bugs, and you have been doing it to save time. By the stage 1 project they cannot debug alone. Which change best follows this module?",
+     "options": [
+      "Keep fixing bugs; they will learn by watching",
+      "Stop answering questions entirely",
+      "Teach the 20-minute struggle rule, ask them to predict what the program will do and where it diverges, and give hints rather than fixes",
+      "Give them a debugging book and cancel sessions"
+     ],
+     "answer": 2,
+     "explain": "Your goal is their independence. Questions that make them predict and locate the divergence, with hints only when needed, build the skill your fixes were skipping. Watching is passive, and cutting off support entirely is the opposite mistake."
+    },
+    {
+     "id": "s8m2e4",
+     "level": 2,
+     "type": "mcq",
+     "prompt": "You have three hours a week. Which allocation best supports a 5-year direction of 'make our data platform ten times cheaper'?",
+     "options": [
+      "Three hours on whatever is trending online that week",
+      "Two hours of deliberate practice on storage-engine internals with a timed re-implementation drill, one hour of statistics applied to your team's cost experiments",
+      "Three hours answering other people's questions in chat",
+      "Three hours re-reading notes from past courses"
+     ],
+     "answer": 1,
+     "explain": "It aligns the hours with the direction, uses deliberate practice with feedback, and adds an adjacent field with leverage on a real problem. The others are reactive, unfocused or passive."
+    },
+    {
+     "id": "s8m2e5",
+     "level": 3,
+     "type": "mcq",
+     "prompt": "You give a mentee this feedback: 'Your PRs are sloppy.' They become defensive and nothing changes. Which rewrite is best?",
+     "options": [
+      "Your PRs are really sloppy and need work",
+      "Everyone thinks your PRs are sloppy",
+      "In your last three PRs (situation), the description was empty and tests were missing (behaviour), so reviewers spent an extra day asking what each change did (impact). What would help you include those? Let's try a PR template next week",
+      "Never mind, they are fine"
+     ],
+     "answer": 2,
+     "explain": "Situation-behaviour-impact makes the issue concrete and about the work, and asking for their view leads to a shared next step. The other options are vague, second-hand or withdraw the feedback."
+    },
+    {
+     "id": "s8m2e6",
+     "level": 3,
+     "type": "mcq",
+     "prompt": "Connecting to module 1: you are deciding which project to bet on in your 5-year plan. Which reasoning is strongest?",
+     "options": [
+      "Choose the one that sounds most impressive",
+      "Choose the problem from your scored list with a real attack, a clear why-now, and stages that each deliver value, and attach a dated kill criterion",
+      "Choose whatever your manager is excited about this quarter",
+      "Choose the hardest problem, regardless of attack"
+     ],
+     "answer": 1,
+     "explain": "Hamming's test of an attack, staging work so partial results matter, and a kill criterion together make a bet worth years and safe to stop. Impressiveness, someone else's short-term enthusiasm, or raw difficulty do not guarantee importance or tractability."
+    },
+    {
+     "id": "s8m2e7",
+     "level": 2,
+     "type": "mcq",
+     "prompt": "After your talk, the only feedback you got was 'great talk!' from three friends. How do you get feedback that will actually improve the next one?",
+     "options": [
+      "Accept it; the talk was great",
+      "Watch your recording against a short checklist, and ask two experienced speakers specifically: where did attention drop, and which slide would you cut?",
+      "Never give a talk again",
+      "Ask the audience to rate it out of 10"
+     ],
+     "answer": 1,
+     "explain": "Specific questions to stronger practitioners, plus your own review of the recording, produce feedback you can act on. Polite praise from friends and single scores carry little information about what to change."
+    }
+   ]
+  }
+ ]
 }

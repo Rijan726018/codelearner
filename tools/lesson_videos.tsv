@@ -1,0 +1,189 @@
+# lessonId	videoId	title  (hand-picked; verified as real YouTube videos via search results)
+s0m1l1	ZWM-I2rRfP8	Interpreter vs Compiler: What's the Difference?
+s0m1l2	DEq3YNvDlgI	Navigation and Folder Creation in Terminal (cd, ls, mkdir)
+s0m1l3	06I63_p-2A4	Visual Studio Code (Mac) - Setting up a Python Development Environment and Complete Overview
+s0m1l4	OXZ77HvL_Yg	Markdown crash course in 15 mins
+s0m1l5	Kg1Yvry_Ydk	Python Tutorial: VENV (Mac & Linux) - How to Use Virtual Environments with the Built-In venv Module
+s0m2l1	qmytIzqzK4U	The 3 Areas of Git You MUST Understand (Working Directory, Staging Area, Repository)
+s0m2l2	7PQzEklsyNA	Git Log Explained: A Beginner's Guide to Viewing Commit History
+s0m2l3	RGOj5yH7evk	Git and GitHub for Beginners - Crash Course (freeCodeCamp)
+s0m2l4	onZk7LRr7Fg	8 evidence-based study tips
+s1m1l1	YYXdXT2l-Gg	Python Tutorial for Beginners 1: Install and Setup for Mac and Windows (Corey Schafer)
+s1m1l3	8T14Q1LDDwk	Input & Type Conversion - Python for Beginners
+s1m1l4	khKv-8q7YmY	Python Tutorial for Beginners 3: Integers and Floats - Working with Numeric Data (Corey Schafer)
+s1m1l5	k9TUPpGqYTo	Python Tutorial for Beginners 2: Strings - Working with Textual Data (Corey Schafer)
+s1m2l1	DZwmZ8Usvnk	Python Tutorial for Beginners 6: Conditionals and Booleans - If, Else, and Elif Statements (Corey Schafer)
+s1m2l2	yZ5LdU7EsqM	Conditional Statements in Python (if/else/elif)
+s1m2l3	_Izc-544tS4	While Loop, Break - Python for Beginners
+s1m2l4	6iF8Xb7Z3wQ	Python Tutorial for Beginners 7: Loops and Iterations - For/While Loops (Corey Schafer)
+s1m2l5	9Z_vxBDDyos	Beginner Python Tutorial: Nested Loops
+s1m1l2	KrAldCnF2oM	Python Tutorial: Basic Data Types - Integer, Float, String, Boolean, NoneType
+s1m3l1	9Os0o3wzS_I	Python Tutorial for Beginners 8: Functions (Corey Schafer)
+s1m3l2	al3ChgHDmVE	Print vs Return - Python (What's the Difference?)
+s1m3l4	YSozY8AmTSY	Mastering Programming Part 1: Decomposing Simple Tasks
+s1m3l5	jjUgWvNxHys	Starting With Python's assert Statement
+s1m4l1	W8KRzm-HUcc	Python Tutorial for Beginners 4: Lists, Tuples, and Sets (Corey Schafer)
+s1m4l2	ajrtAuDg3yw	Python Tutorial: Slicing Lists and Strings (Corey Schafer)
+s1m4l3	daefaLgNkw0	Python Tutorial for Beginners 5: Dictionaries - Working with Key-Value Pairs (Corey Schafer)
+s1m4l4	W8KRzm-HUcc	Python Tutorial for Beginners 4: Lists, Tuples, and Sets (Corey Schafer)
+s1m4l5	3dt4OGnU5sM	Python Tutorial: Comprehensions - How they work and why you should be using them (Corey Schafer)
+s1m3l3	4_ZpPjfdQpI	Variable Scope: the LEGB rule, global and nonlocal
+s1m5l1	Uh2ebFW8OYM	Python Tutorial: File Objects - Reading and Writing to Files (Corey Schafer)
+s1m5l2	9N6a-VLBa2I	Python Tutorial: Working with JSON Data using the json Module (Corey Schafer)
+s1m5l3	NIWwJbo-9_8	Python Tutorial: Using Try/Except Blocks for Error Handling (Corey Schafer)
+s1m5l4	Qmj5UQRkL4s	Traceback (most recent call last): Python's tracebacks explained
+s1m5l5	CqvZ3vGoGs0	Python Tutorial for Beginners 9: Import Modules and Exploring The Standard Library (Corey Schafer)
+s1m6l1	ZDa-Z5JzLYM	Python OOP Tutorial 1: Classes and Instances (Corey Schafer)
+s1m6l2	JeznW_7DlB0	Python Object Oriented Programming (OOP) - For Beginners
+s1m6l3	CfvjW3O-P4E	Recursion, Visually (It's Just a Stack)
+s1m6l4	kF656IEsnwQ	Why Recursion Blows Up: Call Stacks, Stack Overflow, and Memoization
+s1m6l5	AGWyx96lP8U	How I Plan My Coding Projects - 9 Steps
+s2m1l1	v4cd1O4zkGw	Big O Notation (HackerRank, Gayle Laakmann McDowell)
+s2m1l2	2R8_ABfiQcc	Time Complexity of Nested Loops (Dependent Loops)
+s2m1l3	wlumpKWvuys	Space Complexity Explained
+s2m1l4	PMlYYNrciJ8	Coding Interview Pattern: Two Pointers
+s2m1l5	a8GvJ2Ckttk	Sliding Window Technique Explained - Algorithm Tutorial for Beginners
+s2m2l1	shs0KM3wKv8	Data Structures: Hash Tables (HackerRank)
+s2m2l3	Dq_ObZwTY_Q	Monotonic Stack Data Structure Explained
+s2m2l4	wjI1WNcIntg	Data Structures: Stacks and Queues (HackerRank)
+s2m2l2	-Q6ySZY6Pvc	LeetCode 1: Two Sum Visualized
+s2m2l5	njTh_OwMljA	Data Structures: Linked Lists (HackerRank)
+s2m3l1	P3YID7liBug	Algorithms: Binary Search (HackerRank)
+s2m3l2	12Z40cCDAT4	Koko Eating Bananas - LeetCode 875 - Binary Search on Answer
+s2m3l3	KF2j-9iSf4Q	Algorithms: Merge Sort (HackerRank)
+s2m3l4	SLauY6PpjW4	Algorithms: Quicksort (HackerRank)
+s2m3l5	SzzSwvQfKyk	Algorithms: Sort An Array with Comparator (HackerRank)
+s2m4l1	6jfKWLGWU34	Binary Tree Traversal (In order, Pre order, Post order, and level order traversal)
+s2m4l2	oSWTXtMglKE	Data Structures: Trees (HackerRank)
+s2m4l3	t0Cq6tVNRBA	Data Structures: Heaps (HackerRank)
+s2m4l4	YPTqKIgVk-k	Top K Frequent Elements - Bucket Sort - Leetcode 347 (NeetCode)
+s2m4l5	zIjfhVPRZCg	Data Structures: Tries (HackerRank)
+s2m5l1	g7VAuxFeAD0	Graph Representations Explained: Edge Lists, Adjacency Lists & Adjacency Matrices
+s2m5l2	zaBhtODEL0w	Algorithms: Graph Search, DFS and BFS (HackerRank)
+s2m5l3	ibjEGG7ylHk	Union Find Introduction (William Fiset)
+s2m5l4	ZW3tb6sY5PI	Topological Sorting Explained: Kahn's Algorithm & DFS
+s2m5l5	GazC3A4OQTE	Dijkstra's Algorithm - Computerphile
+s2m6l1	P8Xa2BitN3I	Algorithms: Memoization and Dynamic Programming (HackerRank)
+s2m6l2	4ClOkX0SWW4	Longest Common Subsequence Problem Visually Explained
+s2m6l3	9zso22POLEg	Greedy Algorithms 2 - Devising a Greedy Scheduling Algorithm
+s2m6l4	REOH22Xwdkk	Subsets - Backtracking - Leetcode 78 (NeetCode)
+s2m6l5	Q4C3ZRJLnac	How to Solve ANY Coding Interview Question in 6 Steps
+s3m1l1	FR6HwszKKVo	How does GCC compile C code to an executable
+s3m1l2	Yyr2K9ZZ0ZA	Understanding Signed vs Unsigned Integers in C
+s3m1l3	MIL2BK02X8A	Pointers in C for Absolute Beginners
+s3m1l4	lQP4X3odvHE	How to manage memory with malloc, calloc, realloc, and free in C
+s3m1l5	kXqq50_e2_M	Find Memory Leaks and Buffer Overrun Using Valgrind and AddressSanitizer (ASAN)
+s3m2l1	lKTsv6iVxV4	Binary: Plusses & Minuses (Why We Use Two's Complement) - Computerphile
+s3m2l2	4JgtUf5ThqY	Bit Shifting, Bit Masking, and Bit Manipulation
+s3m2l3	PZRI1IfStY0	Floating Point Numbers - Computerphile
+s3m2l4	hExfiB_UFzA	Binary Addition, Half-Adder, Full-Adder Logic Gate Circuits Clearly Explained
+s3m2l5	jFDMZpkUWCw	Fetch Decode Execute Cycle in more detail
+s3m3l1	bfcOdn8qrck	Stack vs Heap - Memory Management
+s3m3l2	tSAcFKW9lM8	L1, L2, L3 Cache: CPU Cache Hierarchy Explained (TLBs, MMU, Page Tables)
+s3m3l3	4e18yybPo1E	What is Virtual Memory? MMU, Page Tables, and more
+s3m3l4	MGVQiIWk-4o	Pages, Page Tables, MMU & TLB & Address Translation Explained
+s3m3l5	pQK6V8NoDe0	Coding a Memory Allocator From Scratch
+s3m4l1	eoXM5FXLE7g	fork(), exec(), wait() - How UNIX Really Creates Processes
+s3m4l2	2beOYY4S0B8	How Operating Systems Actually Work (kernel mode vs. user mode)
+s3m4l3	EVEP17ux8gA	CPU Scheduling Algorithms: FCFS, SJF, Round Robin, Priority
+s3m4l4	bNzMz6rb_3Y	Linux Files: What Happens When a File Is Opened (File Descriptors)
+s3m4l5	TfFLKfU9KJ8	Pipes and Named Pipes in C
+s3m5l1	ldJ8WGZVXZk	Introduction To Threads (pthreads)
+s3m5l2	Lu6EghdDO5A	Race Conditions - What is required and a Detailed Example
+s3m5l3	nxw2y27z0V4	Synchronization: The Producer/Consumer Problem
+s3m5l4	MWuc27pv9wk	Deadlock: The Most Frustrating Problem in Computer Science
+s3m5l5	OyNG4qiWnmU	The C++ memory model: an intuition (Arvid Norberg)
+s3m6l1	2QGgEk20RXM	TCP/IP Model Explained
+s3m6l2	xMtP5ZB3wSk	TCP - Three-way handshake in detail
+s3m6l3	mpQZVYPuDGU	How a DNS Server (Domain Name System) works
+s3m6l4	set7R_bHG_k	C Programming: TCP Server
+s3m6l5	AlkDbnbv7dk	What happens when you type a URL into your browser? (ByteByteGo)
+s4m1l1	qHrm9pR-p_s	Web accessibility tutorials 01: Landmarks & semantic HTML elements
+s4m1l2	yMEjLBKyvEg	The fundamentals of CSS layout (Kevin Powell)
+s4m1l3	beZfCfiuIkA	Learn JavaScript closures in 10 minutes
+s4m1l4	aZ3JWv0ofuA	Event Delegation in JavaScript, Simplified
+s4m1l5	8aGhZQkoFbQ	What the heck is the event loop anyway? (Philip Roberts, JSConf EU)
+s4m2l1	4EcR6o17PEU	TypeScript Advanced - Generics, Utility Types, Narrowing
+s4m2l2	tMc_VSt6Cco	React Components & Props
+s4m2l3	uC9-bXdnHDk	You might not need an effect (React)
+s4m2l4	SYs5E4yrtpY	Be Cautious of React.useEffect Race Condition Bugs
+s4m2l5	uqKoqcO08ho	How to Folder Structure Your React App
+s4m3l1	iYM2zFP3Zn0	HTTP Crash Course & Exploration
+s4m3l2	OTz2mlLYeWU	Create a CRUD REST API with Node.js, Express and MySQL
+s4m3l3	O0OkcpfkflQ	Zod Input Validation in Node.js (Beginner Tutorial)
+s4m3l4	7fIOSZtU3EE	Session vs Token Authentication
+s4m3l5	eJEbe6byDZk	OWASP Top 10 - Broken Access Control
+s4m4l1	h0nxCDiD-zg	SQL Tutorial for Beginners (Kevin Stratvert)
+s4m4l2	aY7z4HcHm5M	SQL Joins Basics (Visually Explained)
+s4m4l3	YZSHpDn7GP4	PostgreSQL Indexes and B-Trees (and an introduction to EXPLAIN)
+s4m4l4	iD_Yk5AhNGc	ACID: Isolation, Transactions and what can go wrong with your data
+s4m4l5	GFQaEYEc8_8	Learn Database Normalization - 1NF, 2NF, 3NF, 4NF, 5NF
+s4m5l1	VO0Qbl-wzOQ	Testing Pyramid - Unit Test, Integration Test, and E2E Test
+s4m5l2	pzLJ1cMhnc8	Test Driven Development in Node - Write a Bug Fix Unit-Test First
+s4m5l3	XcoTYFdq_L0	Test Doubles - Designing for and using Stubs, Fakes, Mocks, and Spies
+s4m5l4	r5L1XRZaCR0	Testing Express REST API With Jest & Supertest
+s4m5l5	9KVCxMrshIk	Running NodeJS Tests/CI with GitHub Actions
+s4m6l1	fgaFm_GyEUo	Secure SSH Key Setup
+s4m6l2	gAkwW2tuIqE	Learn Docker in 7 Easy Steps - Full Beginner's Tutorial
+s4m6l3	QBSKSihFt-I	Principles every developer should know (The Twelve-Factor App)
+s4m6l4	hGYNW8-_c3U	Deploy to Production - Node, Postgres, Redis, React - with Render
+s4m6l5	Jzr0Jdnq_EI	OWASP Top 10 2025: Your complete guide to securing your applications
+s5m1l1	bmSAYlu0NcY	A Philosophy of Software Design (John Ousterhout)
+s5m1l2	bmSAYlu0NcY	A Philosophy of Software Design (John Ousterhout)
+s5m1l3	tMg97MoIwgk	SE Radio 520: John Ousterhout on A Philosophy of Software Design
+s5m1l5	Bf7vDBBOBUA	Don't Write Comments (CodeAesthetic)
+s5m2l1	QlR5ebEJ7F8	Refactoring Chapter 3: Bad Smells in Code
+s5m2l2	immGpH8Sgow	Raise Code Quality by Following Martin Fowler's Safe Refactoring Steps
+s5m2l3	yzCFUmlRXKk	Characterization Tests
+s5m2l4	naYIFpHDp_s	How to refactor code the right way - Martin Fowler
+s5m2l5	8X66Pjei1pY	Modernizing legacy systems with the Strangler Fig pattern
+s5m3l1	JAwUn2-WBEs	Understanding large and unfamiliar codebases - Mike Shah
+s5m3l2	sVu6-VNFkTs	A tour of CPython's runtime (VMIL 2024)
+s5m3l3	XBIVUwmMcwc	Your First GitHub Contribution: Fork to Pull Request
+s5m3l4	5y4-0CcOpAs	Committing to clarity: The art of writing good git commit messages
+s5m1l4	-J3wNP6u5YU	Naming Things in Code (CodeAesthetic)
+s5m3l5	d9_fweNDjKw	Better Code Reviews in 6 Simple Steps (Trisha Gee)
+s5m4l1	rYR0eJdGBmQ	Functional Programming: The Purest Coding Style Explained
+s5m4l2	lQ7XF-6HYGc	Rust Ownership and Borrowing
+s5m4l3	f6kdp27TYZs	Google I/O 2012 - Go Concurrency Patterns (Rob Pike)
+s5m4l4	8ts7Lf1-R2M	Error handling in Rust: from first principles (Luca Palmieri)
+s5m4l5	KQVy0CaB7ds	Parse, Don't Validate
+s5m5l1	wfRQagosmTw	Debugging: Scientific Method
+s5m5l2	D7JJnLFOn4A	Git bisect tutorial: how to find a bad commit
+s5m5l3	D53T1Ejig1Q	USENIX ATC '17: Visualizing Performance with Flame Graphs (Brendan Gregg)
+s5m5l5	umm-MyCl3Q4	Observability Crash Course: Logs, Metrics, Traces Explained
+s6m1l1	JG2ESDGwHHY	The Eight Fallacies of Distributed Computing (Stephen Asbury)
+s6m1l2	UbjUETifVac	Better Retries with Exponential Backoff and Jitter
+s6m1l3	UqY1tF3zxjc	CSE138 Distributed Systems L3: partial orders, Lamport clocks, vector clocks
+s6m1l4	jfHBrweuKRA	What Is Idempotency? Idempotency Keys, Deduplication & Retries Explained
+s6m1l5	cQP8WApzIQQ	MIT 6.824 Distributed Systems, Lecture 1: Introduction (MapReduce)
+s6m2l1	tLYgGaY1MYo	LSM Tree vs B-Tree
+s6m2l2	mh5L6PI65uI	Write-Ahead Logging in Databases
+s6m2l4	3SSDXcOFvoE	System Design: Database Replication - Multi Leader, Single Leader, Leaderless
+s6m2l5	zaRkONvyGr8	What is Consistent Hashing and Where is it used? (ByteByteGo)
+s6m3l1	WfZ33lhvvx4	Strong Consistency & Linearizability Explained
+s6m3l2	dWjiUqikRx0	CAP & PACELC theorems explained
+s6m3l3	AiYvR8yBMaU	Transactions, ACID, and Isolation levels (Designing Data-Intensive Applications ch. 7)
+s6m3l4	eltn4x788UM	Distributed Transactions are Hard (How Two-Phase Commit works)
+s6m4l1	MzLZhAShgs0	epoll: How Linux Handles 10,000 Connections
+s6m4l2	6vDnlXWkAtY	Backpressure in Stream Processing: Keeping Fast Producers from Breaking Slow Consumers
+s6m4l3	6picL_46kQ8	Caching Strategies Explained: Cache-Aside, Write-Through & Write-Back
+s6m3l5	no5Im1daS-o	USENIX ATC '14 - In Search of an Understandable Consensus Algorithm (Raft, Diego Ongaro)
+s6m4l4	uGB53fnW6XQ	Load Balancers L4 vs L7 Explained
+s6m4l5	co2LZv0n4U4	Latency is a distribution, not a number: p99, fan-out and the tail at scale
+s6m5l1	AsJJGe5vxFM	System Design Basics: Back Of The Envelope Estimation
+s6m5l2	qSJAvd5Mgio	Design a URL Shortener (Bitly) - System Design Interview
+s6m5l3	IbwgUJcGMnA	Design Facebook Messenger/WhatsApp
+s6m5l4	ywNR71uGvHI	SRE Fundamentals: SLIs, SLOs & Error Budgets
+s6m5l5	qgHWzQ2zcqQ	Postmortem Culture at Google
+s7m1l2	Cq_jg4iQ4lk	How to Read an Academic Paper Using Keshav's Approach
+s7m1l3	8WARK0aNX88	The Expert on Expertise: An Interview with K. Anders Ericsson
+s7m2l1	5JtqqrJ5PK0	Crafting Interpreters Show & Tell: Scanning
+s7m2l2	2l1Si4gSb9A	Pratt Parsing
+s7m2l4	DUNkdl0Jhgs	Creating a VM / Compiler Episode 1: Bytecode VM
+s7m2l5	c32zXYAK7CI	Garbage Collection (Mark & Sweep) - Computerphile
+s7m3l1	aircAruvnKk	But what is a neural network? (3Blue1Brown)
+s7m3l2	VMj-3S1tku0	The spelled-out intro to neural networks and backpropagation: building micrograd (Andrej Karpathy)
+s7m3l3	Ilg3gGewQ5U	What is backpropagation really doing? (3Blue1Brown)
+s7m3l4	PaCmpygFfXo	The spelled-out intro to language modeling: building makemore (Andrej Karpathy)
+s7m3l5	eMlx5fFNoYc	Attention in transformers, visually explained (3Blue1Brown)
