@@ -3953,6 +3953,10 @@
       "title": "Python docs: timeit",
       "url": "https://docs.python.org/3/library/timeit.html"
      },
+     "video": {
+      "id": "v8DoZJKbZ7o",
+      "title": "How to benchmark (poorly) - Philipp Krenn"
+     },
      "why": "A misleading benchmark can justify the wrong change. Controlling noise and thinking end to end keeps performance work honest.",
      "terms": [
       {

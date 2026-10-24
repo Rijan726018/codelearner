@@ -112,6 +112,10 @@
       "title": "80,000 Hours: career capital",
       "url": "https://80000hours.org/career-guide/career-capital/"
      },
+     "video": {
+      "id": "jCUpMZVkTRY",
+      "title": "How To Pick Your Specialization As a Software Engineer"
+     },
      "why": "World-class depth is only possible in a narrow area. Choosing it deliberately, not by accident, decides what your next 5,000 hours compound into.",
      "terms": [
       {
@@ -481,6 +485,10 @@
       "title": "Julia Evans, How to ask good questions",
       "url": "https://jvns.ca/blog/good-questions/"
      },
+     "video": {
+      "id": "-UO7VSqsbOs",
+      "title": "Finding Mentors As A Junior Software Engineer - Engineering Manager AMA"
+     },
      "why": "People ahead of you can compress years of trial and error into one conversation. Communities give you a steady stream of problems, feedback and opportunities.",
      "terms": [
       {
@@ -609,6 +617,10 @@
      "resource": {
       "title": "Rachel by the Bay / Julia Evans on blogging",
       "url": "https://jvns.ca/blog/2023/06/05/some-blogging-myths/"
+     },
+     "video": {
+      "id": "YODPgBadj80",
+      "title": "How to write technical blog posts - talk by Quincy Larson"
      },
      "why": "Writing exposes the gaps in your understanding and builds a public record of what you know. Short, honest posts are among the best learning tools there are.",
      "terms": [
@@ -1116,6 +1128,10 @@
      "resource": {
       "title": "Crafting Interpreters: Evaluating Expressions",
       "url": "https://craftinginterpreters.com/evaluating-expressions.html"
+     },
+     "video": {
+      "id": "bEnBLbVwmC4",
+      "title": "Tree-Walk Interpreters"
      },
      "why": "An AST plus a recursive evaluator is a complete, working interpreter. It's the clearest way to see what a program means.",
      "terms": [
@@ -2450,6 +2466,10 @@
       "title": "OWASP Threat Modeling Cheat Sheet",
       "url": "https://cheatsheetseries.owasp.org/cheatsheets/Threat_Modeling_Cheat_Sheet.html"
      },
+     "video": {
+      "id": "-OBgxD_Zhdw",
+      "title": "Threat Modeling and The Four Question Framework - Adam Shostack"
+     },
      "why": "Most security failures are designed in. Threat modeling finds them on a whiteboard, when fixing them costs an hour instead of an incident.",
      "terms": [
       {
@@ -2570,6 +2590,10 @@
      "resource": {
       "title": "pwn.college (defensive/educational)",
       "url": "https://pwn.college/"
+     },
+     "video": {
+      "id": "ompM0tVESVk",
+      "title": "Buffer Overflows Part 3 - Memory Protections"
      },
      "why": "Memory corruption in C and C++ is behind a large share of serious vulnerabilities. Knowing how overflows work explains why each defence and memory-safe languages matter.",
      "terms": [
@@ -2697,6 +2721,10 @@
      "resource": {
       "title": "OWASP Top Ten",
       "url": "https://owasp.org/www-project-top-ten/"
+     },
+     "video": {
+      "id": "SUTFSW5EhC8",
+      "title": "Examples and Prevention of Server-Side Request Forgery"
      },
      "why": "Injection, SSRF and broken authentication are among the most common web vulnerabilities. Each has one primary defence you can apply every time.",
      "terms": [
@@ -2836,6 +2864,10 @@
       "title": "Latacora, Cryptographic Right Answers",
       "url": "https://www.latacora.com/blog/2018/04/03/cryptographic-right-answers/"
      },
+     "video": {
+      "id": "od44W45sCQ4",
+      "title": "What Are AEAD Ciphers?"
+     },
      "why": "Cryptography fails in subtle ways that tests don't catch. Using vetted constructions and managing keys properly is what keeps data actually protected.",
      "terms": [
       {
@@ -2964,6 +2996,10 @@
      "resource": {
       "title": "pwn.college",
       "url": "https://pwn.college/"
+     },
+     "video": {
+      "id": "iU8d37jHKbI",
+      "title": "Introduction to Capture The Flag (CTF) - DUCTF Team, CSECcon 2022"
      },
      "why": "Capture the Flag challenges are legal, self-contained practice with immediate feedback. Write-ups turn each challenge into skill you keep and can show.",
      "terms": [
@@ -3213,6 +3249,10 @@
       "title": "Brendan Gregg",
       "url": "https://www.brendangregg.com/"
      },
+     "video": {
+      "id": "M6ldFtwWup0",
+      "title": "Introduction to Perf - Linux Performance Analysis"
+     },
      "why": "Optimising without measuring usually speeds up the wrong code. perf and hardware counters show not just where time goes but why.",
      "terms": [
       {
@@ -3336,6 +3376,10 @@
       "title": "Brendan Gregg: CPU caches / latency",
       "url": "https://www.brendangregg.com/"
      },
+     "video": {
+      "id": "rX0ItVEVjHc",
+      "title": "CppCon 2014: Mike Acton \"Data-Oriented Design and C++\""
+     },
      "why": "Memory access dominates the speed of data-heavy code. Data-oriented layouts can make the same algorithm many times faster.",
      "terms": [
       {
@@ -3456,6 +3500,10 @@
      "resource": {
       "title": "CMU 15-445 (systems/perf context)",
       "url": "https://15445.courses.cs.cmu.edu/"
+     },
+     "video": {
+      "id": "XvL5j2kYJL4",
+      "title": "An introduction to vector programming with portable SIMD - Andrés Quintero"
      },
      "why": "SIMD lets one instruction work on many values. It's how numeric libraries, codecs and databases get much of their speed.",
      "terms": [
@@ -3581,6 +3629,10 @@
      "resource": {
       "title": "CMU 15-445: Query Execution",
       "url": "https://15445.courses.cs.cmu.edu/"
+     },
+     "video": {
+      "id": "7hgZKrFXYNs",
+      "title": "CMU Advanced Database Systems - Vectorized Query Execution (Andy Pavlo)"
      },
      "why": "How a database executes a plan matters as much as the plan. Vectorised execution is why modern analytics engines are so much faster than row-at-a-time designs.",
      "terms": [
@@ -3719,6 +3771,10 @@
      "resource": {
       "title": "CMU 15-445: Buffer Pools & Concurrency Control",
       "url": "https://15445.courses.cs.cmu.edu/"
+     },
+     "video": {
+      "id": "Y9H2HaRKOIw",
+      "title": "CMU Intro to Database Systems - Memory Management + Buffer Cache (Andy Pavlo)"
      },
      "why": "The buffer pool and concurrency control are the heart of a database engine. They explain its performance and the isolation guarantees you rely on.",
      "terms": [

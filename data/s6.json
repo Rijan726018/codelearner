@@ -1295,6 +1295,10 @@
       "title": "Protocol Buffers: Encoding",
       "url": "https://protobuf.dev/programming-guides/encoding/"
      },
+     "video": {
+      "id": "BywIOD_Y3CE",
+      "title": "The Need for Protocol Buffers"
+     },
      "why": "Services and stored data outlive any single deploy. Compatible schema evolution lets old and new code run side by side during rollouts.",
      "terms": [
       {
