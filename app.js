@@ -19,9 +19,9 @@ let INTERVALS = [1,3,7,16,35,90,180];
 
 /* ---------- state ---------- */
 const D = {stages:[], research:null, q:{}, mods:[], lessons:{}, modById:{}};
-const P0 = () => ({lessons:{}, notes:{}, ms:{}, exams:{}, log:{}, solved:{}, tried:{}, steps:{}, nodes:{}, badges:{}, xpSeen:null, time:{}, manual:[], goal:null});
+const P0 = () => ({lessons:{}, notes:{}, ms:{}, exams:{}, log:{}, solved:{}, tried:{}, steps:{}, nodes:{}, badges:{}, xpSeen:null, time:{}, manual:[], goal:null, calib:{}});
 const normP = d => { const z=P0(); Object.keys(z).forEach(k=>{ if(d && d[k]!=null) z[k]=d[k]; }); return z; };
-let P = P0();   // progress doc: core lessons, notes, milestones, exams, activity log, problems, bootcamp steps, roadmap nodes, badges, practice time
+let P = P0();   // progress doc: core lessons, notes, milestones, exams, activity log, problems, bootcamp steps, roadmap nodes, badges, practice time, confidence calibration
 let S = {cards:{}};                                        // spaced-repetition doc
 let route = {v:"home"};
 const EXTRA_LOADERS = [];   // other modules push async loaders (problems, bootcamp, paths) that boot awaits
@@ -119,12 +119,18 @@ function stageStats(sid){
 }
 function dueCards(){ const t=today(); return Object.entries(S.cards).filter(([id,c])=>c.d<=t && D.q[id]).map(([id])=>id); }
 
-/* ---------- spaced repetition (Leitner boxes on expanding intervals) ---------- */
-function srs(qid, correct){
-  const t=today(); const c=S.cards[qid];
+/* ---------- spaced repetition (Leitner boxes on expanding intervals) ----------
+   conf is how sure the learner said they were: "guess", "think" or "sure". A right answer that was a guess isn't
+   knowledge yet, so the card stays in its box and comes back tomorrow. Every rated answer also feeds P.calib,
+   which the profile turns into a calibration chart (how often "certain" is actually right). */
+const CONF = [{k:"guess", label:"Guessing"}, {k:"think", label:"Fairly sure"}, {k:"sure", label:"Certain"}];
+function srs(qid, correct, conf){
+  const t=today(); const c=S.cards[qid]; const lucky = correct && conf==="guess";
   if(!c){ S.cards[qid] = {b:0, d:t+INTERVALS[0], l:correct?0:1}; }
+  else if(lucky){ c.d=t+1; }
   else if(correct){ c.b=Math.min(c.b+1, INTERVALS.length-1); c.d=t+INTERVALS[c.b]; }
   else { c.b=0; c.d=t+1; c.l=(c.l||0)+1; }
+  if(conf){ const k=P.calib[conf] || (P.calib[conf]={n:0, ok:0}); k.n++; if(correct) k.ok++; save("p", true); }
   logActivity(); save("s");
 }
 
@@ -267,50 +273,90 @@ function viewMap(el){
     ${body}`;
 }
 
-/* ================= LESSON ================= */
+/* ================= LESSON =================
+   The page follows what the learning research says works (Method page): guess first (pretesting), read, watch a short
+   video then recall it (interpolated testing), study a worked example after predicting its output (PRIMM), confront the
+   common misconceptions (refutation), produce something, explain it back, answer with a confidence rating, and only then
+   compare against the key takeaways. */
 function viewLesson(el){
   const l=D.lessons[route.id]; if(!l){ go({v:"map"}); return; }
   const m=D.modById[l.mid], meta=META[m.si];
   const idx=m.lessons.indexOf(l), next=m.lessons[idx+1], prev=m.lessons[idx-1];
   const exLang = l.example ? normLang(l.example.lang) : null;
   const tryLang = exLang || (l.example && ["c","go","rust","bash","ts","tsx"].includes(l.example.lang) ? null : ({s0:"python",s1:"python",s2:"python",s5:"python",s6:"python",s7:"python"})[m.sid] || null);
+  const warm = P.lessons[l.id] ? null : (l.questions.find(q=>q.type==="mcq"&&q.level<=2) || l.questions[0]);
+  const secs=[]; const sec=(id,title,html)=>secs.push({id,title,html});
+  const note=(k,ph,max=600)=>`<textarea class="explain sm" data-note="${esc(k)}" maxlength="${max}" placeholder="${esc(ph)}">${esc(P.notes[k]||"")}</textarea>`;
+  sec("learn","Learn",`<div class="prose">${(l.concept||[]).map(p=>`<p>${md(p)}</p>`).join("")}</div>
+    ${(l.terms||[]).length?`<div class="terms"><span class="eyebrow">Key terms</span><dl>${l.terms.map(t=>`<div><dt>${md(t.t)}</dt><dd>${md(t.d)}</dd></div>`).join("")}</dl></div>`:""}`);
+  sec("watch","Watch",`${videoBlock(l)}${l.video?`<div class="recall"><span class="eyebrow">After watching · from memory</span><p>Without rewinding, write the one idea from the video you most want to keep, or one thing it showed that the reading didn't.</p>${note(l.id+":v","The video's key idea, in my words…")}</div>`:""}`);
+  if(l.visual) sec("see","See it",visual(l.visual));
+  if(l.example) sec("example","Worked example",`${exLang?`<div class="predict"><span class="eyebrow">Predict first</span><p>Read the code and write what you expect it to print <b>before</b> you press Run. Then run it, compare, and change one thing to test your idea.</p>${note(l.id+":p","I expect it to print…",400)}</div><div id="ex-ed"></div>`:codeBlock(l.example.code)+(l.example.lang&&!["text","markdown","diff"].includes(l.example.lang)?`<p class="muted" style="margin:0;font-size:.85rem">${esc(String(l.example.lang).toUpperCase())} doesn't run in the browser. Predict what it does, then copy it into a file and run it in your terminal.</p>`:"")}<div class="prose"><p>${md(l.example.explain||"")}</p></div>`);
+  if((l.mistakes||[]).length) sec("mistakes","Common mistakes",`<p class="muted" style="margin:0;font-size:.9rem">Beginners often believe these. Read the wrong idea, then why it's wrong.</p><div class="mist">${l.mistakes.map(x=>`<div class="mi"><div class="w"><span class="eyebrow">Myth</span><p>${md(x.wrong)}</p></div><div class="r"><span class="eyebrow">Actually</span><p>${md(x.right)}</p></div></div>`).join("")}</div>`);
+  sec("try","Try it yourself",`<div class="tryit"><span class="eyebrow">${tryLang?"Write it below · no peeking":"In your editor · no peeking"}</span><div>${md(l.tryit)}</div></div>${tryLang?`<div id="try-ed"></div><p class="muted" style="margin:0;font-size:.85rem">Your code saves automatically. Stuck for 20 minutes? Ask the hint tutor; it can see this code.</p>`:""}`);
+  sec("explain","Explain it back",`<p class="muted" style="margin:0;font-size:.9rem">Write two or three sentences as if teaching a friend. Gaps in your explanation are gaps in your understanding.</p>
+    <textarea class="explain" id="note-${l.id}" maxlength="1500" placeholder="In my own words…">${esc(P.notes[l.id]||"")}</textarea>`);
+  sec("check","Check yourself",`<p class="muted" style="margin:0;font-size:.9rem">Pick how sure you are when you check each answer. Lucky guesses come back tomorrow, and confident misses get flagged.</p><div id="lq"></div>`);
+  if((l.takeaways||[]).length) sec("takeaways","Key takeaways",`<div class="tk" id="tk"><div class="tklock"><p>Write your explanation in step ${secs.findIndex(s=>s.id==="explain")+1} first. Comparing your own words with these is where it sticks.</p><button type="button" class="btn ghost sm" id="tkshow">Show them now</button></div><ul class="tklist">${l.takeaways.map(t=>`<li>${md(t)}</li>`).join("")}</ul></div>`);
   el.innerHTML = `
   <nav class="crumbs"><button data-act="map" data-stage-go="${m.si}">Stage ${m.si}: ${esc(meta.name)}</button><span>›</span><span>${esc(m.title)}</span><span>›</span><span>Day ${idx+1}</span></nav>
   <div class="lesson">
     <article>
       <header style="display:grid;gap:10px"><span class="eyebrow">Day ${idx+1} of ${m.lessons.length} · ~${l.minutes||60} min</span><h1 class="h1">${esc(l.title)}</h1>
-      <div class="objective"><span class="eyebrow">Objective</span>${md(l.objective)}</div></header>
-      <section class="sec"><h3>1 · Learn</h3><div class="prose">${(l.concept||[]).map(p=>`<p>${md(p)}</p>`).join("")}</div></section>
-      ${l.visual?`<section class="sec"><h3>2 · See it</h3>${visual(l.visual)}</section>`:""}
-      ${l.example?`<section class="sec"><h3>${l.visual?3:2} · Worked example</h3>${exLang?`<div id="ex-ed"></div><p class="muted" style="margin:0;font-size:.85rem">This runs right here. Change a value, run it again, and predict the output before you press Run.</p>`:codeBlock(l.example.code)+(l.example.lang&&!["text","markdown","diff"].includes(l.example.lang)?`<p class="muted" style="margin:0;font-size:.85rem">${esc(String(l.example.lang).toUpperCase())} doesn't run in the browser. Copy it into a file and run it in your terminal.</p>`:"")}<div class="prose"><p>${md(l.example.explain||"")}</p></div></section>`:""}
-      <section class="sec"><h3>Try it yourself</h3><div class="tryit"><span class="eyebrow">${tryLang?"Write it below · no peeking":"In your editor · no peeking"}</span><div>${md(l.tryit)}</div></div>${tryLang?`<div id="try-ed"></div><p class="muted" style="margin:0;font-size:.85rem">Your code saves automatically. Stuck for 20 minutes? Ask the hint tutor; it can see this code.</p>`:""}</section>
-      <section class="sec"><h3>Explain it back</h3><p class="muted" style="margin:0;font-size:.9rem">Write two or three sentences as if teaching a friend. Gaps in your explanation are gaps in your understanding.</p>
-        <textarea class="explain" id="note-${l.id}" maxlength="1500" placeholder="In my own words…">${esc(P.notes[l.id]||"")}</textarea></section>
-      <section class="sec"><h3>Check yourself</h3><div id="lq"></div></section>
+      <div class="objective"><span class="eyebrow">Objective</span>${md(l.objective)}</div>
+      ${l.why?`<p class="why"><b>Why it matters.</b> ${md(l.why)}</p>`:""}</header>
+      ${warm?`<section class="sec warm" id="sec-warm"><h3>Warm-up · guess first</h3><p class="muted" style="margin:0;font-size:.9rem">Answer before you read. Guessing first makes the lesson stick better, even when the guess is wrong. It doesn't touch your review deck.</p><div id="wq"></div></section>`:""}
+      ${secs.map((s,i)=>`<section class="sec" id="sec-${s.id}"><h3>${i+1} · ${esc(s.title)}</h3>${s.html}</section>`).join("")}
       <div class="row" id="lfoot" style="justify-content:space-between;border-top:1px solid var(--line);padding-top:18px">
         ${prev?`<button class="btn" data-lesson="${prev.id}">← ${esc(prev.title)}</button>`:"<span></span>"}
         <span class="row" id="lcomplete"></span>
       </div>
       ${l.resource?.url?`<p class="muted" style="margin:0;font-size:.9rem">Go deeper: <a href="${esc(l.resource.url)}" target="_blank" rel="noopener">${esc(l.resource.title||l.resource.url)}</a></p>`:""}
     </article>
-    <aside><span class="eyebrow">${esc(m.title)}</span><ul class="toc">${m.lessons.map((x,i)=>`<li class="${P.lessons[x.id]?"done":""}"><button data-lesson="${x.id}" aria-current="${x.id===l.id}"><span class="ck">${P.lessons[x.id]?"✓":i+1}</span><span>${esc(x.title)}</span></button></li>`).join("")}
+    <aside><nav class="onpage" aria-label="On this page"><span class="eyebrow">On this page</span>${warm?`<button type="button" data-jump="warm"><span>0</span>Warm-up</button>`:""}${secs.map((s,i)=>`<button type="button" data-jump="${s.id}"><span>${i+1}</span>${esc(s.title)}</button>`).join("")}</nav>
+      <span class="eyebrow">${esc(m.title)}</span><ul class="toc">${m.lessons.map((x,i)=>`<li class="${P.lessons[x.id]?"done":""}"><button data-lesson="${x.id}" aria-current="${x.id===l.id}"><span class="ck">${P.lessons[x.id]?"✓":i+1}</span><span>${esc(x.title)}</span></button></li>`).join("")}
       <li><button data-exam="${m.id}"><span class="ck">★</span><span>Module exam${passed(m)?" · passed":""}</span></button></li></ul>
       <section class="tutor" id="tutor" hidden><span class="eyebrow">Hint tutor</span><p class="muted" style="margin:0;font-size:.84rem">Stuck? Describe what you tried. You get a hint or a question back, never the full answer.</p><textarea id="tq" class="explain" style="min-height:70px" maxlength="1200" placeholder="I tried… and got…"></textarea><button class="btn" id="tbtn">Get a hint</button><div id="tout" class="tout"></div></section></aside>
   </div>`;
-  bindVisuals(el);
+  bindVisuals(el); bindVideos(el);
+  el.querySelector(".onpage").addEventListener("click",e=>{ const b=e.target.closest("[data-jump]"); if(b) document.getElementById("sec-"+b.dataset.jump)?.scrollIntoView({behavior:"smooth", block:"start"}); });
   if(exLang) mountEditor($("#ex-ed"), {lang:exLang, code:l.example.code, label:"Worked example"});
   lessonScratch = tryLang ? mountEditor($("#try-ed"), {lang:tryLang, code:STARTER[tryLang](l), draftKey:l.id, label:"Your scratchpad"}) : null;
   bindTutor(l, m);
-  const ta=$("#note-"+l.id); let nt; ta.addEventListener("input",()=>{ clearTimeout(nt); nt=setTimeout(()=>{ P.notes[l.id]=ta.value.slice(0,1500); save("p"); },900); });
+  el.querySelectorAll("textarea[data-note]").forEach(t=>{ let tm; t.addEventListener("input",()=>{ clearTimeout(tm); tm=setTimeout(()=>{ P.notes[t.dataset.note]=t.value.slice(0,+t.maxLength||600); save("p",true); },900); }); });
+  const tk=$("#tk"), openTk=()=>tk?.classList.add("open");
+  if((P.notes[l.id]||"").trim().length>=40 || P.lessons[l.id]) openTk();
+  $("#tkshow")?.addEventListener("click",openTk);
+  const ta=$("#note-"+l.id); let nt; ta.addEventListener("input",()=>{ if(ta.value.trim().length>=40) openTk(); clearTimeout(nt); nt=setTimeout(()=>{ P.notes[l.id]=ta.value.slice(0,1500); save("p"); },900); });
   const showComplete = (ready)=>{
     const done=!!P.lessons[l.id];
     $("#lcomplete").innerHTML = done
       ? `<span class="pill ok">Completed</span>${next?`<button class="btn primary" data-lesson="${next.id}">Next: ${esc(next.title)} →</button>`:`<button class="btn exam" data-exam="${m.id}">Take the module exam →</button>`}`
       : `<button class="btn primary" id="completeBtn" ${ready?"":"disabled"} title="${ready?"":"Answer the questions first"}">Complete lesson</button>`;
-    const cb=$("#completeBtn"); if(cb) cb.onclick=()=>{ P.lessons[l.id]=today(); logActivity(2); save("p"); showComplete(true); const li=el.querySelector(`.toc [data-lesson="${l.id}"]`); if(li){ li.parentElement.classList.add("done"); li.querySelector(".ck").textContent="✓"; } updateBadge(); };
+    const cb=$("#completeBtn"); if(cb) cb.onclick=()=>{ P.lessons[l.id]=today(); logActivity(2); save("p"); showComplete(true); openTk(); const li=el.querySelector(`.toc [data-lesson="${l.id}"]`); if(li){ li.parentElement.classList.add("done"); li.querySelector(".ck").textContent="✓"; } updateBadge(); };
   };
   showComplete(!!P.lessons[l.id]);
-  quiz($("#lq"), l.questions.map(q=>D.q[q.id]), {mode:"lesson", onAnswer:(q,ok)=>srs(q.id,ok), onFinish:()=>showComplete(true), compactResult:true});
+  if(warm) quiz($("#wq"), [D.q[warm.id]], {mode:"pretest", confidence:false, finishLabel:"Start the lesson ↓", onFinish:()=>{
+    $("#wq").innerHTML=`<p class="muted" style="margin:0">Keep that answer in mind. The lesson explains it, and the question comes back in step ${secs.findIndex(s=>s.id==="check")+1}.</p>`;
+    document.getElementById("sec-learn")?.scrollIntoView({behavior:"smooth", block:"start"}); }});
+  quiz($("#lq"), l.questions.map(q=>D.q[q.id]), {mode:"lesson", onAnswer:(q,ok,conf)=>srs(q.id,ok,conf), onFinish:()=>showComplete(true), compactResult:true});
+}
+/* Videos load only when played (a click-to-play facade): no YouTube requests or cookies until then, and the page stays fast. */
+const ytSearch = l => "https://www.youtube.com/results?search_query="+encodeURIComponent(l.title+" explained");
+function videoBlock(l){
+  if(!l.video) return `<div class="vidnone"><p>No hand-picked video for this lesson yet. A short one helps: watch at most 10 minutes, then come back and do the steps below.</p><a class="btn ghost sm" href="${esc(ytSearch(l))}" target="_blank" rel="noopener">Search YouTube for “${esc(l.title)}”</a></div>`;
+  const id=esc(l.video.id);
+  return `<div class="vid" data-vid="${id}" data-title="${esc(l.video.title)}"><button type="button" class="vidplay" aria-label="Play video: ${esc(l.video.title)}"><img src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" alt="" loading="lazy" referrerpolicy="no-referrer"><span class="pb" aria-hidden="true"></span></button></div>
+    <p class="vidmeta"><span><b>${esc(l.video.title)}</b></span><span class="muted"><a href="https://www.youtube.com/watch?v=${id}" target="_blank" rel="noopener">Open on YouTube</a> · <a href="${esc(ytSearch(l))}" target="_blank" rel="noopener">Find another</a></span></p>
+    <p class="muted" style="margin:0;font-size:.85rem">Watch actively: pause when a new idea appears and say it out loud. Long video? Watch the part that covers the objective and skip the rest.</p>`;
+}
+function bindVideos(root){
+  root.querySelectorAll(".vid").forEach(v=>v.querySelector(".vidplay")?.addEventListener("click",()=>{
+    const f=document.createElement("iframe");
+    f.src=`https://www.youtube-nocookie.com/embed/${encodeURIComponent(v.dataset.vid)}?autoplay=1&rel=0`;
+    f.title=v.dataset.title||"Video"; f.allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"; f.allowFullscreen=true; f.referrerPolicy="strict-origin-when-cross-origin";
+    v.replaceChildren(f); v.classList.add("on");
+  }));
 }
 function codeBlock(code, cur){ return `<pre class="code">${String(code||"").split("\n").map((ln,i)=>`<span class="l ${cur===i+1?"cur":""}">${esc(ln)||" "}</span>`).join("")}</pre>`; }
 function visual(v){
@@ -367,8 +413,9 @@ ${lessonScratch&&lessonScratch.value.trim()?`Their current code in the lesson sc
 
 /* ================= QUIZ ENGINE ================= */
 function norm(s){ return String(s??"").replace(/\r/g,"").split("\n").map(x=>x.replace(/\s+$/,"")).join("\n").trim(); }
+// Each answer is checked with a confidence rating (CONF) unless opt.confidence is false, as in the lesson warm-up.
 function quiz(el, qs, opt){
-  qs=qs.filter(Boolean); let i=0; const res=[];
+  qs=qs.filter(Boolean); let i=0; const res=[]; const rated = opt.confidence!==false;
   if(!qs.length){ el.innerHTML=`<div class="empty">No questions here yet.</div>`; opt.onFinish?.(1,[]); return; }
   const step=()=>{
     const q=qs[i]; let answered=false, choice=null, order=null;
@@ -384,27 +431,37 @@ function quiz(el, qs, opt){
       ${q.code?codeBlock(q.code):""}
       ${input}
       <div id="fb"></div>
-      <div class="row"><button class="btn primary" id="qcheck" ${q.type==="mcq"?"disabled":""}>Check</button><span class="muted" style="font-size:.82rem">${opt.mode==="exam"?"Answer from memory. No notes.":""}</span></div>
+      <div class="row qact">${rated?`<div class="conf" role="group" aria-label="Check your answer: how sure are you?"><span class="cl">Check · how sure are you?</span>${CONF.map(c=>`<button type="button" class="btn sm${c.k==="sure"?" primary":""}" data-conf="${c.k}" ${q.type==="mcq"?"disabled":""}>${c.label}</button>`).join("")}</div>`:""}<button class="btn primary" id="qcheck" ${rated?"hidden":""} ${!rated&&q.type==="mcq"?"disabled":""}>Check</button><span class="muted" style="font-size:.82rem">${opt.mode==="exam"?"Answer from memory. No notes.":""}</span></div>
     </div>`;
-    const check=el.querySelector("#qcheck");
-    if(q.type==="mcq") el.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{ if(answered) return; choice=+b.dataset.o; el.querySelectorAll(".opt").forEach(x=>x.setAttribute("aria-pressed", x===b)); check.disabled=false; });
-    if(q.type==="predict"){ const inp=el.querySelector("#pred"); inp.focus({preventScroll:true}); inp.addEventListener("keydown",e=>{ if(e.key==="Enter"&&inp.tagName==="INPUT"){ e.preventDefault(); check.click(); } }); }
+    const check=el.querySelector("#qcheck"), confs=[...el.querySelectorAll("[data-conf]")];
+    const ready=()=>{ check.disabled=false; confs.forEach(b=>b.disabled=false); };
+    if(q.type==="mcq") el.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{ if(answered) return; choice=+b.dataset.o; el.querySelectorAll(".opt").forEach(x=>x.setAttribute("aria-pressed", x===b)); ready(); });
+    if(q.type==="predict"){ const inp=el.querySelector("#pred"); inp.focus({preventScroll:true}); inp.addEventListener("keydown",e=>{ if(e.key==="Enter"&&inp.tagName==="INPUT"){ e.preventDefault(); if(rated) confs[1].focus(); else check.click(); } }); }
     let sel=null;
     const drawP=()=>{ const ol=el.querySelector("#pars"); ol.innerHTML=order.map((k,pos)=>`<li data-p="${pos}" class="${sel===pos?"sel":""}"><pre>${esc(q.lines[k])}</pre><span class="mv"><button type="button" data-mv="-1" aria-label="Move up">↑</button><button type="button" data-mv="1" aria-label="Move down">↓</button></span></li>`).join(""); };
     if(q.type==="parsons"){ drawP(); el.querySelector("#pars").addEventListener("click",e=>{ if(answered) return; const li=e.target.closest("li"); if(!li) return; const pos=+li.dataset.p; const mv=e.target.closest("[data-mv]");
       if(mv){ const to=pos+(+mv.dataset.mv); if(to>=0&&to<order.length){ [order[pos],order[to]]=[order[to],order[pos]]; } sel=null; }
       else if(sel===null) sel=pos; else { [order[pos],order[sel]]=[order[sel],order[pos]]; sel=null; }
       drawP(); }); }
-    check.onclick=()=>{
-      if(answered){ i++; if(i<qs.length) step(); else finish(); return; }
+    confs.forEach(b=>b.onclick=()=>grade(b.dataset.conf));
+    check.onclick=()=>{ if(answered){ i++; if(i<qs.length) step(); else finish(); return; } grade(null); };
+    const grade=conf=>{
+      if(answered) return;
       let ok=false, right="";
       if(q.type==="mcq"){ if(choice==null) return; ok=choice===q.answer; el.querySelectorAll(".opt").forEach(b=>{ const k=+b.dataset.o; b.disabled=true; if(k===q.answer) b.classList.add("right"); else if(k===choice) b.classList.add("wrong"); }); }
       else if(q.type==="predict"){ const inp=el.querySelector("#pred"); const v=norm(inp.value); if(!v){ inp.focus(); return; } ok=[q.answer,...(q.accept||[])].some(a=>norm(a)===v); inp.readOnly=true; right=`<pre>${esc(q.answer)}</pre>`; }
       else if(q.type==="parsons"){ ok=order.every((k,pos)=>q.lines[k]===q.lines[pos]); el.querySelector("#pars").classList.add(ok?"right":"wrong"); right=ok?"":`<pre>${esc(q.lines.join("\n"))}</pre>`; }
-      answered=true; res.push({q,ok}); opt.onAnswer?.(q,ok);
-      el.querySelector("#fb").innerHTML=`<div class="fb ${ok?"r":"w"}"><b>${ok?"Correct":"Not quite"}</b>${!ok&&right?`<span class="eyebrow">Correct answer</span>${right}`:""}<p>${md(q.explain)}</p>${q.code&&qLang(q)?`<button type="button" class="btn ghost sm" data-runq style="justify-self:start">Run this code ▶</button>`:""}</div>`;
+      answered=true; res.push({q,ok,conf}); opt.onAnswer?.(q,ok,conf);
+      // Confident errors are the ones people correct best once they see why (the hypercorrection effect), so say so;
+      // a lucky guess is flagged so it isn't mistaken for knowing.
+      const note = ok ? (conf==="guess"?"Right, but you were guessing, so this one comes back tomorrow instead of moving up a box.":"")
+        : conf==="sure" ? "You were certain and it was wrong. Misses like this are the easiest to fix for good, so read why before moving on."
+        : conf==="guess" ? "A wrong guess still helps: now you know exactly what to look for." : "";
+      confs.forEach(b=>{ b.disabled=true; b.classList.toggle("on", b.dataset.conf===conf); });
+      el.querySelector(".conf")?.classList.add("done"); check.hidden=false;
+      el.querySelector("#fb").innerHTML=`<div class="fb ${ok?"r":"w"}"><b>${ok?(conf==="guess"?"Correct, by a guess":"Correct"):"Not quite"}</b>${note?`<p class="cn">${note}</p>`:""}${!ok&&right?`<span class="eyebrow">Correct answer</span>${right}`:""}<p>${md(q.explain)}</p>${q.code&&qLang(q)?`<button type="button" class="btn ghost sm" data-runq style="justify-self:start">Run this code ▶</button>`:""}</div>`;
       const rq=el.querySelector("[data-runq]"); if(rq) rq.onclick=()=>runSnippet(rq, q.code, qLang(q));
-      check.textContent = i<qs.length-1 ? "Next question →" : (opt.mode==="exam"?"See result":"Finish"); check.disabled=false; check.focus({preventScroll:true});
+      check.textContent = i<qs.length-1 ? "Next question →" : (opt.finishLabel || (opt.mode==="exam"?"See result":"Finish")); check.disabled=false; check.focus({preventScroll:true});
       el.querySelectorAll(".dots i")[i].className = ok?"r":"w";
     };
   };
@@ -438,7 +495,7 @@ function viewExam(el){
     return;
   }
   el.innerHTML = `<nav class="crumbs"><span>${esc(m.title)}</span><span>›</span><span>Exam</span></nav><div id="ex" style="max-width:820px"></div>`;
-  quiz($("#ex"), examQuestions(m), {mode:"exam", onAnswer:(q,ok)=>srs(q.id,ok), onFinish:(sc,res)=>{
+  quiz($("#ex"), examQuestions(m), {mode:"exam", onAnswer:(q,ok,conf)=>srs(q.id,ok,conf), onFinish:(sc,res)=>{
     const prev=P.exams[m.id]; P.exams[m.id]={best:Math.max(sc,prev?.best||0), last:today(), n:(prev?.n||0)+1}; logActivity(3); save("p");
     const pass=sc>=PASS; let nm=D.mods[m.gi+1]; if(pass) UI.confetti(); if(isTrack(m)) nm=D.mods.find(x=>x.sid==="s8");
     $("#ex").innerHTML=`<div class="result"><div class="row" style="gap:24px">${ring(sc,pass)}<div style="display:grid;gap:6px"><span class="eyebrow">${pass?"Passed":"Not yet"}</span><h2 class="h2">${pass?(nm?`Unlocked: ${esc(nm.title)}`:"You've passed the final module."):`You need ${PASS*100}%. Study the misses below, then retake.`}</h2><p class="muted" style="margin:0">${res.filter(r=>r.ok).length} of ${res.length} correct. Every question is now in your review deck.</p></div></div>
@@ -462,7 +519,7 @@ function viewReview(el){
   }
   el.innerHTML=`<div id="rv" style="max-width:820px"></div>`;
   const qs=route.ids.map(id=>D.q[id]); const missed=[];
-  quiz($("#rv"), qs, {mode:"review", onAnswer:(q,ok)=>{ srs(q.id,ok); if(!ok) missed.push(q); }, onFinish:(sc,res)=>{
+  quiz($("#rv"), qs, {mode:"review", onAnswer:(q,ok,conf)=>{ srs(q.id,ok,conf); if(!ok) missed.push(q); }, onFinish:(sc,res)=>{
     $("#rv").innerHTML=`<div class="result"><div class="row" style="gap:24px">${ring(sc,sc>=PASS)}<div style="display:grid;gap:6px"><span class="eyebrow">Review done</span><h2 class="h2">${res.filter(r=>r.ok).length} of ${res.length} remembered</h2><p class="muted" style="margin:0">${missed.length?`${missed.length} card${missed.length>1?"s":""} reset to tomorrow.`:"Every card moved to a longer interval."}</p></div></div>
     <div class="row">${dueCards().length?`<button class="btn primary" data-act="review">Keep going (${dueCards().length} left)</button>`:""}<button class="btn ghost" data-act="today">Back to today</button></div>${resultList(res)}</div>`;
   }});
@@ -473,7 +530,7 @@ function viewPractice(el){
   if(practiceStage==null){ const cm=currentModule(); practiceStage=cm?cm.si:0; }
   if(route.started){
     el.innerHTML=`<div id="pq" style="max-width:820px"></div>`;
-    quiz($("#pq"), route.qs, {mode:"practice", onAnswer:(q,ok)=>srs(q.id,ok), onFinish:(sc,res)=>{
+    quiz($("#pq"), route.qs, {mode:"practice", onAnswer:(q,ok,conf)=>srs(q.id,ok,conf), onFinish:(sc,res)=>{
       $("#pq").innerHTML=`<div class="result"><div class="row" style="gap:24px">${ring(sc,sc>=PASS)}<div style="display:grid;gap:6px"><span class="eyebrow">Level ${route.level} · ${LEVELS[route.level].name}</span><h2 class="h2">${sc>=PASS?(route.level<3?"Strong. Try the next level up.":"Excellent analysis."):"Keep practising at this level."}</h2></div></div>
       <div class="row"><button class="btn primary" id="again">Another set</button>${sc>=PASS&&route.level<3?`<button class="btn" id="up">Level ${route.level+1}</button>`:""}<button class="btn ghost" data-act="practice">Change stage or level</button></div>${resultList(res)}</div>`;
       $("#again").onclick=()=>startPractice(route.level); const up=$("#up"); if(up) up.onclick=()=>startPractice(route.level+1);
@@ -519,8 +576,13 @@ function viewMethod(el){
   <section style="display:grid;gap:14px"><h2 class="h2">How this app applies it</h2>
     <div class="tbl"><table><thead><tr><th>Feature</th><th>Principle</th><th>What it does</th></tr></thead><tbody>
       <tr><td>Daily lessons</td><td>Worked examples, small steps</td><td>One objective a day; see a solved example before you solve one yourself</td></tr>
+      <tr><td>Warm-up question</td><td>Pretesting</td><td>You guess one question before reading; the attempt tells you what to look for</td></tr>
+      <tr><td>Watch, then recall</td><td>Short videos, interpolated testing</td><td>A hand-picked short video, then you write its key idea without rewinding</td></tr>
+      <tr><td>Predict first</td><td>PRIMM</td><td>You write the expected output before running the worked example, then change it and predict again</td></tr>
+      <tr><td>Common mistakes</td><td>Refutation</td><td>Each classic misconception is stated, then corrected with the reason</td></tr>
       <tr><td>Check yourself</td><td>Retrieval practice</td><td>Every lesson ends with recall, apply and analyze questions</td></tr>
-      <tr><td>Explain it back</td><td>Self-explanation, generation</td><td>You write the idea in your own words</td></tr>
+      <tr><td>How sure are you?</td><td>Metacognition, hypercorrection</td><td>Confident misses are flagged; lucky guesses come back tomorrow instead of moving up; your profile shows your calibration</td></tr>
+      <tr><td>Explain it back</td><td>Self-explanation, generation</td><td>You write the idea in your own words, then compare with the key takeaways</td></tr>
       <tr><td>Review deck</td><td>Spacing</td><td>Every question returns on expanding intervals</td></tr>
       <tr><td>Module exams</td><td>Mastery learning, interleaving</td><td>${PASS*100}% to move on; mixed topics including earlier modules</td></tr>
       <tr><td>Test out</td><td>Expertise reversal</td><td>Skip what you already know; time goes to what's new</td></tr>

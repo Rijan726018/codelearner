@@ -109,7 +109,45 @@
      "resource": {
       "title": "Beginner's Guide to Linkers (David Drysdale)",
       "url": "https://www.lurklurk.org/linkers/linkers.html"
-     }
+     },
+     "video": {
+      "id": "FR6HwszKKVo",
+      "title": "How does GCC compile C code to an executable"
+     },
+     "why": "When a C or C++ build fails, knowing which stage produced the error tells you where to look. The same pipeline sits under Rust, Go and every native library Python uses.",
+     "terms": [
+      {
+       "t": "Preprocessor",
+       "d": "Handles `#include` and `#define` by pasting and replacing text."
+      },
+      {
+       "t": "Compiler",
+       "d": "Turns one preprocessed file into assembly, then an object file."
+      },
+      {
+       "t": "Object file",
+       "d": "Machine code for one source file, with holes for symbols defined elsewhere."
+      },
+      {
+       "t": "Linker",
+       "d": "Joins object files and libraries by matching symbol names."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "An 'undefined reference' error means my code has a syntax error.",
+       "right": "It's a linker error: something is declared but no object file or library defines it. Check what you're linking."
+      },
+      {
+       "wrong": "A header file contains the function's code.",
+       "right": "Headers usually hold declarations. The definitions live in a `.c` file or library that must be linked."
+      }
+     ],
+     "takeaways": [
+      "`cc` runs preprocessor, compiler, assembler and linker in sequence.",
+      "Use `-E`, `-S` and `-c` to stop after each stage and inspect the output.",
+      "Static libraries are copied in at link time; shared ones are loaded at run time."
+     ]
     },
     {
      "id": "s3m1l2",
@@ -222,7 +260,45 @@
      "resource": {
       "title": "cppreference: C arithmetic types",
       "url": "https://en.cppreference.com/w/c/language/arithmetic_types"
-     }
+     },
+     "video": {
+      "id": "Yyr2K9ZZ0ZA",
+      "title": "Understanding Signed vs Unsigned Integers in C"
+     },
+     "why": "Fixed-size integers cause real security bugs and wrong answers. Predicting wraparound, promotion and signed/unsigned comparisons is basic C literacy.",
+     "terms": [
+      {
+       "t": "LP64",
+       "d": "The 64-bit Unix model: `int` is 4 bytes, `long` and pointers are 8."
+      },
+      {
+       "t": "Unsigned wraparound",
+       "d": "Unsigned arithmetic wraps modulo 2^n, by definition."
+      },
+      {
+       "t": "Undefined behavior",
+       "d": "Code the standard gives no meaning to, like signed overflow; anything can happen."
+      },
+      {
+       "t": "Integer promotion",
+       "d": "Types narrower than `int` become `int` before arithmetic."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "`INT_MAX + 1` safely wraps to `INT_MIN`.",
+       "right": "Signed overflow is undefined behavior; the optimizer may assume it never happens and delete your check."
+      },
+      {
+       "wrong": "`-1 < 1u` is true.",
+       "right": "The signed `-1` is converted to unsigned (a huge number), so the comparison is false."
+      }
+     ],
+     "takeaways": [
+      "Only `sizeof(char) == 1` is fixed; use `<stdint.h>` types when size matters.",
+      "Unsigned wraps; signed overflow is undefined.",
+      "Mixed signed/unsigned comparisons convert to unsigned; compiler warnings catch them."
+     ]
     },
     {
      "id": "s3m1l3",
@@ -316,7 +392,45 @@
      "resource": {
       "title": "Beej's Guide to C Programming: Pointers",
       "url": "https://beej.us/guide/bgc/html/split/pointers.html"
-     }
+     },
+     "video": {
+      "id": "MIL2BK02X8A",
+      "title": "Pointers in C for Absolute Beginners"
+     },
+     "why": "Pointers are how C passes data around, builds data structures and talks to hardware. Drawing memory diagrams is the reliable way to reason about them.",
+     "terms": [
+      {
+       "t": "Pointer",
+       "d": "A variable holding a memory address."
+      },
+      {
+       "t": "`&` and `*`",
+       "d": "Address-of and dereference: `p = &x` then `*p = 7` changes `x`."
+      },
+      {
+       "t": "Pass by value",
+       "d": "Functions get copies of their arguments, so pass an address to modify the caller's variable."
+      },
+      {
+       "t": "Array decay",
+       "d": "An array name becomes a pointer to its first element in most expressions."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "`void inc(int n) { n++; }` increments the caller's variable.",
+       "right": "It increments a copy. Take `int *n` and write `(*n)++`."
+      },
+      {
+       "wrong": "`p + 1` moves one byte forward.",
+       "right": "Pointer arithmetic moves by the size of the pointed-to type: one `int` is 4 bytes."
+      }
+     ],
+     "takeaways": [
+      "Draw boxes for variables and arrows for pointers.",
+      "`a[i]` means `*(a + i)`.",
+      "To change something in a function, pass its address."
+     ]
     },
     {
      "id": "s3m1l4",
@@ -414,7 +528,45 @@
      "resource": {
       "title": "cppreference: malloc",
       "url": "https://en.cppreference.com/w/c/memory/malloc"
-     }
+     },
+     "video": {
+      "id": "lQP4X3odvHE",
+      "title": "How to manage memory with malloc, calloc, realloc, and free in C"
+     },
+     "why": "Strings, structs and heap memory are where most C bugs and security holes live. Knowing their layout and lifetimes prevents overflows, leaks and use-after-free.",
+     "terms": [
+      {
+       "t": "C string",
+       "d": "A `char` array ending in `'\\0'`; there's no stored length."
+      },
+      {
+       "t": "Padding",
+       "d": "Bytes the compiler adds so each struct field is aligned."
+      },
+      {
+       "t": "`malloc` / `free`",
+       "d": "Request heap memory and give it back; you own its lifetime."
+      },
+      {
+       "t": "Use-after-free",
+       "d": "Reading or writing memory after it has been freed."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "`\"cat\"` needs 3 bytes.",
+       "right": "It needs 4: three characters plus the terminating `'\\0'`."
+      },
+      {
+       "wrong": "`sizeof(struct { char c; int i; })` is 5.",
+       "right": "Padding aligns the `int`, so it's typically 8."
+      }
+     ],
+     "takeaways": [
+      "Every buffer needs room for the terminating zero.",
+      "Struct size includes padding; order fields to reduce it.",
+      "Every `malloc` needs exactly one `free`, and nothing may use the pointer afterwards."
+     ]
     },
     {
      "id": "s3m1l5",
@@ -520,7 +672,45 @@
      "resource": {
       "title": "LLDB to GDB command map",
       "url": "https://lldb.llvm.org/use/map.html"
-     }
+     },
+     "video": {
+      "id": "kXqq50_e2_M",
+      "title": "Find Memory Leaks and Buffer Overrun Using Valgrind and AddressSanitizer (ASAN)"
+     },
+     "why": "Crashes and silent memory corruption are inevitable in C. A debugger and sanitizers turn a mysterious segfault into the exact line and variable in minutes.",
+     "terms": [
+      {
+       "t": "Segmentation fault",
+       "d": "The process touched memory it has no right to."
+      },
+      {
+       "t": "Backtrace",
+       "d": "The chain of calls at the crash; frame #0 is where it died."
+      },
+      {
+       "t": "AddressSanitizer",
+       "d": "`-fsanitize=address`: stops at the first out-of-bounds or use-after-free access."
+      },
+      {
+       "t": "Valgrind",
+       "d": "Runs the program on a simulated CPU to find leaks and invalid accesses."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "If the program doesn't crash, it has no memory bugs.",
+       "right": "Many overflows silently corrupt data. Run with AddressSanitizer to find them."
+      },
+      {
+       "wrong": "The crash line in frame #0 is always where the bug is.",
+       "right": "That's where the bad access happened; the bad pointer often came from a caller. Walk up the frames."
+      }
+     ],
+     "takeaways": [
+      "Compile with `-g` and run in gdb or lldb; `bt` shows the backtrace.",
+      "Inspect variables in the crashing frame, then move up to callers.",
+      "Use ASan during development to catch silent memory errors."
+     ]
     }
    ],
    "project": {
@@ -753,7 +943,45 @@
      "resource": {
       "title": "Two's complement (Thomas Finley, Cornell)",
       "url": "https://www.cs.cornell.edu/~tomf/notes/cps104/twoscomp.html"
-     }
+     },
+     "video": {
+      "id": "lKTsv6iVxV4",
+      "title": "Binary: Plusses & Minuses (Why We Use Two's Complement) - Computerphile"
+     },
+     "why": "Memory dumps, network packets, colours and permissions are written in hex and binary. Two's complement explains why integers overflow the way they do.",
+     "terms": [
+      {
+       "t": "Hex",
+       "d": "Base 16; one digit is exactly 4 bits, so a byte is two hex digits."
+      },
+      {
+       "t": "Two's complement",
+       "d": "Signed integers where the top bit has weight -2^(n-1)."
+      },
+      {
+       "t": "Sign extension",
+       "d": "Copying the sign bit when widening a signed number."
+      },
+      {
+       "t": "Endianness",
+       "d": "Byte order in memory: little-endian stores the least significant byte first."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "To negate a number in two's complement, flip the top bit.",
+       "right": "Flip every bit and add 1."
+      },
+      {
+       "wrong": "Signed and unsigned numbers need different addition circuits.",
+       "right": "The same adder works for both; only the interpretation of the bits differs."
+      }
+     ],
+     "takeaways": [
+      "Convert by place values: binary in powers of 2, hex in powers of 16.",
+      "In 8 bits, `1111 1111` is 255 unsigned or -1 signed.",
+      "Two's complement makes addition and subtraction the same circuit."
+     ]
     },
     {
      "id": "s3m2l2",
@@ -865,7 +1093,45 @@
      "resource": {
       "title": "Bit Twiddling Hacks (Sean Eron Anderson)",
       "url": "https://graphics.stanford.edu/~seander/bithacks.html"
-     }
+     },
+     "video": {
+      "id": "4JgtUf5ThqY",
+      "title": "Bit Shifting, Bit Masking, and Bit Manipulation"
+     },
+     "why": "Flags, permissions, network headers and compact data structures all pack information into bits. Reading and writing masks is a daily skill in systems code.",
+     "terms": [
+      {
+       "t": "Mask",
+       "d": "A value selecting the bits you care about, like `1u << k`."
+      },
+      {
+       "t": "Set / clear / toggle",
+       "d": "`x | m`, `x & ~m`, `x ^ m`."
+      },
+      {
+       "t": "Shift",
+       "d": "`x << k` multiplies by 2^k; `x >> k` divides (for unsigned)."
+      },
+      {
+       "t": "Popcount",
+       "d": "The number of set bits."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "`x & 1 << k` tests bit k.",
+       "right": "It works only because `<<` binds tighter than `&`. Write `(x >> k) & 1` or add parentheses."
+      },
+      {
+       "wrong": "`x & (x - 1)` is a random trick.",
+       "right": "It clears the lowest set bit, so it tests powers of two and counts set bits."
+      }
+     ],
+     "takeaways": [
+      "Build a mask with `1u << k`, then set, clear, toggle or test.",
+      "Use unsigned types for bit manipulation.",
+      "`x & (x - 1) == 0` (for x > 0) means x is a power of two."
+     ]
     },
     {
      "id": "s3m2l3",
@@ -958,7 +1224,45 @@
      "resource": {
       "title": "The Floating-Point Guide",
       "url": "https://floating-point-gui.de/"
-     }
+     },
+     "video": {
+      "id": "PZRI1IfStY0",
+      "title": "Floating Point Numbers - Computerphile"
+     },
+     "why": "Every program that handles money, measurements or graphics uses floats. Knowing why they're inexact prevents broken comparisons and drifting totals.",
+     "terms": [
+      {
+       "t": "IEEE 754 double",
+       "d": "1 sign bit, 11 exponent bits, 52 fraction bits: about 15–17 significant digits."
+      },
+      {
+       "t": "Rounding error",
+       "d": "Values like 0.1 can't be represented exactly in binary."
+      },
+      {
+       "t": "Tolerance comparison",
+       "d": "`math.isclose(a, b)` instead of `==`."
+      },
+      {
+       "t": "Non-associativity",
+       "d": "`(a + b) + c` can differ from `a + (b + c)`."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "`0.1 + 0.2 != 0.3` is a bug in Python.",
+       "right": "0.1 is a repeating fraction in binary and gets rounded. Every IEEE 754 language behaves this way."
+      },
+      {
+       "wrong": "Floats are fine for money if I round at the end.",
+       "right": "Errors accumulate. Use integer cents or a decimal type for money."
+      }
+     ],
+     "takeaways": [
+      "Most decimal fractions are stored approximately.",
+      "Compare floats with a tolerance, never `==` after arithmetic.",
+      "Add small numbers before large ones, or use `math.fsum`."
+     ]
     },
     {
      "id": "s3m2l4",
@@ -1063,7 +1367,45 @@
      "resource": {
       "title": "Nand2Tetris: Project 1 (Boolean Logic)",
       "url": "https://www.nand2tetris.org/project01"
-     }
+     },
+     "video": {
+      "id": "hExfiB_UFzA",
+      "title": "Binary Addition, Half-Adder, Full-Adder Logic Gate Circuits Clearly Explained"
+     },
+     "why": "Seeing an adder built from NAND gates removes the last bit of magic between your code and the hardware.",
+     "terms": [
+      {
+       "t": "NAND",
+       "d": "A universal gate: every other gate can be built from it."
+      },
+      {
+       "t": "Multiplexer",
+       "d": "Picks one of two inputs based on a select bit."
+      },
+      {
+       "t": "Full adder",
+       "d": "Adds three bits (a, b, carry-in) into a sum and carry-out."
+      },
+      {
+       "t": "ALU",
+       "d": "The circuit that computes arithmetic and logic operations, chosen by control bits."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Arithmetic needs special circuits different from logic gates.",
+       "right": "A half adder is just XOR and AND; chain full adders and you can add any width."
+      },
+      {
+       "wrong": "A ripple-carry adder computes all bits at once.",
+       "right": "Each bit waits for the carry from the one below, which is why fast CPUs use carry-lookahead."
+      }
+     ],
+     "takeaways": [
+      "NAND builds NOT, AND, OR, XOR and MUX.",
+      "Half adder = XOR + AND; full adder = two half adders + OR.",
+      "The Hack ALU's six control bits select every operation it supports."
+     ]
     },
     {
      "id": "s3m2l5",
@@ -1173,7 +1515,45 @@
      "resource": {
       "title": "Compiler Explorer (godbolt.org)",
       "url": "https://godbolt.org/"
-     }
+     },
+     "video": {
+      "id": "jFDMZpkUWCw",
+      "title": "Fetch Decode Execute Cycle in more detail"
+     },
+     "why": "Reading compiler output tells you what your code really costs and is the starting point for performance work, debugging optimised builds and security analysis.",
+     "terms": [
+      {
+       "t": "Program counter",
+       "d": "Holds the address of the next instruction (`rip` on x86-64)."
+      },
+      {
+       "t": "Fetch–decode–execute",
+       "d": "Read the instruction, work out what it means, do it, write back."
+      },
+      {
+       "t": "Pipeline",
+       "d": "Overlapping stages of many instructions; branch mispredictions flush it."
+      },
+      {
+       "t": "Calling convention",
+       "d": "Where arguments and return values live, such as `rdi`, `rsi` and `rax` on x86-64."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "The CPU runs one instruction completely before starting the next.",
+       "right": "Modern CPUs pipeline and run instructions out of order; mispredicted branches cost cycles."
+      },
+      {
+       "wrong": "Compiler output is unreadable.",
+       "right": "At `-O2` small functions are short. Start with the calling convention and Compiler Explorer."
+      }
+     ],
+     "takeaways": [
+      "A CPU is a fetch–decode–execute loop driven by the program counter.",
+      "Unpredictable branches are expensive.",
+      "Use `cc -O2 -S` or godbolt.org to see what your C becomes."
+     ]
     }
    ],
    "project": {
@@ -1404,7 +1784,45 @@
      "resource": {
       "title": "OSTEP ch. 13: The Abstraction: Address Spaces",
       "url": "https://pages.cs.wisc.edu/~remzi/OSTEP/vm-intro.pdf"
-     }
+     },
+     "video": {
+      "id": "bfcOdn8qrck",
+      "title": "Stack vs Heap - Memory Management"
+     },
+     "why": "Knowing where each variable lives explains stack overflows, dangling pointers and why some allocations are cheap and others aren't.",
+     "terms": [
+      {
+       "t": "Address space",
+       "d": "Each process's private view of memory: text, data, heap, stack and more."
+      },
+      {
+       "t": "Stack frame",
+       "d": "One function call's return address, saved registers and locals."
+      },
+      {
+       "t": "Heap",
+       "d": "Memory for data whose size or lifetime isn't known at compile time."
+      },
+      {
+       "t": "Guard page",
+       "d": "An unmapped page below the stack so overflowing it crashes cleanly."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Returning a pointer to a local array is fine.",
+       "right": "The frame is gone after return, so the pointer dangles. Allocate on the heap or let the caller pass a buffer."
+      },
+      {
+       "wrong": "Deep recursion only uses CPU time.",
+       "right": "Each call adds a frame; the default stack is about 8 MiB, so very deep recursion crashes."
+      }
+     ],
+     "takeaways": [
+      "Locals live on the stack; `malloc` memory lives on the heap; string literals in rodata.",
+      "Stack allocation is just moving a pointer; heap allocation costs more.",
+      "ASLR randomises region addresses each run."
+     ]
     },
     {
      "id": "s3m3l2",
@@ -1524,7 +1942,45 @@
      "resource": {
       "title": "Latency Numbers Every Programmer Should Know",
       "url": "https://gist.github.com/jboner/2841832"
-     }
+     },
+     "video": {
+      "id": "tSAcFKW9lM8",
+      "title": "L1, L2, L3 Cache: CPU Cache Hierarchy Explained (TLBs, MMU, Page Tables)"
+     },
+     "why": "Memory access, not arithmetic, usually decides how fast code runs. Locality explains why the same algorithm can be ten times faster with a different loop order.",
+     "terms": [
+      {
+       "t": "Cache line",
+       "d": "The 64-byte unit moved between memory and cache."
+      },
+      {
+       "t": "Temporal locality",
+       "d": "Data used now is likely used again soon."
+      },
+      {
+       "t": "Spatial locality",
+       "d": "Data near what you used is likely used next."
+      },
+      {
+       "t": "Row-major order",
+       "d": "C stores `a[i][j]` and `a[i][j+1]` next to each other."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Two loops with the same Big-O run at the same speed.",
+       "right": "Cache behaviour can make one many times faster, such as row-by-row vs column-by-column traversal."
+      },
+      {
+       "wrong": "Linked lists and arrays are equally cache-friendly.",
+       "right": "Array elements are contiguous; linked nodes are scattered, so each step can miss the cache."
+      }
+     ],
+     "takeaways": [
+      "L1 is about 1 ns, DRAM about 100 ns: hundreds of cycles apart.",
+      "Walk memory in the order it's stored.",
+      "Contiguous data beats pointer-chasing."
+     ]
     },
     {
      "id": "s3m3l3",
@@ -1621,7 +2077,45 @@
      "resource": {
       "title": "OSTEP ch. 18: Paging: Introduction",
       "url": "https://pages.cs.wisc.edu/~remzi/OSTEP/vm-paging.pdf"
-     }
+     },
+     "video": {
+      "id": "4e18yybPo1E",
+      "title": "What is Virtual Memory? MMU, Page Tables, and more"
+     },
+     "why": "Virtual memory explains segfaults, why `malloc` is cheap until you touch the memory, how processes are isolated, and what swapping is.",
+     "terms": [
+      {
+       "t": "Virtual address",
+       "d": "The address your program uses; the MMU translates it on every access."
+      },
+      {
+       "t": "Page",
+       "d": "A fixed-size block, usually 4 KiB; an address is page number plus offset."
+      },
+      {
+       "t": "Page table",
+       "d": "The per-process map from virtual page numbers to physical frames."
+      },
+      {
+       "t": "Page fault",
+       "d": "Raised when a page isn't present; the kernel maps it or kills the process."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "A pointer value is a location in physical RAM.",
+       "right": "It's virtual. The same address in two processes maps to different physical memory."
+      },
+      {
+       "wrong": "Every page fault is an error.",
+       "right": "Most are normal: first touch of new memory or loading a page of a file. Only invalid accesses become `SIGSEGV`."
+      }
+     ],
+     "takeaways": [
+      "Split an address into page number (high bits) and offset (low 12 bits for 4 KiB).",
+      "The page table is a 4-level tree to save space.",
+      "Minor faults are cheap; major faults read from disk and are slow."
+     ]
     },
     {
      "id": "s3m3l4",
@@ -1726,7 +2220,45 @@
      "resource": {
       "title": "OSTEP ch. 19: Paging: Faster Translations (TLBs)",
       "url": "https://pages.cs.wisc.edu/~remzi/OSTEP/vm-tlbs.pdf"
-     }
+     },
+     "video": {
+      "id": "MGVQiIWk-4o",
+      "title": "Pages, Page Tables, MMU & TLB & Address Translation Explained"
+     },
+     "why": "Large-memory programs can spend much of their time on address translation. Understanding the TLB explains when huge pages and better locality pay off.",
+     "terms": [
+      {
+       "t": "TLB",
+       "d": "A small cache of recent virtual-to-physical translations."
+      },
+      {
+       "t": "Page walk",
+       "d": "Reading the page table levels after a TLB miss."
+      },
+      {
+       "t": "TLB reach",
+       "d": "Entries × page size: how much memory the TLB can map at once."
+      },
+      {
+       "t": "Huge pages",
+       "d": "2 MiB or 1 GiB pages that multiply TLB reach."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Address translation is free.",
+       "right": "A TLB miss means a page walk of up to four memory accesses."
+      },
+      {
+       "wrong": "Huge pages always help.",
+       "right": "They help large, randomly accessed working sets; they waste memory for small or sparse ones."
+      }
+     ],
+     "takeaways": [
+      "64 entries × 4 KiB covers only 256 KiB.",
+      "Random access across gigabytes causes constant TLB misses.",
+      "Address-space IDs avoid flushing the TLB on every context switch."
+     ]
     },
     {
      "id": "s3m3l5",
@@ -1827,7 +2359,45 @@
      "resource": {
       "title": "OSTEP ch. 17: Free-Space Management",
       "url": "https://pages.cs.wisc.edu/~remzi/OSTEP/vm-freespace.pdf"
-     }
+     },
+     "video": {
+      "id": "pQK6V8NoDe0",
+      "title": "Coding a Memory Allocator From Scratch"
+     },
+     "why": "Writing an allocator shows exactly what `malloc` and `free` cost, why fragmentation happens and why memory bugs corrupt the heap so badly.",
+     "terms": [
+      {
+       "t": "Block header",
+       "d": "Size and allocated bit stored just before each block's payload."
+      },
+      {
+       "t": "Free list",
+       "d": "A list of free blocks: implicit (walk all blocks) or explicit (linked free blocks)."
+      },
+      {
+       "t": "Split / coalesce",
+       "d": "Cut a large free block to fit a request / merge adjacent free blocks."
+      },
+      {
+       "t": "Fragmentation",
+       "d": "Internal: waste inside blocks. External: free memory too scattered to use."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "`free(p)` only needs the pointer, so the allocator must search for the block size.",
+       "right": "The size is in the header right before `p`, which is why writing before a buffer corrupts the heap."
+      },
+      {
+       "wrong": "Best fit always beats first fit.",
+       "right": "Best fit can leave tiny unusable slivers and costs more to search. Each placement policy trades speed for fragmentation."
+      }
+     ],
+     "takeaways": [
+      "Headers make `free` O(1) to find the block size.",
+      "Coalescing with boundary tags prevents the heap from shattering.",
+      "Segregated free lists by size are what real allocators use."
+     ]
     }
    ],
    "project": {
@@ -2067,7 +2637,45 @@
      "resource": {
       "title": "OSTEP ch. 5: Process API",
       "url": "https://pages.cs.wisc.edu/~remzi/OSTEP/cpu-api.pdf"
-     }
+     },
+     "video": {
+      "id": "eoXM5FXLE7g",
+      "title": "fork(), exec(), wait() - How UNIX Really Creates Processes"
+     },
+     "why": "Every shell, server and build tool starts programs this way. `fork`, `exec` and `wait` are the core of how Unix runs anything.",
+     "terms": [
+      {
+       "t": "Process",
+       "d": "A running program: address space, registers, open files and a PID."
+      },
+      {
+       "t": "`fork()`",
+       "d": "Clones the process; returns 0 in the child and the child's PID in the parent."
+      },
+      {
+       "t": "`exec`",
+       "d": "Replaces the current program with a new one, keeping the PID and open files."
+      },
+      {
+       "t": "Zombie",
+       "d": "A child that has exited but hasn't been waited for yet."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Code after a successful `exec` call still runs.",
+       "right": "`exec` doesn't return on success; only error-handling code after it ever runs."
+      },
+      {
+       "wrong": "After `fork`, parent and child share variables.",
+       "right": "Each gets its own copy of the address space; changes in one aren't seen by the other."
+      }
+     ],
+     "takeaways": [
+      "A shell forks, the child execs the command, the parent waits.",
+      "Check `fork`'s return value to know which process you're in.",
+      "Always `waitpid` for children to avoid zombies."
+     ]
     },
     {
      "id": "s3m4l2",
@@ -2168,7 +2776,45 @@
      "resource": {
       "title": "OSTEP ch. 6: Limited Direct Execution",
       "url": "https://pages.cs.wisc.edu/~remzi/OSTEP/cpu-mechanisms.pdf"
-     }
+     },
+     "video": {
+      "id": "2beOYY4S0B8",
+      "title": "How Operating Systems Actually Work (kernel mode vs. user mode)"
+     },
+     "why": "Every file, network and process operation goes through system calls. Knowing their cost and error rules explains performance and robustness of real programs.",
+     "terms": [
+      {
+       "t": "User mode / kernel mode",
+       "d": "Restricted mode for programs; privileged mode for the OS."
+      },
+      {
+       "t": "System call",
+       "d": "A controlled jump into the kernel to request a service."
+      },
+      {
+       "t": "libc wrapper",
+       "d": "The C function (`read`, `write`) that issues the syscall."
+      },
+      {
+       "t": "`errno`",
+       "d": "Set on failure to say why; check the return value first."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "`printf` and `malloc` are system calls.",
+       "right": "They're library functions that sometimes make system calls (`write`, `mmap`)."
+      },
+      {
+       "wrong": "I can check `errno` to see if a call failed.",
+       "right": "`errno` is only meaningful after a call reports failure, usually by returning -1."
+      }
+     ],
+     "takeaways": [
+      "Syscalls cross into kernel mode and back, costing far more than a function call.",
+      "Batch work to reduce the number of syscalls.",
+      "Check every return value, then read `errno` with `perror` or `strerror`."
+     ]
     },
     {
      "id": "s3m4l3",
@@ -2285,7 +2931,45 @@
      "resource": {
       "title": "OSTEP ch. 7: Scheduling: Introduction",
       "url": "https://pages.cs.wisc.edu/~remzi/OSTEP/cpu-sched.pdf"
-     }
+     },
+     "video": {
+      "id": "EVEP17ux8gA",
+      "title": "CPU Scheduling Algorithms: FCFS, SJF, Round Robin, Priority"
+     },
+     "why": "Schedulers decide what runs when, which is why your UI stays responsive while a compile runs. The trade-offs carry over to job queues and load balancers.",
+     "terms": [
+      {
+       "t": "Turnaround time",
+       "d": "Completion time minus arrival time."
+      },
+      {
+       "t": "Response time",
+       "d": "First-run time minus arrival time."
+      },
+      {
+       "t": "Round Robin",
+       "d": "Give each job a time slice in turn: good response, worse turnaround."
+      },
+      {
+       "t": "MLFQ",
+       "d": "Multi-level feedback queue: learns which jobs are interactive from their behaviour."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "One scheduling policy is best for everything.",
+       "right": "SJF minimises turnaround, Round Robin minimises response time; they pull in opposite directions."
+      },
+      {
+       "wrong": "A smaller time slice is always better.",
+       "right": "Each context switch has a cost, so very small slices waste time switching."
+      }
+     ],
+     "takeaways": [
+      "FIFO suffers the convoy effect behind long jobs.",
+      "Preemption via timer interrupts keeps one job from hogging the CPU.",
+      "Real schedulers infer job types from behaviour."
+     ]
     },
     {
      "id": "s3m4l4",
@@ -2386,7 +3070,45 @@
      "resource": {
       "title": "OSTEP ch. 39: Files and Directories",
       "url": "https://pages.cs.wisc.edu/~remzi/OSTEP/file-intro.pdf"
-     }
+     },
+     "video": {
+      "id": "bNzMz6rb_3Y",
+      "title": "Linux Files: What Happens When a File Is Opened (File Descriptors)"
+     },
+     "why": "File descriptors underlie files, pipes, sockets and terminals. Understanding them explains redirection, why deleting an open file doesn't free space, and how links work.",
+     "terms": [
+      {
+       "t": "File descriptor",
+       "d": "A small integer indexing the process's fd table."
+      },
+      {
+       "t": "Open file description",
+       "d": "Kernel object holding the offset and flags; can be shared by several fds."
+      },
+      {
+       "t": "Inode",
+       "d": "Metadata and data block locations for a file, without its name."
+      },
+      {
+       "t": "Hard link",
+       "d": "Another directory entry pointing at the same inode."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Deleting a file frees its space immediately.",
+       "right": "`unlink` removes a name. Space is freed only when no links and no open descriptors remain."
+      },
+      {
+       "wrong": "A file's name is stored in its inode.",
+       "right": "Names live in directories, which map names to inode numbers."
+      }
+     ],
+     "takeaways": [
+      "`open` returns the lowest unused fd number.",
+      "`dup2(old, new)` is how shells redirect output.",
+      "Hard links share an inode; symbolic links store a path."
+     ]
     },
     {
      "id": "s3m4l5",
@@ -2487,7 +3209,45 @@
      "resource": {
       "title": "Linux man page: pipe(7)",
       "url": "https://man7.org/linux/man-pages/man7/pipe.7.html"
-     }
+     },
+     "video": {
+      "id": "TfFLKfU9KJ8",
+      "title": "Pipes and Named Pipes in C"
+     },
+     "why": "Pipes are how Unix tools combine, and signals are how processes are stopped, notified and cleaned up. Both appear in every long-running service.",
+     "terms": [
+      {
+       "t": "Pipe",
+       "d": "A one-way kernel buffer with a read end and a write end."
+      },
+      {
+       "t": "EOF on a pipe",
+       "d": "`read` returns 0 only when every write end is closed."
+      },
+      {
+       "t": "Signal",
+       "d": "An asynchronous notification, such as `SIGINT` or `SIGTERM`."
+      },
+      {
+       "t": "Async-signal-safe",
+       "d": "Functions safe to call inside a signal handler, like `write`; `printf` isn't."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "The reader gets EOF when the writer process finishes writing.",
+       "right": "Only when every copy of the write end is closed, including ones inherited by other processes."
+      },
+      {
+       "wrong": "I can do anything in a signal handler.",
+       "right": "Handlers interrupt arbitrary code. Set a `volatile sig_atomic_t` flag or call async-signal-safe functions only."
+      }
+     ],
+     "takeaways": [
+      "For `a | b`, each child `dup2`s one pipe end and closes all the others.",
+      "Unclosed write ends make readers hang forever.",
+      "Keep signal handlers tiny: set a flag and return."
+     ]
     }
    ],
    "project": {
@@ -2721,7 +3481,45 @@
      "resource": {
       "title": "OSTEP ch. 27: Interlude: Thread API",
       "url": "https://pages.cs.wisc.edu/~remzi/OSTEP/threads-api.pdf"
-     }
+     },
+     "video": {
+      "id": "ldJ8WGZVXZk",
+      "title": "Introduction To Threads (pthreads)"
+     },
+     "why": "Threads let one program use many cores and stay responsive while waiting. They also introduce the hardest bugs you'll meet, so start with what is shared.",
+     "terms": [
+      {
+       "t": "Thread",
+       "d": "An independent stream of execution with its own registers and stack."
+      },
+      {
+       "t": "Shared state",
+       "d": "Threads share the address space: globals, heap and open files."
+      },
+      {
+       "t": "`pthread_create` / `pthread_join`",
+       "d": "Start a thread / wait for it and collect its result."
+      },
+      {
+       "t": "Concurrency vs parallelism",
+       "d": "Tasks in progress at once vs running at the same instant on different cores."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Passing `&i` from a loop gives each thread its own `i`.",
+       "right": "All threads see the same variable, which keeps changing. Give each thread its own argument."
+      },
+      {
+       "wrong": "Python threads run Python code in parallel on many cores.",
+       "right": "In CPython the GIL lets one thread run Python bytecode at a time; use processes for CPU-bound work."
+      }
+     ],
+     "takeaways": [
+      "Threads share memory but not stacks or registers.",
+      "Always join threads you start.",
+      "Give each thread its own argument storage."
+     ]
     },
     {
      "id": "s3m5l2",
@@ -2849,7 +3647,45 @@
      "resource": {
       "title": "OSTEP ch. 26: Concurrency: An Introduction",
       "url": "https://pages.cs.wisc.edu/~remzi/OSTEP/threads-intro.pdf"
-     }
+     },
+     "video": {
+      "id": "Lu6EghdDO5A",
+      "title": "Race Conditions - What is required and a Detailed Example"
+     },
+     "why": "Race conditions cause bugs that appear once in a million runs and vanish under the debugger. Recognising the patterns is the only reliable defence.",
+     "terms": [
+      {
+       "t": "Race condition",
+       "d": "The result depends on the timing of threads."
+      },
+      {
+       "t": "Data race",
+       "d": "Concurrent access to one location, at least one a write, with no synchronisation: undefined behavior in C."
+      },
+      {
+       "t": "Critical section",
+       "d": "Code that must not run in two threads at once."
+      },
+      {
+       "t": "Check-then-act",
+       "d": "Testing a condition and acting on it as two separate steps."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "`counter++` is a single, safe operation.",
+       "right": "It's load, add, store. Two threads can interleave and lose updates."
+      },
+      {
+       "wrong": "If my tests pass, there are no races.",
+       "right": "Races depend on timing. Use ThreadSanitizer (`-fsanitize=thread`) to detect them."
+      }
+     ],
+     "takeaways": [
+      "Any shared variable written by one thread needs synchronisation.",
+      "Check-then-act must be made atomic as a whole.",
+      "ThreadSanitizer finds data races your tests miss."
+     ]
     },
     {
      "id": "s3m5l3",
@@ -2953,7 +3789,45 @@
      "resource": {
       "title": "OSTEP ch. 30: Condition Variables",
       "url": "https://pages.cs.wisc.edu/~remzi/OSTEP/threads-cv.pdf"
-     }
+     },
+     "video": {
+      "id": "nxw2y27z0V4",
+      "title": "Synchronization: The Producer/Consumer Problem"
+     },
+     "why": "Mutexes and condition variables are the basic tools for safe shared state and for threads that wait on each other, as in every work queue.",
+     "terms": [
+      {
+       "t": "Mutex",
+       "d": "A lock that lets one thread at a time into a critical section."
+      },
+      {
+       "t": "Condition variable",
+       "d": "Lets a thread sleep until another signals that a condition may now hold."
+      },
+      {
+       "t": "`pthread_cond_wait`",
+       "d": "Atomically unlocks the mutex and sleeps; relocks before returning."
+      },
+      {
+       "t": "Spurious wakeup",
+       "d": "Waking without the condition being true, which is allowed."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "`if (count == 0) wait(...)` is enough.",
+       "right": "Wakeups can be spurious or the condition can change again. Always wait in a `while` loop."
+      },
+      {
+       "wrong": "Locking only the writes is enough.",
+       "right": "Reads of shared state must hold the same lock, or they can see half-updated data."
+      }
+     ],
+     "takeaways": [
+      "Protect each piece of shared state with one mutex, held for both reads and writes.",
+      "Wait on a condition variable in a `while` loop, with the mutex held.",
+      "Keep critical sections short."
+     ]
     },
     {
      "id": "s3m5l4",
@@ -3054,7 +3928,45 @@
      "resource": {
       "title": "OSTEP ch. 32: Common Concurrency Problems",
       "url": "https://pages.cs.wisc.edu/~remzi/OSTEP/threads-bugs.pdf"
-     }
+     },
+     "video": {
+      "id": "MWuc27pv9wk",
+      "title": "Deadlock: The Most Frustrating Problem in Computer Science"
+     },
+     "why": "Deadlocks freeze servers without any error message. Knowing the four conditions tells you exactly which one to break.",
+     "terms": [
+      {
+       "t": "Deadlock",
+       "d": "Threads each waiting for a resource another holds, so none can proceed."
+      },
+      {
+       "t": "Coffman conditions",
+       "d": "Mutual exclusion, hold and wait, no preemption, circular wait."
+      },
+      {
+       "t": "Lock ordering",
+       "d": "Always acquire locks in one global order to prevent cycles."
+      },
+      {
+       "t": "`trylock` with back-off",
+       "d": "Release everything and retry if a lock isn't available."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Deadlocks only happen with many locks.",
+       "right": "Two locks taken in opposite orders by two threads is enough."
+      },
+      {
+       "wrong": "Calling a callback while holding a lock is harmless.",
+       "right": "Unknown code may take other locks and create a cycle. Release locks before calling out."
+      }
+     ],
+     "takeaways": [
+      "All four Coffman conditions must hold, so break one.",
+      "A global lock order is the standard fix.",
+      "Diagnose with thread backtraces: look for threads blocked in `lock`."
+     ]
     },
     {
      "id": "s3m5l5",
@@ -3151,7 +4063,45 @@
      "resource": {
       "title": "Preshing on Programming: Acquire and Release Semantics",
       "url": "https://preshing.com/20120913/acquire-and-release-semantics/"
-     }
+     },
+     "video": {
+      "id": "OyNG4qiWnmU",
+      "title": "The C++ memory model: an intuition (Arvid Norberg)"
+     },
+     "why": "Atomics power lock-free counters, reference counts and the internals of every mutex. Memory ordering explains why 'obviously correct' flag code fails on ARM.",
+     "terms": [
+      {
+       "t": "Atomic operation",
+       "d": "An indivisible read-modify-write, such as `atomic_fetch_add`."
+      },
+      {
+       "t": "Compare-and-swap",
+       "d": "Write a new value only if the current value is what you expected."
+      },
+      {
+       "t": "Release / acquire",
+       "d": "Pairing that makes writes before a release visible after the matching acquire."
+      },
+      {
+       "t": "False sharing",
+       "d": "Threads writing different variables on the same cache line slow each other down."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Writing data then setting a plain `ready = 1` flag publishes it safely.",
+       "right": "Compilers and CPUs can reorder those writes. Use a release store and an acquire load."
+      },
+      {
+       "wrong": "Atomics are free.",
+       "right": "Contended atomics bounce the cache line between cores at roughly 50–100 ns each."
+      }
+     ],
+     "takeaways": [
+      "Use atomics for simple counters and flags.",
+      "Publish data with release; read it with acquire.",
+      "Pad hot per-thread variables onto separate cache lines."
+     ]
     }
    ],
    "project": {
@@ -3383,7 +4333,45 @@
      "resource": {
       "title": "Computer Networks: A Systems Approach (free online book)",
       "url": "https://book.systemsapproach.org/"
-     }
+     },
+     "video": {
+      "id": "2QGgEk20RXM",
+      "title": "TCP/IP Model Explained"
+     },
+     "why": "Every web request, database connection and video call rides on these layers. Knowing what each adds tells you where a problem can be and which protocol fits.",
+     "terms": [
+      {
+       "t": "Encapsulation",
+       "d": "Each layer wraps the data from above in its own header."
+      },
+      {
+       "t": "IP",
+       "d": "Best-effort delivery of packets between hosts by address."
+      },
+      {
+       "t": "TCP",
+       "d": "Reliable, ordered byte stream with connections and retransmission."
+      },
+      {
+       "t": "UDP",
+       "d": "Unreliable datagrams with ports: low overhead, no ordering."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "UDP is always faster, so it's better.",
+       "right": "UDP skips reliability. Use it when late data is useless (games, calls) or the app handles loss itself."
+      },
+      {
+       "wrong": "IP guarantees packets arrive.",
+       "right": "IP is best effort: packets can be lost, duplicated or reordered. TCP adds reliability on top."
+      }
+     ],
+     "takeaways": [
+      "Link moves frames locally, IP routes packets, TCP/UDP add ports, apps speak HTTP or DNS.",
+      "Each layer only talks to its peer layer on the other host.",
+      "Choose TCP for correctness, UDP for timeliness."
+     ]
     },
     {
      "id": "s3m6l2",
@@ -3488,7 +4476,45 @@
      "resource": {
       "title": "RFC 9293: Transmission Control Protocol",
       "url": "https://www.rfc-editor.org/rfc/rfc9293"
-     }
+     },
+     "video": {
+      "id": "xMtP5ZB3wSk",
+      "title": "TCP - Three-way handshake in detail"
+     },
+     "why": "TCP behaviour explains slow page loads, stalled downloads and why connection reuse matters. Counting round trips is how you estimate network latency.",
+     "terms": [
+      {
+       "t": "Three-way handshake",
+       "d": "SYN, SYN-ACK, ACK: one round trip before data flows."
+      },
+      {
+       "t": "Sequence number",
+       "d": "Numbers bytes, not packets, so the receiver can order and acknowledge them."
+      },
+      {
+       "t": "Cumulative ACK",
+       "d": "The number of the next byte the receiver expects."
+      },
+      {
+       "t": "Congestion control",
+       "d": "The sender's window grows with slow start and shrinks on loss."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "TCP numbers each packet 1, 2, 3.",
+       "right": "It numbers bytes. Each segment carries the sequence number of its first byte."
+      },
+      {
+       "wrong": "A new connection can send at full speed immediately.",
+       "right": "Slow start begins small and doubles each round trip, so short transfers on new connections are slow."
+      }
+     ],
+     "takeaways": [
+      "Handshake costs one RTT; TLS adds more.",
+      "Loss is recovered by timeout or three duplicate ACKs.",
+      "Reusing connections avoids handshakes and slow start."
+     ]
     },
     {
      "id": "s3m6l3",
@@ -3589,7 +4615,45 @@
      "resource": {
       "title": "Julia Evans: How updating DNS works",
       "url": "https://jvns.ca/blog/how-updating-dns-works/"
-     }
+     },
+     "video": {
+      "id": "mpQZVYPuDGU",
+      "title": "How a DNS Server (Domain Name System) works"
+     },
+     "why": "'It's always DNS' is a running joke because so many outages start there. Tracing a lookup is the first step in debugging any 'can't connect' problem.",
+     "terms": [
+      {
+       "t": "Recursive resolver",
+       "d": "Does the lookup for you, walking root, TLD and authoritative servers, and caches the result."
+      },
+      {
+       "t": "Authoritative server",
+       "d": "Holds the actual records for a domain."
+      },
+      {
+       "t": "TTL",
+       "d": "How long a record may be cached."
+      },
+      {
+       "t": "Record types",
+       "d": "A (IPv4), AAAA (IPv6), CNAME (alias), MX (mail), NS (delegation), TXT."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Changing a DNS record takes effect everywhere instantly.",
+       "right": "Resolvers keep cached answers until the TTL expires."
+      },
+      {
+       "wrong": "My computer asks the root servers directly.",
+       "right": "Your stub resolver asks a recursive resolver, which does the walk and caches it."
+      }
+     ],
+     "takeaways": [
+      "Names are resolved right to left: root, TLD, domain.",
+      "`dig name` and `dig +trace name` show what's happening.",
+      "Lower the TTL before planned changes."
+     ]
     },
     {
      "id": "s3m6l4",
@@ -3695,7 +4759,45 @@
      "resource": {
       "title": "Beej's Guide to Network Programming",
       "url": "https://beej.us/guide/bgnet/html/"
-     }
+     },
+     "video": {
+      "id": "set7R_bHG_k",
+      "title": "C Programming: TCP Server"
+     },
+     "why": "Every networked program, from web servers to databases, is built on sockets. Handling byte order and partial reads correctly is what makes them reliable.",
+     "terms": [
+      {
+       "t": "Socket",
+       "d": "A file descriptor for a network endpoint."
+      },
+      {
+       "t": "`accept`",
+       "d": "Returns a new socket for each client; the listening socket stays open."
+      },
+      {
+       "t": "Network byte order",
+       "d": "Big-endian; convert with `htons`/`ntohs`."
+      },
+      {
+       "t": "Framing",
+       "d": "Marking where messages begin and end in a byte stream, by length prefix or delimiter."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "One `send` arrives as exactly one `recv`.",
+       "right": "TCP is a byte stream: data can arrive split or merged. Loop until you have a full message."
+      },
+      {
+       "wrong": "`recv` returning 0 means no data yet.",
+       "right": "It means the peer closed the connection."
+      }
+     ],
+     "takeaways": [
+      "Server: socket, bind, listen, accept. Client: getaddrinfo, socket, connect.",
+      "Always loop on `send` and `recv`.",
+      "Design a framing scheme for your messages."
+     ]
     },
     {
      "id": "s3m6l5",
@@ -3800,7 +4902,45 @@
      "resource": {
       "title": "What happens when... (alex/what-happens-when)",
       "url": "https://github.com/alex/what-happens-when"
-     }
+     },
+     "video": {
+      "id": "AlkDbnbv7dk",
+      "title": "What happens when you type a URL into your browser? (ByteByteGo)"
+     },
+     "why": "'What happens when you type a URL?' ties together everything in this stage: DNS, TCP, TLS, HTTP and rendering. It's also a favourite interview question.",
+     "terms": [
+      {
+       "t": "URL parts",
+       "d": "Scheme, host, port, path and query."
+      },
+      {
+       "t": "TLS handshake",
+       "d": "Agrees on keys and verifies the server's certificate before HTTP."
+      },
+      {
+       "t": "Request line",
+       "d": "Method, path and version, like `GET /docs HTTP/1.1`."
+      },
+      {
+       "t": "Status code",
+       "d": "2xx success, 3xx redirect, 4xx client error, 5xx server error."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "The `Host` header is optional.",
+       "right": "It's required in HTTP/1.1 because one IP address can serve many sites."
+      },
+      {
+       "wrong": "HTTP lines end with `\\n`.",
+       "right": "They end with `\\r\\n`, and a blank line separates headers from the body."
+      }
+     ],
+     "takeaways": [
+      "Parse URL, resolve DNS, open TCP, do TLS, send HTTP, render.",
+      "HTTP/1.1 is readable text you can write by hand.",
+      "Keep-alive reuses connections for later requests."
+     ]
     }
    ],
    "project": {

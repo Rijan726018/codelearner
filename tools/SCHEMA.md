@@ -54,6 +54,17 @@ Write ONE file per stage: `data/<stageId>.json` (e.g. `data/s1.json`). It must b
 }
 ```
 
+These fields are merged in by `python3 tools/merge_lessons.py` from `tools/lesson_extra/sN.py` and `tools/lesson_videos.tsv`, so edit them there, not in the JSON:
+```json
+{
+  "why": "1–2 sentences on why this matters in real work.",
+  "terms": [{ "t": "Term", "d": "One-line definition" }],                  // 3–5 key terms
+  "mistakes": [{ "wrong": "A belief beginners hold", "right": "Why it's wrong and what's true" }],   // 2–3, refutation style
+  "takeaways": ["…", "…", "…"],                                            // exactly 3, shown after the learner explains it back
+  "video": { "id": "11-char YouTube id", "title": "Video title" }         // optional; lessons without one get a YouTube search link
+}
+```
+
 ## Visual (pick ONE type per lesson)
 - `{"type":"steps","title":"...","steps":[{"label":"Source code","detail":"what you write"}, ...]}` — 3–6 boxes rendered as a left-to-right flow with arrows. For pipelines, processes, request lifecycles.
 - `{"type":"compare","title":"...","left":{"title":"list","points":["..",".."]},"right":{"title":"tuple","points":["..",".."]}}` — side-by-side contrast.

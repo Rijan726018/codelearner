@@ -399,6 +399,21 @@ function pathCard(p){
 }
 
 /* ================= PROFILE ================= */
+// Calibration: how often each confidence rating turns out right. Well-calibrated learners study the right things.
+function calibPanel(){
+  const c=P.calib||{}, tot=CONF.reduce((a,x)=>a+(c[x.k]?.n||0),0);
+  const head=`<h2 class="h3">How well you know what you know</h2>`;
+  if(!tot) return `<section class="panel">${head}<p class="muted" style="margin:0">Each time you check an answer you say how sure you are. After a few questions, this shows how often you're right at each level, so you can tell real knowledge from lucky guesses.</p></section>`;
+  const pct=k=>c[k]?.n ? Math.round(100*c[k].ok/c[k].n) : null;
+  const tips=[];
+  const enough=k=>(c[k]?.n||0)>=5;
+  if(enough("sure") && pct("sure")<85) tips.push(`When you feel certain you're right ${pct("sure")}% of the time. Before you press Certain, say why the other options are wrong.`);
+  if(enough("think") && pct("think")<50) tips.push(`"Fairly sure" answers are right only ${pct("think")}% of the time, so treat them as guesses and slow down on those topics.`);
+  if(enough("guess") && pct("guess")>=60 && !(enough("think") && pct("think")<50)) tips.push(`Your guesses are right ${pct("guess")}% of the time. You know more than you think, so trust Fairly sure more often.`);
+  if(!tips.length && tot>=15 && (enough("sure")||enough("think"))) tips.push("Your confidence matches your results. Keep rating honestly; it's what makes the review schedule fit you.");
+  return `<section class="panel">${head}<div class="calib">${CONF.map(x=>{ const p=pct(x.k); return `<div class="r"><span>${x.label}</span><span class="t" data-tip="${c[x.k]?.ok||0} right of ${c[x.k]?.n||0}"><i style="width:${p??0}%"></i></span><span class="n">${p==null?"no answers":`${p}% of ${c[x.k].n}`}</span></div>`; }).join("")}</div>
+    ${tips.length?`<p class="muted" style="margin:0">${esc(tips.join(" "))}</p>`:""}</section>`;
+}
 function viewProfile(el){
   const s=Game.stats(); const got=BADGES.filter(b=>P.badges?.[b.id]);
   const parts=[["Core lessons","lessons","book"],["Module exams","exams","lock"],["Projects","projects","rocket"],["Review cards","reviews","refresh"],["Problems","problems","braces"],["Bootcamp & projects","bootcamp","cap"],["Career paths","paths","route"]];
@@ -410,6 +425,7 @@ function viewProfile(el){
     <section class="panel"><h2 class="h3">Where your XP comes from</h2><div class="mast">${parts.map(([t,k])=>`<div class="r"><span>${t}</span><span class="t" data-tip="${s.parts[k].toLocaleString()} XP"><i style="width:${100*s.parts[k]/mx}%"></i></span><span class="n">${s.parts[k].toLocaleString()}</span></div>`).join("")}</div>
       <p class="muted" style="margin:0;font-size:.84rem">Lesson ${XPV.lesson} · exam ${XPV.exam} · milestone ${XPV.milestone} · card ${XPV.card} · Easy/Medium/Hard ${XPV.Easy}/${XPV.Medium}/${XPV.Hard} · step ${XPV.step} · roadmap topic ${XPV.node}</p></section>
   </div>
+  ${calibPanel()}
   <section style="display:grid;gap:14px"><div class="sec-h"><h2 class="h2">Badges</h2><span class="pill acc">${got.length} of ${BADGES.length} unlocked</span></div>
     <div class="badges">${BADGES.map(b=>`<div class="bdg ${P.badges?.[b.id]?"got":""}"><span class="md">${icon(b.i,"lg")}</span><b>${esc(b.n)}</b><span>${esc(b.d)}</span>${P.badges?.[b.id]?`<span class="pill ok">${fmtDay(P.badges[b.id])}</span>`:""}</div>`).join("")}</div></section>
   <section class="panel"><h2 class="h3">Ranks</h2><div class="row">${RANKS.map(([n,t])=>`<span class="pill ${s.level>=n?"acc":""}">Lv ${n}+ · ${t}</span>`).join("")}</div></section>

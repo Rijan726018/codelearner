@@ -33,6 +33,11 @@ def check(path):
                     n=len(v["code"].split("\n"))
                     for s in v["steps"]:
                         if not (1<=s["line"]<=n): errs.append(f"{l['id']}: trace line out of range")
+            if "terms" in l and not (3<=len(l["terms"])<=5 and all(t.get("t") and t.get("d") for t in l["terms"])): errs.append(f"{l['id']}: bad terms")
+            if "mistakes" in l and not (2<=len(l["mistakes"])<=3 and all(x.get("wrong") and x.get("right") for x in l["mistakes"])): errs.append(f"{l['id']}: bad mistakes")
+            if "takeaways" in l and len(l["takeaways"])!=3: errs.append(f"{l['id']}: takeaways must have 3 items")
+            vd=l.get("video")
+            if vd and not (re.fullmatch(r"[A-Za-z0-9_-]{11}", vd.get("id","")) and vd.get("title")): errs.append(f"{l['id']}: bad video")
             lv={x.get("level") for x in l["questions"]}
             if not {1,2,3}<=lv: errs.append(f"{l['id']}: missing a level")
             for x in l["questions"]: q(x,l["id"])

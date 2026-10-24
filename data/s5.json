@@ -106,7 +106,45 @@
      "resource": {
       "title": "No Silver Bullet (Brooks): essential vs accidental complexity",
       "url": "https://en.wikipedia.org/wiki/No_Silver_Bullet"
-     }
+     },
+     "video": {
+      "id": "bmSAYlu0NcY",
+      "title": "A Philosophy of Software Design (John Ousterhout)"
+     },
+     "why": "Complexity, not features, is what slows teams down over time. Naming its symptoms lets you spot it early and argue for fixing it in concrete terms.",
+     "terms": [
+      {
+       "t": "Change amplification",
+       "d": "A simple change needs edits in many places."
+      },
+      {
+       "t": "Cognitive load",
+       "d": "How much a developer must know to make a change safely."
+      },
+      {
+       "t": "Unknown unknowns",
+       "d": "It isn't obvious what you need to change or know; the worst symptom."
+      },
+      {
+       "t": "Strategic vs tactical programming",
+       "d": "Investing in good design vs just getting the feature working."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Complex code means long code or clever algorithms.",
+       "right": "Complexity is whatever makes a system hard to understand and change. Short code can be very complex."
+      },
+      {
+       "wrong": "We can clean up complexity later when we have time.",
+       "right": "It accumulates in small increments. Spend a little on design with every change."
+      }
+     ],
+     "takeaways": [
+      "Complexity shows up as change amplification, cognitive load and unknown unknowns.",
+      "Its causes are dependencies and obscurity.",
+      "Invest a small, steady amount in design with each change."
+     ]
     },
     {
      "id": "s5m1l2",
@@ -204,7 +242,45 @@
      "resource": {
       "title": "Python docs: pathlib, a deep module in the standard library",
       "url": "https://docs.python.org/3/library/pathlib.html"
-     }
+     },
+     "video": {
+      "id": "bmSAYlu0NcY",
+      "title": "A Philosophy of Software Design (John Ousterhout)"
+     },
+     "why": "Deep modules give a lot of power through a small interface, so most of the system can ignore their details. It's the single most useful test of a design.",
+     "terms": [
+      {
+       "t": "Interface",
+       "d": "Everything a caller must know: parameters, return values, errors, side effects, ordering rules."
+      },
+      {
+       "t": "Deep module",
+       "d": "A simple interface hiding a lot of functionality."
+      },
+      {
+       "t": "Shallow module",
+       "d": "An interface nearly as complex as what it does."
+      },
+      {
+       "t": "Classitis",
+       "d": "Splitting into many tiny classes that each add an interface but little power."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Smaller classes and functions are always better.",
+       "right": "Many shallow pieces multiply interfaces to learn. Aim for depth, not size."
+      },
+      {
+       "wrong": "Exposing every option makes a module flexible.",
+       "right": "Make the common case one simple call with sensible defaults; expose options only when needed."
+      }
+     ],
+     "takeaways": [
+      "Compare what a module hides with what it asks callers to know.",
+      "Design for the common case first.",
+      "Merge or remove wrappers that add nothing."
+     ]
     },
     {
      "id": "s5m1l3",
@@ -303,7 +379,45 @@
      "resource": {
       "title": "Wikipedia: Information hiding (Parnas)",
       "url": "https://en.wikipedia.org/wiki/Information_hiding"
-     }
+     },
+     "video": {
+      "id": "tMg97MoIwgk",
+      "title": "SE Radio 520: John Ousterhout on A Philosophy of Software Design"
+     },
+     "why": "When a design decision lives in one module, you can change it in one place. Leakage is why small changes turn into multi-file hunts.",
+     "terms": [
+      {
+       "t": "Information hiding",
+       "d": "Each module encapsulates one design decision behind its interface."
+      },
+      {
+       "t": "Information leakage",
+       "d": "One decision reflected in several modules."
+      },
+      {
+       "t": "Back-door leakage",
+       "d": "Modules sharing knowledge without it appearing in any interface, like a file format."
+      },
+      {
+       "t": "Temporal decomposition",
+       "d": "Splitting code by the order things happen rather than by the knowledge they use."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "If two modules don't call each other, they're independent.",
+       "right": "If both know the same file format or schema, changing it breaks both. That's leakage."
+      },
+      {
+       "wrong": "Returning raw database rows keeps things simple.",
+       "right": "It forces every caller to know the schema. Return a small domain object instead."
+      }
+     ],
+     "takeaways": [
+      "Ask: which design decision does this module hide?",
+      "Look for knowledge shared through formats, ordering and return types.",
+      "Group code by the knowledge it needs, not by the order it runs."
+     ]
     },
     {
      "id": "s5m1l4",
@@ -415,7 +529,45 @@
      "resource": {
       "title": "Martin Fowler: TwoHardThings (naming)",
       "url": "https://martinfowler.com/bliki/TwoHardThings.html"
-     }
+     },
+     "video": {
+      "id": "-J3wNP6u5YU",
+      "title": "Naming Things in Code (CodeAesthetic)"
+     },
+     "why": "Names are read every time code is read. Precise, consistent names prevent misuse, and a hard-to-name thing is often a design problem in disguise.",
+     "terms": [
+      {
+       "t": "Precise name",
+       "d": "Creates an accurate picture of what the thing is."
+      },
+      {
+       "t": "Consistent name",
+       "d": "The same word always means the same thing across the codebase."
+      },
+      {
+       "t": "Units in names",
+       "d": "`timeout_ms`, `size_bytes`: stop unit mix-ups."
+      },
+      {
+       "t": "Scope-sized names",
+       "d": "Short for tiny scopes, descriptive for wide ones."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Short names like `d` or `tmp` keep code compact.",
+       "right": "They make every reader guess. Use short names only in tiny scopes like a three-line loop."
+      },
+      {
+       "wrong": "Struggling to name something just means I need a thesaurus.",
+       "right": "It often means the thing does too much or isn't a clear concept. Reconsider the design."
+      }
+     ],
+     "takeaways": [
+      "Put units and important constraints into names.",
+      "Use one word per concept everywhere.",
+      "Treat a hard-to-name thing as a design smell."
+     ]
     },
     {
      "id": "s5m1l5",
@@ -503,7 +655,45 @@
      "resource": {
       "title": "Jeff Atwood: Code Tells You How, Comments Tell You Why",
       "url": "https://blog.codinghorror.com/code-tells-you-how-comments-tell-you-why/"
-     }
+     },
+     "video": {
+      "id": "Bf7vDBBOBUA",
+      "title": "Don't Write Comments (CodeAesthetic)"
+     },
+     "why": "Code shows what happens but not why. Good comments preserve the reasons, constraints and rejected alternatives that would otherwise leave with the author.",
+     "terms": [
+      {
+       "t": "Interface comment",
+       "d": "Describes what a function does, its arguments, returns and errors, so callers can skip the body."
+      },
+      {
+       "t": "Implementation comment",
+       "d": "Explains why the code is written this way, at the level of intent."
+      },
+      {
+       "t": "Comment rot",
+       "d": "Comments drifting out of date with the code."
+      },
+      {
+       "t": "Restating comment",
+       "d": "Repeats what the code already says; delete it."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Good code is self-documenting, so comments are unnecessary.",
+       "right": "Code can't record intent, constraints or rejected approaches. Comments carry that."
+      },
+      {
+       "wrong": "Comments should explain each line.",
+       "right": "Line-by-line narration repeats the code and rots fast. Explain intent and non-obvious decisions."
+      }
+     ],
+     "takeaways": [
+      "Write interface comments for callers.",
+      "Comment the why, not the what.",
+      "Keep comments next to the code and update them in the same commit."
+     ]
     }
    ],
    "project": {
@@ -739,7 +929,45 @@
      "resource": {
       "title": "Refactoring Guru: Code smells catalog",
       "url": "https://refactoring.guru/refactoring/smells"
-     }
+     },
+     "video": {
+      "id": "QlR5ebEJ7F8",
+      "title": "Refactoring Chapter 3: Bad Smells in Code"
+     },
+     "why": "Smells point at the parts of a codebase that will cost you most. Combining them with change frequency tells you where refactoring actually pays.",
+     "terms": [
+      {
+       "t": "Refactoring",
+       "d": "Changing internal structure without changing observable behaviour."
+      },
+      {
+       "t": "Code smell",
+       "d": "A surface sign of a deeper design problem, like Long Function or Duplicated Code."
+      },
+      {
+       "t": "Shotgun surgery",
+       "d": "One change requires small edits in many places."
+      },
+      {
+       "t": "Hotspot",
+       "d": "A file that is both complex and frequently changed."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Every smell should be fixed as soon as it's found.",
+       "right": "Smells in code nobody touches cost little. Prioritise hotspots that change often."
+      },
+      {
+       "wrong": "Refactoring means rewriting code to be better.",
+       "right": "Refactoring keeps behaviour identical. Changing behaviour is a separate step."
+      }
+     ],
+     "takeaways": [
+      "Learn the common smells and the refactoring that fixes each.",
+      "Find hotspots with `git log` change counts.",
+      "Refactor where people are working."
+     ]
     },
     {
      "id": "s5m2l2",
@@ -844,7 +1072,45 @@
      "resource": {
       "title": "Martin Fowler: Parallel Change",
       "url": "https://martinfowler.com/bliki/ParallelChange.html"
-     }
+     },
+     "video": {
+      "id": "immGpH8Sgow",
+      "title": "Raise Code Quality by Following Martin Fowler's Safe Refactoring Steps"
+     },
+     "why": "Small, tested refactoring steps let you improve code continuously without breaking it. Mixing refactors with feature changes is how regressions slip through.",
+     "terms": [
+      {
+       "t": "Make the change easy",
+       "d": "Refactor first so the feature becomes a small change."
+      },
+      {
+       "t": "Mechanical step",
+       "d": "One small, behaviour-preserving edit like a rename or extraction."
+      },
+      {
+       "t": "Parallel change",
+       "d": "Add the new form, migrate callers gradually, then remove the old."
+      },
+      {
+       "t": "Pure refactor commit",
+       "d": "A commit that changes structure but no test assertions."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "I'll refactor and add the feature in one commit to save time.",
+       "right": "Reviewers can't tell which changes alter behaviour. Keep them in separate commits."
+      },
+      {
+       "wrong": "Big refactors need a big branch.",
+       "right": "Use small steps and parallel change so main always works."
+      }
+     ],
+     "takeaways": [
+      "Tests green, one mechanical step, tests green, commit.",
+      "Change widely used signatures with expand, migrate, contract.",
+      "Never refactor and change behaviour in the same step."
+     ]
     },
     {
      "id": "s5m2l3",
@@ -946,7 +1212,45 @@
      "resource": {
       "title": "Wikipedia: Characterization test",
       "url": "https://en.wikipedia.org/wiki/Characterization_test"
-     }
+     },
+     "video": {
+      "id": "yzCFUmlRXKk",
+      "title": "Characterization Tests"
+     },
+     "why": "Most code you'll change in your career has no tests. Characterization tests make it safe to touch without first understanding every line.",
+     "terms": [
+      {
+       "t": "Legacy code",
+       "d": "Code without tests."
+      },
+      {
+       "t": "Characterization test",
+       "d": "A test that records what the code does now, quirks included."
+      },
+      {
+       "t": "Golden master",
+       "d": "Saved output for many inputs, compared on every run."
+      },
+      {
+       "t": "Seam",
+       "d": "A place to change behaviour without editing code there, like a parameter or injected dependency."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Characterization tests should assert what the code ought to do.",
+       "right": "They pin what it actually does. Fix bugs later, deliberately, in a separate step."
+      },
+      {
+       "wrong": "Untestable code must be rewritten before testing.",
+       "right": "Introduce a small seam, such as a parameter with a default, then test."
+      }
+     ],
+     "takeaways": [
+      "Assert something wrong, run, copy the actual value into the test.",
+      "Pin current behaviour before refactoring.",
+      "Use parameters and dependency injection as cheap seams."
+     ]
     },
     {
      "id": "s5m2l4",
@@ -1045,7 +1349,45 @@
      "resource": {
       "title": "Refactoring catalog: Extract Class",
       "url": "https://refactoring.com/catalog/extractClass.html"
-     }
+     },
+     "video": {
+      "id": "naYIFpHDp_s",
+      "title": "How to refactor code the right way - Martin Fowler"
+     },
+     "why": "Extract Function and Extract Class are the refactorings you'll use most. Knowing when the reverse is better keeps you from fragmenting code into shallow pieces.",
+     "terms": [
+      {
+       "t": "Extract Function",
+       "d": "Move a fragment into a function named after what it does."
+      },
+      {
+       "t": "Extract Class",
+       "d": "Split a class whose fields and methods form two responsibilities."
+      },
+      {
+       "t": "Inline Function",
+       "d": "Replace a call with the function's body when the indirection adds nothing."
+      },
+      {
+       "t": "Intention-revealing name",
+       "d": "A name describing what, not how."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Extracting more functions always improves code.",
+       "right": "Each one is another interface. Extract when it hides a real idea behind a clear name."
+      },
+      {
+       "wrong": "Extraction is a manual cut and paste.",
+       "right": "Use the editor's automated refactoring, then run the tests."
+      }
+     ],
+     "takeaways": [
+      "Extract when you have to work out what a fragment does.",
+      "Extract a class when a subset of fields and methods change together.",
+      "Inline when a function's name says no more than its body."
+     ]
     },
     {
      "id": "s5m2l5",
@@ -1165,7 +1507,45 @@
      "resource": {
       "title": "Joel Spolsky: Things You Should Never Do, Part I",
       "url": "https://www.joelonsoftware.com/2000/04/06/things-you-should-never-do-part-i/"
-     }
+     },
+     "video": {
+      "id": "8X66Pjei1pY",
+      "title": "Modernizing legacy systems with the Strangler Fig pattern"
+     },
+     "why": "Refactoring costs time now to save time later. Knowing when that trade doesn't pay, and how to replace a system safely, avoids wasted months and failed rewrites.",
+     "terms": [
+      {
+       "t": "Preparatory refactoring",
+       "d": "Refactoring right before a change to make that change easy."
+      },
+      {
+       "t": "Comprehension refactoring",
+       "d": "Refactoring to understand code as you read it."
+      },
+      {
+       "t": "Big rewrite",
+       "d": "Replacing a system all at once, usually riskier than it looks."
+      },
+      {
+       "t": "Strangler fig",
+       "d": "Replace a system piece by piece behind the same interface."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Ugly code should always be refactored.",
+       "right": "If it works and isn't changing, refactoring has no payoff."
+      },
+      {
+       "wrong": "A full rewrite is the clean way to fix a bad system.",
+       "right": "Rewrites lose hidden behaviour and take longer than planned. Replace it incrementally."
+      }
+     ],
+     "takeaways": [
+      "Refactor when change is coming and you have a safety net.",
+      "Avoid refactoring right before a risky release or without tests.",
+      "Prefer the strangler fig pattern to a big rewrite."
+     ]
     }
    ],
    "project": {
@@ -1388,7 +1768,45 @@
      "resource": {
       "title": "ripgrep: fast code search (README and guide)",
       "url": "https://github.com/BurntSushi/ripgrep"
-     }
+     },
+     "video": {
+      "id": "JAwUn2-WBEs",
+      "title": "Understanding large and unfamiliar codebases - Mike Shah"
+     },
+     "why": "You'll spend more time reading code than writing it. Finding the right 1% of a large codebase quickly is what makes you productive on a new team.",
+     "terms": [
+      {
+       "t": "ripgrep",
+       "d": "`rg`: very fast code search by text or regex."
+      },
+      {
+       "t": "Go to definition",
+       "d": "Jump from a call to where the function is defined."
+      },
+      {
+       "t": "Call chain",
+       "d": "The written path from entry point to the code you care about."
+      },
+      {
+       "t": "Pickaxe",
+       "d": "`git log -S \"text\"`: find commits that added or removed a string."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "I should read the codebase from top to bottom first.",
+       "right": "Start from a specific question and trace only what answers it."
+      },
+      {
+       "wrong": "Code alone tells me why it's written this way.",
+       "right": "History does: `git log`, `git blame` and linked PRs explain decisions."
+      }
+     ],
+     "takeaways": [
+      "Search beats browsing.",
+      "Write down the call chain as you trace.",
+      "Use git history to find the why."
+     ]
     },
     {
      "id": "s5m3l2",
@@ -1483,7 +1901,45 @@
      "resource": {
       "title": "CPython source: Objects/listobject.c",
       "url": "https://github.com/python/cpython/blob/main/Objects/listobject.c"
-     }
+     },
+     "video": {
+      "id": "sVu6-VNFkTs",
+      "title": "A tour of CPython's runtime (VMIL 2024)"
+     },
+     "why": "Mature open-source C codebases are some of the best-written code you can read. Learning their conventions turns intimidating source into a guided tour.",
+     "terms": [
+      {
+       "t": "Project conventions",
+       "d": "Recurring naming and structure, like CPython's `PyList_Append` or Redis's command tables."
+      },
+      {
+       "t": "Reference counting",
+       "d": "CPython frees an object when its count of references reaches zero."
+      },
+      {
+       "t": "Active reading",
+       "d": "Reading with a question, notes and the ability to run the code."
+      },
+      {
+       "t": "Design rationale",
+       "d": "The reason a non-obvious implementation choice was made."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "I need to understand the whole project before reading any file.",
+       "right": "Pick one familiar behaviour, like `list.append`, and trace it."
+      },
+      {
+       "wrong": "Reading is enough; building it is optional.",
+       "right": "Building from source and adding a print shows what really runs."
+      }
+     ],
+     "takeaways": [
+      "Learn the conventions first; they repeat everywhere.",
+      "Trace one behaviour you know from the outside.",
+      "Keep notes with your question, the call chain and open questions."
+     ]
     },
     {
      "id": "s5m3l3",
@@ -1593,7 +2049,45 @@
      "resource": {
       "title": "Open Source Guides: How to Contribute to Open Source",
       "url": "https://opensource.guide/how-to-contribute/"
-     }
+     },
+     "video": {
+      "id": "XBIVUwmMcwc",
+      "title": "Your First GitHub Contribution: Fork to Pull Request"
+     },
+     "why": "Contributing to open source builds real skill and a public record of your work. Following the workflow and the project's norms is what gets pull requests merged.",
+     "terms": [
+      {
+       "t": "Fork",
+       "d": "Your own copy of the repository on GitHub."
+      },
+      {
+       "t": "Upstream",
+       "d": "The original repository you contribute to."
+      },
+      {
+       "t": "Good first issue",
+       "d": "An issue maintainers have marked as suitable for newcomers."
+      },
+      {
+       "t": "CONTRIBUTING.md",
+       "d": "The project's rules for setup, style, tests and PRs."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "I should open a big PR with several improvements to show what I can do.",
+       "right": "Small, focused PRs are cheap to review and far more likely to merge."
+      },
+      {
+       "wrong": "I can start coding as soon as I find an issue.",
+       "right": "Comment with your plan and wait for a reply to avoid duplicate or unwanted work."
+      }
+     ],
+     "takeaways": [
+      "Claim the issue and confirm the approach first.",
+      "Read CONTRIBUTING.md and match the project's style and tests.",
+      "Sync with upstream before pushing; respond to review promptly."
+     ]
     },
     {
      "id": "s5m3l4",
@@ -1681,7 +2175,45 @@
      "resource": {
       "title": "Chris Beams: How to Write a Git Commit Message",
       "url": "https://cbea.ms/git-commit/"
-     }
+     },
+     "video": {
+      "id": "5y4-0CcOpAs",
+      "title": "Committing to clarity: The art of writing good git commit messages"
+     },
+     "why": "Commit messages and PR descriptions are read during reviews, outages and archaeology years later. Clear ones save reviewers and future maintainers hours.",
+     "terms": [
+      {
+       "t": "Subject line",
+       "d": "Imperative mood, about 50 characters: 'Add retry to payment client'."
+      },
+      {
+       "t": "Body",
+       "d": "Explains what and why, wrapped at about 72 characters."
+      },
+      {
+       "t": "Atomic commit",
+       "d": "One logical change that builds and passes tests on its own."
+      },
+      {
+       "t": "Conventional Commits",
+       "d": "Prefixes like `feat:` and `fix:` used by some projects."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "The diff explains the change, so the message can be short.",
+       "right": "The diff shows what changed, not why. The why is what future readers need."
+      },
+      {
+       "wrong": "A PR description just lists the files changed.",
+       "right": "Give the problem, approach, risks and how you tested it."
+      }
+     ],
+     "takeaways": [
+      "Write the subject as a command and the body as the why.",
+      "Keep commits atomic so bisect and revert work.",
+      "Write PR descriptions for a reviewer with none of your context."
+     ]
     },
     {
      "id": "s5m3l5",
@@ -1796,7 +2328,45 @@
      "resource": {
       "title": "Google Engineering Practices: How to do a code review",
       "url": "https://google.github.io/eng-practices/review/reviewer/"
-     }
+     },
+     "video": {
+      "id": "d9_fweNDjKw",
+      "title": "Better Code Reviews in 6 Simple Steps (Trisha Gee)"
+     },
+     "why": "Code review is where teams share knowledge and keep quality up. Reviewing well and receiving review gracefully are skills that shape your reputation.",
+     "terms": [
+      {
+       "t": "Review priorities",
+       "d": "Design and correctness first, then tests and readability, then style."
+      },
+      {
+       "t": "Severity label",
+       "d": "Marking comments as blocking, suggestion or nit."
+      },
+      {
+       "t": "Approve when it improves",
+       "d": "Approve once the change improves code health, even if imperfect."
+      },
+      {
+       "t": "Comment on code, not people",
+       "d": "'This loop re-reads the file' rather than 'you made this slow'."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "A thorough review comments on everything, including style.",
+       "right": "Let linters handle style. Focus on design, correctness and tests, and label nits as optional."
+      },
+      {
+       "wrong": "When reviewers push back, I should defend my approach.",
+       "right": "Assume good intent, answer every comment, and fix or explain without arguing."
+      }
+     ],
+     "takeaways": [
+      "Review in priority order and label severity.",
+      "Be kind, specific and actionable.",
+      "Respond to every comment and say thanks."
+     ]
     }
    ],
    "project": {
@@ -2072,7 +2642,45 @@
      "resource": {
       "title": "Python docs: Functional Programming HOWTO",
       "url": "https://docs.python.org/3/howto/functional.html"
-     }
+     },
+     "video": {
+      "id": "rYR0eJdGBmQ",
+      "title": "Functional Programming: The Purest Coding Style Explained"
+     },
+     "why": "Pure functions and immutable data make code easier to test and reason about in any language, and they remove a whole class of aliasing bugs.",
+     "terms": [
+      {
+       "t": "Pure function",
+       "d": "Output depends only on inputs; no side effects."
+      },
+      {
+       "t": "Immutability",
+       "d": "Values never change after creation; you build new ones."
+      },
+      {
+       "t": "map / filter / reduce",
+       "d": "Transform every element / keep some / combine into one value."
+      },
+      {
+       "t": "Functional core, imperative shell",
+       "d": "Pure logic inside; I/O and side effects at the edges."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Functional style means no loops or variables at all.",
+       "right": "It means separating pure logic from side effects. Use whatever reads clearly."
+      },
+      {
+       "wrong": "Immutable data is always slower.",
+       "right": "Copying is usually cheap at normal sizes, and it prevents bugs that cost far more."
+      }
+     ],
+     "takeaways": [
+      "Push side effects to the edges.",
+      "Prefer frozen dataclasses, tuples and new values over mutation.",
+      "Use comprehensions or map/filter when they read more clearly than loops."
+     ]
     },
     {
      "id": "s5m4l2",
@@ -2194,7 +2802,45 @@
      "resource": {
       "title": "The Rust Book, ch. 4: What Is Ownership?",
       "url": "https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html"
-     }
+     },
+     "video": {
+      "id": "lQ7XF-6HYGc",
+      "title": "Rust Ownership and Borrowing"
+     },
+     "why": "Rust's ownership rules give memory safety without a garbage collector. Learning them changes how you think about who owns data in every language.",
+     "terms": [
+      {
+       "t": "Owner",
+       "d": "The single variable responsible for a value; it's dropped when the owner leaves scope."
+      },
+      {
+       "t": "Move",
+       "d": "Assigning or passing a value transfers ownership; the old name can't be used."
+      },
+      {
+       "t": "Borrow",
+       "d": "A reference: many shared `&T` or exactly one mutable `&mut T`, never both."
+      },
+      {
+       "t": "Borrow checker",
+       "d": "The compiler check that enforces these rules."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Cloning everything is the fix for borrow checker errors.",
+       "right": "Cloning works but hides design problems and costs memory. Prefer borrowing when you don't need ownership."
+      },
+      {
+       "wrong": "I can hold a mutable reference while also reading through another reference.",
+       "right": "Shared and mutable references can't overlap; that rule is what prevents data races."
+      }
+     ],
+     "takeaways": [
+      "One owner at a time; moving transfers it.",
+      "Borrow with `&` to read, `&mut` to change.",
+      "Take ownership in an API only when the function truly consumes the value."
+     ]
     },
     {
      "id": "s5m4l3",
@@ -2301,7 +2947,45 @@
      "resource": {
       "title": "A Tour of Go: Concurrency",
       "url": "https://go.dev/tour/concurrency/1"
-     }
+     },
+     "video": {
+      "id": "f6kdp27TYZs",
+      "title": "Google I/O 2012 - Go Concurrency Patterns (Rob Pike)"
+     },
+     "why": "Go's goroutines and channels make concurrent servers and pipelines straightforward. The worker-pool pattern bounds concurrency in any language.",
+     "terms": [
+      {
+       "t": "Goroutine",
+       "d": "A lightweight function run concurrently with `go f()`."
+      },
+      {
+       "t": "Channel",
+       "d": "A typed pipe between goroutines; unbuffered sends wait for a receiver."
+      },
+      {
+       "t": "WaitGroup",
+       "d": "Waits for a set of goroutines to finish."
+      },
+      {
+       "t": "Worker pool",
+       "d": "N goroutines reading jobs from one channel, bounding concurrency."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Goroutines are free, so start one per item.",
+       "right": "Unbounded goroutines can exhaust connections or memory. Bound them with a worker pool."
+      },
+      {
+       "wrong": "Ranging over a channel ends when the sender stops sending.",
+       "right": "It ends only when the channel is closed. Forgetting `close` deadlocks the receiver."
+      }
+     ],
+     "takeaways": [
+      "Unbuffered channels synchronise; buffered ones decouple.",
+      "Close the jobs channel when done sending, and wait for workers.",
+      "Every receive needs a sender, or the program deadlocks."
+     ]
     },
     {
      "id": "s5m4l4",
@@ -2413,7 +3097,45 @@
      "resource": {
       "title": "The Go Blog: Error handling and Go",
       "url": "https://go.dev/blog/error-handling-and-go"
-     }
+     },
+     "video": {
+      "id": "8ts7Lf1-R2M",
+      "title": "Error handling in Rust: from first principles (Luca Palmieri)"
+     },
+     "why": "How failure travels shapes every API you design. Separating expected failures from bugs and adding context makes errors actionable instead of mysterious.",
+     "terms": [
+      {
+       "t": "Exceptions",
+       "d": "Failures unwind the stack until something catches them."
+      },
+      {
+       "t": "Errors as values",
+       "d": "Failure is in the return type: Go's `(value, error)`, Rust's `Result<T, E>`."
+      },
+      {
+       "t": "Expected failure vs bug",
+       "d": "Missing file or invalid input vs a broken invariant in your code."
+      },
+      {
+       "t": "Error context",
+       "d": "Wrapping an error with what was being attempted as it travels up."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Catching every exception makes code robust.",
+       "right": "It hides bugs. Handle expected failures; let bugs crash loudly with good context."
+      },
+      {
+       "wrong": "Returning a bare 'failed' error is enough.",
+       "right": "Add context at each layer, like 'loading config from /etc/app.toml: permission denied'."
+      }
+     ],
+     "takeaways": [
+      "Put expected failures in the interface; treat bugs differently.",
+      "Add context as errors move up.",
+      "Where possible, define errors out of existence with better APIs."
+     ]
     },
     {
      "id": "s5m4l5",
@@ -2511,7 +3233,45 @@
      "resource": {
       "title": "Alexis King: Parse, don't validate",
       "url": "https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/"
-     }
+     },
+     "video": {
+      "id": "KQVy0CaB7ds",
+      "title": "Parse, Don't Validate"
+     },
+     "why": "Types that make illegal states unrepresentable remove whole categories of bugs and checks. Parsing at the boundary means the rest of your code can trust its data.",
+     "terms": [
+      {
+       "t": "Product type",
+       "d": "Holds this AND that: a struct, tuple or dataclass."
+      },
+      {
+       "t": "Sum type",
+       "d": "Is this OR that: a Rust enum or a TypeScript discriminated union."
+      },
+      {
+       "t": "Make illegal states unrepresentable",
+       "d": "Design types so invalid combinations can't be built."
+      },
+      {
+       "t": "Parse, don't validate",
+       "d": "Convert raw input once into a type that proves it's valid."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "A few boolean flags and optional fields are flexible.",
+       "right": "They allow impossible combinations like `loading` and `error` both true. Use a sum type."
+      },
+      {
+       "wrong": "Validating input in each function is safest.",
+       "right": "Parse once at the boundary into a precise type, then pass that type around."
+      }
+     ],
+     "takeaways": [
+      "Replace flag combinations with a sum type.",
+      "Parse at the edges; trust the types inside.",
+      "Types are documentation that can't go stale."
+     ]
     }
    ],
    "project": {
@@ -2745,7 +3505,45 @@
      "resource": {
       "title": "The Debugging Book (Andreas Zeller), free online",
       "url": "https://www.debuggingbook.org/"
-     }
+     },
+     "video": {
+      "id": "wfRQagosmTw",
+      "title": "Debugging: Scientific Method"
+     },
+     "why": "Guess-and-check debugging is slow and often leaves the real bug in place. A written hypothesis log finds causes faster and makes hard bugs tractable.",
+     "terms": [
+      {
+       "t": "Reproduction",
+       "d": "A reliable way to make the bug happen, shrunk to the smallest case."
+      },
+      {
+       "t": "Hypothesis",
+       "d": "A specific, testable explanation of the cause."
+      },
+      {
+       "t": "Prediction",
+       "d": "What you'll see if the hypothesis is true."
+      },
+      {
+       "t": "Experiment",
+       "d": "The cheapest observation that confirms or rejects it."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "If I change things until it works, the bug is fixed.",
+       "right": "You may have hidden the symptom. Explain the cause and confirm it with a prediction."
+      },
+      {
+       "wrong": "The code I'm reading is the code that's running.",
+       "right": "Check for stale builds, cached files, the wrong branch or a different config."
+      }
+     ],
+     "takeaways": [
+      "Reproduce, shrink, hypothesise, predict, experiment, conclude.",
+      "Write each step in a debugging log.",
+      "Check your assumptions explicitly; the bug lives in the one you skipped."
+     ]
     },
     {
      "id": "s5m5l2",
@@ -2850,7 +3648,45 @@
      "resource": {
       "title": "Git documentation: git-bisect",
       "url": "https://git-scm.com/docs/git-bisect"
-     }
+     },
+     "video": {
+      "id": "D7JJnLFOn4A",
+      "title": "Git bisect tutorial: how to find a bad commit"
+     },
+     "why": "When something used to work, the breaking commit is the fastest route to the cause. Bisect finds it in log₂ of the number of commits.",
+     "terms": [
+      {
+       "t": "`git bisect`",
+       "d": "Binary search through history for the first bad commit."
+      },
+      {
+       "t": "good / bad",
+       "d": "Marks a commit as working or broken."
+      },
+      {
+       "t": "`git bisect run`",
+       "d": "Automates the search with a script: exit 0 good, 125 skip, 1–127 bad."
+      },
+      {
+       "t": "Skip",
+       "d": "Marks a commit that can't be tested, such as one that doesn't build."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Bisect works with any history.",
+       "right": "It needs commits that build and a test that gives a consistent answer. Flaky tests point at the wrong commit."
+      },
+      {
+       "wrong": "Any non-zero exit code means bad in `bisect run`.",
+       "right": "125 means skip, and codes above 127 abort the bisect. Return 1 for bad."
+      }
+     ],
+     "takeaways": [
+      "Mark one known good and one known bad commit, then test each checkout.",
+      "Automate with a script that exits 0, 1 or 125.",
+      "Atomic commits make bisect results meaningful."
+     ]
     },
     {
      "id": "s5m5l3",
@@ -2962,7 +3798,45 @@
      "resource": {
       "title": "Brendan Gregg: Flame Graphs",
       "url": "https://www.brendangregg.com/flamegraphs.html"
-     }
+     },
+     "video": {
+      "id": "D53T1Ejig1Q",
+      "title": "USENIX ATC '17: Visualizing Performance with Flame Graphs (Brendan Gregg)"
+     },
+     "why": "Programmers are bad at guessing where time goes. A profiler tells you the one function worth optimising, so you don't waste days on the wrong one.",
+     "terms": [
+      {
+       "t": "Deterministic profiler",
+       "d": "Records every call, like `cProfile`; accurate counts, more overhead."
+      },
+      {
+       "t": "Sampling profiler",
+       "d": "Samples stacks periodically, like py-spy; low overhead, works in production."
+      },
+      {
+       "t": "Flame graph",
+       "d": "Sampled stacks drawn as boxes; width is time spent."
+      },
+      {
+       "t": "Cumulative time",
+       "d": "Time in a function including everything it calls."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "The tallest stack in a flame graph is the slowest part.",
+       "right": "Width shows time, not height. Look for wide boxes."
+      },
+      {
+       "wrong": "I know which part is slow; profiling is overkill.",
+       "right": "The slow part is usually a surprise, like a hidden O(n²) or repeated I/O. Measure first."
+      }
+     ],
+     "takeaways": [
+      "Measure, don't guess.",
+      "Sort `cProfile` by cumulative time to find expensive call trees.",
+      "In flame graphs, wide plateaus are where to look."
+     ]
     },
     {
      "id": "s5m5l4",
@@ -3078,7 +3952,41 @@
      "resource": {
       "title": "Python docs: timeit",
       "url": "https://docs.python.org/3/library/timeit.html"
-     }
+     },
+     "why": "A misleading benchmark can justify the wrong change. Controlling noise and thinking end to end keeps performance work honest.",
+     "terms": [
+      {
+       "t": "Warm-up",
+       "d": "Initial runs affected by caches and JIT; exclude them."
+      },
+      {
+       "t": "Distribution",
+       "d": "Report median and spread across many runs, not one number."
+      },
+      {
+       "t": "Realistic data",
+       "d": "Inputs matching production sizes and shapes."
+      },
+      {
+       "t": "Amdahl's law",
+       "d": "Overall speedup is limited by the part you didn't improve."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "Running a benchmark once gives the answer.",
+       "right": "Noise from other processes and CPU scaling varies a lot. Repeat and report a distribution."
+      },
+      {
+       "wrong": "Making a function 10× faster makes the program 10× faster.",
+       "right": "If it's 20% of runtime, the best overall speedup is about 1.25×."
+      }
+     ],
+     "takeaways": [
+      "Repeat runs, discard warm-up, report median and spread.",
+      "Benchmark on realistic data.",
+      "Use Amdahl's law to decide whether an optimisation is worth it."
+     ]
     },
     {
      "id": "s5m5l5",
@@ -3175,7 +4083,45 @@
      "resource": {
       "title": "OpenTelemetry: Observability primer",
       "url": "https://opentelemetry.io/docs/concepts/observability-primer/"
-     }
+     },
+     "video": {
+      "id": "umm-MyCl3Q4",
+      "title": "Observability Crash Course: Logs, Metrics, Traces Explained"
+     },
+     "why": "In production you can't attach a debugger. Logs, metrics and traces are how you answer 'what happened to this request?' after the fact.",
+     "terms": [
+      {
+       "t": "Structured logs",
+       "d": "JSON key-value events instead of prose lines."
+      },
+      {
+       "t": "Request ID",
+       "d": "An id attached to every log line for one request, so you can follow it."
+      },
+      {
+       "t": "RED metrics",
+       "d": "Rate, Errors and Duration for every service."
+      },
+      {
+       "t": "Trace / span",
+       "d": "The path of one request through services, timed step by step."
+      }
+     ],
+     "mistakes": [
+      {
+       "wrong": "More log lines means better observability.",
+       "right": "Unstructured noise is hard to query. Log fewer, structured events with ids."
+      },
+      {
+       "wrong": "Average latency tells me how the service performs.",
+       "right": "Averages hide slow requests. Track percentiles like p95 and p99."
+      }
+     ],
+     "takeaways": [
+      "Attach a request ID to every log line.",
+      "Track Rate, Errors and Duration percentiles per service.",
+      "OpenTelemetry standardises traces, metrics and logs."
+     ]
     }
    ],
    "project": {

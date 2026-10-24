@@ -294,6 +294,80 @@
       ]
     },
     {
+      "id": "pretesting",
+      "name": "Pretesting (guess before you learn)",
+      "claim": "Answering questions about material before studying it improves later memory for that material, even when the guesses are wrong.",
+      "evidence": "A 2024 meta-analysis by St. Hilaire, Chan and Ahn pooled pretesting experiments and found a reliable benefit for the specific information that was pretested (Hedges' g ≈ 0.54), but almost none for related material that wasn't asked about (g ≈ 0.04). Wrong guesses still helped, as long as learners then studied the material and saw the right answer.",
+      "strength": "moderate",
+      "howToApply": "Before a lesson, answer one of its questions cold. Treat a wrong guess as a pointer to what to look for while reading, then check yourself again at the end. Don't expect it to help with topics the pretest didn't touch.",
+      "sources": [
+        {
+          "label": "St. Hilaire, Chan & Ahn (2024), Psychonomic Bulletin & Review",
+          "url": "https://doi.org/10.3758/s13423-023-02353-8"
+        }
+      ]
+    },
+    {
+      "id": "confidence",
+      "name": "Confidence ratings and the hypercorrection effect",
+      "claim": "Errors made with high confidence are more likely to be corrected after feedback than errors made with low confidence, and rating your confidence exposes lucky guesses.",
+      "evidence": "Butterfield and Metcalfe (2001) found that when people learned the correct answer to a general-knowledge question they had confidently got wrong, they were more likely to remember it later than for answers they'd guessed wrong. Separately, research on metacognition shows learners misjudge what they know, so a correct guess shouldn't be scheduled as if it were knowledge.",
+      "strength": "moderate",
+      "howToApply": "Say how sure you are before checking an answer. Read the explanation carefully when you were certain and wrong, and treat right-but-guessing answers as unlearned: review them again soon.",
+      "sources": [
+        {
+          "label": "Butterfield & Metcalfe (2001), Journal of Experimental Psychology: Learning, Memory, and Cognition",
+          "url": "https://doi.org/10.1037/0278-7393.27.6.1491"
+        }
+      ]
+    },
+    {
+      "id": "video",
+      "name": "Short videos with recall in between",
+      "claim": "Video helps most when it's short and interrupted by recall. Testing during a lecture reduces mind-wandering and improves learning.",
+      "evidence": "Szpunar, Khan and Schacter (2013) had students watch a 21-minute lecture video with or without brief tests between segments. The tested group mind-wandered about half as much, took about three times as many notes and did better on the final test. Guo, Kim and Rubin (2014) analysed 6.9 million MOOC video sessions and found engagement drops sharply after about 6 minutes, whatever the video's length.",
+      "strength": "moderate",
+      "howToApply": "Watch one short video per topic, pausing when a new idea appears. Afterwards, write the key idea from memory before rewinding or moving on. Skip the parts of long videos that don't serve today's objective.",
+      "sources": [
+        {
+          "label": "Szpunar, Khan & Schacter (2013), PNAS",
+          "url": "https://doi.org/10.1073/pnas.1221764110"
+        },
+        {
+          "label": "Guo, Kim & Rubin (2014), ACM Learning at Scale",
+          "url": "https://doi.org/10.1145/2556325.2566239"
+        }
+      ]
+    },
+    {
+      "id": "refutation",
+      "name": "Confronting misconceptions (refutation)",
+      "claim": "Stating a common misconception and then explaining why it's wrong corrects it better than presenting only the right idea.",
+      "evidence": "Schroeder and Kucera's meta-analysis of between-subjects experiments (44 comparisons, about 3,900 participants) found refutation texts improved learning over standard texts (g ≈ 0.41). The effect is strongest when the wrong idea is named explicitly and directly followed by the correction and its reason.",
+      "strength": "moderate",
+      "howToApply": "For each topic, learn the classic beginner mistakes alongside the rule: read the wrong belief, then why it fails. When you catch your own misconception, write it down in the same 'myth, then actually' form.",
+      "sources": [
+        {
+          "label": "Schroeder & Kucera (2022), Educational Psychology Review meta-analysis",
+          "url": "https://doi.org/10.1007/s10648-021-09656-z"
+        }
+      ]
+    },
+    {
+      "id": "primm",
+      "name": "Predict before you run (PRIMM)",
+      "claim": "Predicting what code will do before running it, then investigating and modifying it, builds program comprehension before writing from scratch.",
+      "evidence": "PRIMM (Predict, Run, Investigate, Modify, Make) was developed and evaluated by Sentance, Waite and Kallia (2019) in a multi-school study with secondary-school learners, where classes using it scored higher on a programming test than comparison classes. It builds on research showing that reading and tracing code is a skill that precedes writing it.",
+      "strength": "moderate",
+      "howToApply": "Before pressing Run on any example, write down the output you expect. Compare, explain any difference, change one thing and predict again, then write your own version.",
+      "sources": [
+        {
+          "label": "Sentance, Waite & Kallia (2019), Computer Science Education",
+          "url": "https://doi.org/10.1080/08993408.2019.1608781"
+        }
+      ]
+    },
+    {
       "id": "sleep",
       "name": "Sleep and consolidation",
       "claim": "Adequate sleep supports memory formation, but the popular claim that sleep itself boosts skill performance is weaker than it sounds.",
