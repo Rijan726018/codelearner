@@ -19,9 +19,9 @@ let INTERVALS = [1,3,7,16,35,90,180];
 
 /* ---------- state ---------- */
 const D = {stages:[], research:null, q:{}, mods:[], lessons:{}, modById:{}};
-const P0 = () => ({lessons:{}, notes:{}, ms:{}, exams:{}, log:{}, solved:{}, tried:{}, steps:{}, nodes:{}, badges:{}, xpSeen:null});
+const P0 = () => ({lessons:{}, notes:{}, ms:{}, exams:{}, log:{}, solved:{}, tried:{}, steps:{}, nodes:{}, badges:{}, xpSeen:null, time:{}, manual:[], goal:null});
 const normP = d => { const z=P0(); Object.keys(z).forEach(k=>{ if(d && d[k]!=null) z[k]=d[k]; }); return z; };
-let P = P0();   // progress doc: core lessons, notes, milestones, exams, activity log, problems, bootcamp steps, roadmap nodes, badges
+let P = P0();   // progress doc: core lessons, notes, milestones, exams, activity log, problems, bootcamp steps, roadmap nodes, badges, practice time
 let S = {cards:{}};                                        // spaced-repetition doc
 let route = {v:"home"};
 const EXTRA_LOADERS = [];   // other modules push async loaders (problems, bootcamp, paths) that boot awaits
@@ -56,6 +56,33 @@ function save(which, quiet){
   }, 800);
 }
 function logActivity(n=1){ const k=dayKey(today()); P.log[k]=(P.log[k]||0)+n; }
+
+/* ---------- account storage: the same doc interface ({get, set}) for the Claude runtime and for Google accounts ---------- */
+const isObj = v => v && typeof v==="object" && !Array.isArray(v);
+// Merge two copies of a progress doc so nothing done on either side is lost: maps are unioned, numbers keep the larger
+// value (best scores, seconds practised, reps), lists of entries are unioned by id, and other values prefer the account copy.
+function mergeDeep(a, b){
+  if(Array.isArray(a) && Array.isArray(b)){ const seen=new Set(), out=[]; [...b, ...a].forEach(x=>{ const k=isObj(x)&&x.id!=null?x.id:JSON.stringify(x); if(!seen.has(k)){ seen.add(k); out.push(x); } }); return out; }
+  if(isObj(a) && isObj(b)){ const out={...a}; Object.keys(b).forEach(k=>{ out[k] = k in a ? mergeDeep(a[k], b[k]) : b[k]; }); return out; }
+  if(typeof a==="number" && typeof b==="number") return Math.max(a, b);
+  if(b==null || b==="") return a;
+  return b;
+}
+const ACCOUNT_HOOKS = [];   // other modules (the editor) attach their own docs: f(col) on connect, f(null) on disconnect
+async function attachStores(col, label="Saved to your account"){
+  stores.p=col.doc("v2progress"); stores.s=col.doc("v2srs"); Drafts.col=col; Drafts.cache={};
+  setSync("Syncing…");
+  const [sp,ss]=await Promise.all([stores.p.get(), stores.s.get()]);
+  if(sp.exists) P=normP(mergeDeep(P, sp.data()||{}));
+  if(ss.exists) S={cards:mergeDeep(S.cards||{}, (ss.data()||{}).cards||{})};
+  await Promise.all([stores.p.set({...P, updated:new Date().toISOString()}), stores.s.set({...S, updated:new Date().toISOString()})]);
+  try{ localStorage.setItem(LKEY.p,JSON.stringify(P)); localStorage.setItem(LKEY.s,JSON.stringify(S)); }catch(e){}
+  for(const f of ACCOUNT_HOOKS){ try{ await f(col); }catch(e){} }
+  setSync(label,true);
+  Game.sync(true);
+  if(!["lesson","exam","review","practice","problem","course","make","code"].includes(route.v)) render();
+}
+function detachStores(){ stores.p=stores.s=null; Drafts.col=null; Drafts.cache={}; ACCOUNT_HOOKS.forEach(f=>{ try{ f(null); }catch(e){} }); }
 
 /* ---------- content indexing ---------- */
 function indexContent(){
@@ -161,6 +188,7 @@ function viewToday(el){
     <span class="eyebrow">${esc(Game.rank(g.level))}</span><b class="h2"><span class="gt">${g.xp.toLocaleString()}</span> XP</b>
     <div class="bar"><i style="width:${100*(g.xp-g.cur)/Math.max(1,g.next-g.cur)}%"></i></div>
     <span class="muted" style="font-size:.88rem">${(g.next-g.xp).toLocaleString()} XP to level ${g.level+1} · ${Object.keys(P.badges||{}).length} badges · <button class="btn ghost sm" data-act="profile">View profile</button></span></div></div></section>
+  ${typeof clockCard==="function"?clockCard():""}
   <div class="stats">
     <div class="stat">${icon("flame")}<b>${streak()}</b><span>day streak</span></div>
     <div class="stat">${icon("refresh")}<b>${due}</b><span>reviews due</span></div>
@@ -553,17 +581,11 @@ document.addEventListener("click",e=>{
   try{ history.replaceState(null,"",routeHash(route)); }catch(e){}
   Game.sync(true); render();
   try{
-    const [db,user]=await Promise.all([window.claude?.use?.("db"), window.claude?.use?.("user")]);
-    const uid=user?await user.id():null;
-    if(!db||!uid){ setSync("Saved in this browser"); return; }
-    const col=db.collection("data/users/"+uid);
-    stores.p=col.doc("v2progress"); stores.s=col.doc("v2srs"); Drafts.col=col;
-    const [sp,ss]=await Promise.all([stores.p.get(), stores.s.get()]);
-    if(sp.exists){ P=normP(sp.data()||{}); } else if(Object.keys(P.lessons).length||Object.keys(P.steps).length||Object.keys(P.solved).length) await stores.p.set(P);
-    if(ss.exists){ S={cards:(ss.data()||{}).cards||{}}; } else if(Object.keys(S.cards).length) await stores.s.set(S);
-    try{ localStorage.setItem(LKEY.p,JSON.stringify(P)); localStorage.setItem(LKEY.s,JSON.stringify(S)); }catch(e){}
-    setSync("Saved to your account",true);
-    Game.sync(true);
-    if(!["lesson","exam","review","practice","problem","course","make"].includes(route.v) && !route.started) render();
-  }catch(e){ stores.p=stores.s=null; setSync("Saved in this browser"); }
+    if(window.claude?.use){
+      const [db,user]=await Promise.all([window.claude.use("db"), window.claude.use("user")]);
+      const uid=user?await user.id():null;
+      if(db&&uid){ await attachStores(db.collection("data/users/"+uid)); return; }
+    }
+  }catch(e){ detachStores(); }
+  if(typeof Account!=="undefined") Account.start(); else setSync("Saved in this browser");
 })();

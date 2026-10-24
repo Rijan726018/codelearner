@@ -3,9 +3,11 @@ import json, os, sys, sqlite3
 sys.path.insert(0, os.path.dirname(__file__))
 from bootcamp_src import C
 import bootcamp_more  # noqa: F401 (appends more courses to C)
+from bootcamp_more2 import TRACKS  # also appends focused courses and sets each course's track and level
 
 def sql_rows(seed, ref):
-    db = sqlite3.connect(":memory:"); db.executescript(seed); cur = db.cursor(); last = None
+    # autocommit, so scripts can BEGIN/COMMIT themselves
+    db = sqlite3.connect(":memory:", isolation_level=None); db.executescript(seed); cur = db.cursor(); last = None
     for stmt in [x.strip() for x in ref.split(";") if x.strip()]:
         cur.execute(stmt)
         if cur.description: last = ([d[0] for d in cur.description], [list(r) for r in cur.fetchall()])
@@ -23,5 +25,5 @@ for c in C:
                     t["rows"] = rows
                     if s.get("ordered"): t["ordered"] = True
             s.pop("ref"); s.pop("ordered", None)
-json.dump({"courses": C}, open("data/bootcamp.json", "w"), separators=(",", ":"))
+json.dump({"courses": C, "tracks": TRACKS}, open("data/bootcamp.json", "w"), separators=(",", ":"), ensure_ascii=False)
 print(len(C), "courses,", sum(len(c["steps"]) for c in C), "steps,", os.path.getsize("data/bootcamp.json"), "bytes")
