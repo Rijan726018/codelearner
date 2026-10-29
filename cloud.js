@@ -3,7 +3,8 @@
    Configure the Firebase project in firebase-config.js. Each person's data lives in Firestore under users/{uid}/docs/{docId},
    and firestore.rules lets a signed-in person read and write only their own documents. Documents are stored as one JSON
    string ({json, updated}) so any shape of progress data is accepted. A page can also supply window.CL_CLOUD_PROVIDER
-   (same interface as firebaseProvider below), which is how the tests run the whole flow without a real project. */
+   (same interface as firebaseProvider below), which is how the tests run the whole flow without a real project.
+   Leaderboard entries (rewards.js) live in boards/{all | w-YYYY-MM-DD}/entries/{uid}, only for people who opt in. */
 const FIREBASE_SDK = "https://www.gstatic.com/firebasejs/10.12.2/";
 
 function firebaseProvider(cfg){
@@ -25,6 +26,17 @@ function firebaseProvider(cfg){
           return {exists: !!d, data: () => d ? (typeof d.json === "string" ? JSON.parse(d.json) : d) : null}; },
         async set(obj){ const {fs, db} = await load(); await fs.setDoc(fs.doc(db, "users", uid, "docs", id), {json: JSON.stringify(obj), updated: fs.serverTimestamp()}); }
       })};
+    },
+    // leaderboards: boards/{name}/entries/{uid}, readable by any signed-in person, writable only by the owner (firestore.rules)
+    board(name){
+      const ref = (fs, db, uid) => fs.doc(db, "boards", name, "entries", uid);
+      return {
+        async put(uid, data){ const {fs, db} = await load(); await fs.setDoc(ref(fs, db, uid), {...data, updated: fs.serverTimestamp()}); },
+        async remove(uid){ const {fs, db} = await load(); await fs.deleteDoc(ref(fs, db, uid)); },
+        async top(field, n){ const {fs, db} = await load();
+          const snap = await fs.getDocs(fs.query(fs.collection(db, "boards", name, "entries"), fs.orderBy(field, "desc"), fs.limit(n)));
+          return snap.docs.map(d => ({uid: d.id, ...d.data()})); }
+      };
     }
   };
 }
@@ -107,6 +119,7 @@ const Account = (() => {
       catch(e){ provider = null; paint(); setSync("Saved in this browser"); }
     },
     get user(){ return user; }, get enabled(){ return !!provider; },
+    board(name){ return provider?.board && user ? provider.board(name) : null; },
     signIn, signOut,
     panel(){   // for the profile page
       if(!provider) return "";

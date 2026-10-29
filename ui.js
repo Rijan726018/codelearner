@@ -135,17 +135,17 @@ new MutationObserver(()=>UI.scan(document.getElementById("main"))).observe(docum
 const NAV = [
   {v:"today", t:"Today", i:"dash"}, {v:"map", t:"Learn", i:"map"},
   {v:"paths", t:"Paths", i:"route"}, {v:"problems", t:"Problems", i:"braces"}, {v:"bootcamp", t:"Bootcamp", i:"cap"}, {v:"build", t:"Build", i:"rocket"}, {v:"editor", t:"Editor", i:"terminal"},
-  {v:"review", t:"Review", i:"refresh", badge:true}
+  {v:"review", t:"Review", i:"refresh", badge:true}, {v:"rewards", t:"Rewards", i:"target"}
 ];
-const NAV_MORE = [{v:"home", t:"Home", i:"home"}, {v:"practice", t:"Practice by level", i:"target"}, {v:"projects", t:"Projects", i:"rocket"}, {v:"clock", t:"Practice clock", i:"clock"}, {v:"method", t:"The Method", i:"book"}, {v:"profile", t:"Profile & badges", i:"award"}];
+const NAV_MORE = [{v:"home", t:"Home", i:"home"}, {v:"practice", t:"Practice by level", i:"target"}, {v:"projects", t:"Projects", i:"rocket"}, {v:"clock", t:"Practice clock", i:"clock"}, {v:"method", t:"The Method", i:"book"}, {v:"profile", t:"Profile & badges", i:"award"}, {v:"rewards", id:"board", t:"Leaderboard", i:"trophy"}, {v:"rewards", id:"shop", t:"Rewards shop", i:"palette"}];
 UI.buildNav = () => {
   document.getElementById("tabs").innerHTML = NAV.map(n=>`<button type="button" data-v="${n.v}">${icon(n.i)}<span>${n.t}</span>${n.badge?`<span class="badge" id="duebadge" hidden>0</span>`:""}</button>`).join("");
   const r=document.querySelector(".top-r"); const m=document.createElement("div"); m.className="more";
-  m.innerHTML=`<button type="button" class="iconbtn" id="moreBtn" aria-haspopup="true" aria-expanded="false" aria-label="More sections">${icon("grid")}</button><div class="menu" id="moreMenu" hidden>${NAV_MORE.map(n=>`<button type="button" data-v="${n.v}">${icon(n.i)}${n.t}</button>`).join("")}</div>`;
+  m.innerHTML=`<button type="button" class="iconbtn" id="moreBtn" aria-haspopup="true" aria-expanded="false" aria-label="More sections">${icon("grid")}</button><div class="menu" id="moreMenu" hidden>${NAV_MORE.map(n=>`<button type="button" data-v="${n.v}"${n.id?` data-id="${n.id}"`:""}>${icon(n.i)}${n.t}</button>`).join("")}</div>`;
   r.insertBefore(m, document.getElementById("themeBtn"));
   const btn=m.querySelector("#moreBtn"), menu=m.querySelector("#moreMenu");
   btn.onclick=e=>{ e.stopPropagation(); menu.hidden=!menu.hidden; btn.setAttribute("aria-expanded",!menu.hidden); };
-  menu.onclick=e=>{ const b=e.target.closest("[data-v]"); if(b){ menu.hidden=true; go({v:b.dataset.v}); } };
+  menu.onclick=e=>{ const b=e.target.closest("[data-v]"); if(b){ menu.hidden=true; go({v:b.dataset.v, ...(b.dataset.id?{id:b.dataset.id}:{})}); } };
   document.addEventListener("click",e=>{ if(!menu.hidden && !m.contains(e.target)){ menu.hidden=true; btn.setAttribute("aria-expanded","false"); } });
   document.getElementById("themeBtn").onclick=UI.toggleTheme;
   document.getElementById("searchBtn").onclick=()=>Palette.open();
@@ -166,6 +166,7 @@ UI.syncNav = tabV => {
   const g=Game.stats(); const sc=document.getElementById("streakChip"), xc=document.getElementById("xpChip");
   if(sc) sc.innerHTML=`${icon("flame","sm")}${g.streak}`;
   if(xc) xc.innerHTML=`<span class="lv">Lv ${g.level}</span><span class="xpn">${g.xp.toLocaleString()} XP</span>`;
+  const cc=document.getElementById("coinChip"); if(cc && typeof Rewards!=="undefined") cc.innerHTML=`${COIN_SVG}<span>${Rewards.balance(g).toLocaleString()}</span>`;
   UI.fitNav();
 };
 
@@ -200,13 +201,21 @@ const BADGES = [
   {id:"hours-1", n:"Clocked In", d:"Practise for 1 hour in total", i:"clock", t:s=>s.hours>=1},
   {id:"hours-10", n:"Ten Hours", d:"Practise for 10 hours in total", i:"clock", t:s=>s.hours>=10},
   {id:"hours-100", n:"Century", d:"Practise for 100 hours in total", i:"clock", t:s=>s.hours>=100},
-  {id:"hours-1000", n:"Thousand-Hour Club", d:"Practise for 1,000 hours in total", i:"mountain", t:s=>s.hours>=1000}
+  {id:"hours-1000", n:"Thousand-Hour Club", d:"Practise for 1,000 hours in total", i:"mountain", t:s=>s.hours>=1000},
+  {id:"challenge-1", n:"Challenger", d:"Complete a daily or weekly challenge", i:"target", t:()=>Object.keys(P.claimed||{}).some(k=>!k.endsWith(":all"))},
+  {id:"challenge-25", n:"Quest Master", d:"Complete 25 challenges", i:"target", t:()=>Object.keys(P.claimed||{}).filter(k=>!k.endsWith(":all")).length>=25},
+  {id:"day-sweep", n:"Full House", d:"Finish all three of a day's challenges", i:"check", t:()=>Object.keys(P.claimed||{}).some(k=>k.startsWith("d:")&&k.endsWith(":all"))},
+  {id:"week-sweep", n:"Clean Sweep", d:"Clear all three weekly challenges in one week", i:"trophy", t:()=>Object.keys(P.claimed||{}).some(k=>k.startsWith("w:")&&k.endsWith(":all"))},
+  {id:"coins-1000", n:"Saver", d:"Hold 1,000 coins at once", i:"star", t:s=>typeof Rewards!=="undefined"&&Rewards.balance(s)>=1000},
+  {id:"shop-1", n:"First Purchase", d:"Buy something in the rewards shop", i:"palette", t:()=>(P.buys||[]).length>=1},
+  {id:"freeze-1", n:"Saved by the Freeze", d:"Have a streak freeze keep your streak alive", i:"shield", t:()=>Object.keys(P.frozen||{}).length>=1},
+  {id:"board-1", n:"On the Board", d:"Join the leaderboard", i:"users", t:()=>!!P.board?.on}
 ];
 const Game = {
   xpFor:n=>50*n*(n-1),
   levelOf(xp){ let n=1; while(this.xpFor(n+1)<=xp) n++; return n; },
   rank(l){ let r=RANKS[0][1]; RANKS.forEach(([n,t])=>{ if(l>=n) r=t; }); return r; },
-  bestStreak(){ const days=Object.keys(P.log||{}).filter(k=>P.log[k]>0).sort(); let best=0, run=0, prev=null;
+  bestStreak(){ const days=[...new Set([...Object.keys(P.log||{}).filter(k=>P.log[k]>0), ...Object.keys(P.frozen||{})])].sort(); let best=0, run=0, prev=null;
     days.forEach(k=>{ const n=Math.round(Date.parse(k)/86400000); run = prev!=null && n===prev+1 ? run+1 : 1; prev=n; best=Math.max(best,run); }); return best; },
   stats(){
     const lessons=Object.keys(P.lessons||{}).filter(k=>D.lessons[k]).length;
@@ -229,14 +238,19 @@ const Game = {
   },
   ready:false,
   sync(silent){
-    const s=this.stats(); P.badges=P.badges||{}; let changed=false; const fresh=[];
+    const R=typeof Rewards!=="undefined" ? Rewards : null;
+    const claimed=R ? R.claim() : [];   // finished challenges and streak freezes, before badges so they can count them
+    const s=this.stats(); P.badges=P.badges||{}; let changed=claimed.length>0; const fresh=[];
     BADGES.forEach(b=>{ if(!P.badges[b.id] && b.t(s)){ P.badges[b.id]=today(); fresh.push(b); changed=true; } });
     const prevXp=P.xpSeen??s.xp, prevLv=this.levelOf(prevXp);
     if(P.xpSeen!==s.xp){ P.xpSeen=s.xp; changed=true; }
+    const coins=R ? R.settle(s) : {gained:0, changed:false}; if(coins.changed) changed=true;
     if(!silent && this.ready){
-      if(s.xp>prevXp) UI.toast(`+${s.xp-prevXp} XP`, `${s.xp.toLocaleString()} XP total · ${this.rank(s.level)}`, "zap", 2400);
-      if(s.level>prevLv){ UI.toast(`Level ${s.level}!`, `You're now a ${this.rank(s.level)}.`, "star", 5000); UI.confetti(); }
-      fresh.forEach((b,i)=>setTimeout(()=>{ UI.toast(`Badge unlocked: ${b.n}`, b.d, b.i, 5000); UI.confetti(90); }, 400+i*700));
+      if(s.xp>prevXp) UI.toast(`+${s.xp-prevXp} XP${coins.gained?` · +${coins.gained} coins`:""}`, `${s.xp.toLocaleString()} XP total · ${this.rank(s.level)}`, "zap", 2400);
+      else if(coins.gained) UI.toast(`+${coins.gained} coins`, `${R.balance(s).toLocaleString()} coins to spend`, "star", 2400);
+      if(s.level>prevLv){ UI.toast(`Level ${s.level}!`, `You're now a ${this.rank(s.level)}.${R?` +${10*s.level} coins.`:""}`, "star", 5000); UI.confetti(); }
+      claimed.forEach((c,i)=>setTimeout(()=>{ UI.toast(c.t, c.s, c.i, 5000); if(c.big) UI.confetti(70); }, 250+i*600));
+      fresh.forEach((b,i)=>setTimeout(()=>{ UI.toast(`Badge unlocked: ${b.n}`, R?`${b.d} · +${COINV.badge} coins`:b.d, b.i, 5000); UI.confetti(90); }, 400+(claimed.length+i)*700));
     }
     this.ready=true;
     if(changed) save("p", true);
@@ -339,7 +353,8 @@ function viewHome(el){
     {i:"rocket", t:"Build & Learn", d:"Pick a real project (a to-do app, a game, a bank system, a database) and build it step by step, learning each concept the moment you need it.", v:"build", c:`${nB} guided projects`},
     {i:"terminal", t:"Editor", d:"Your own multi-file projects in Python, JavaScript, SQL or HTML/CSS/JS with a live preview. Saves as you type, and syncs to your account when you sign in.", v:"editor", c:"Python · JS · SQL · web"},
     {i:"clock", t:"Practice clock", d:"Counts your active practice time and the hours you log from elsewhere, so you can watch your progress toward 10,000 hours, with a daily goal and a projected finish date.", v:"clock", c:"Toward 10,000 hours"},
-    {i:"award", t:"XP, levels & badges", d:"Every lesson, problem, step and hour adds up. XP is recomputed from what you've really done, so it can't be gamed, and badges mark the milestones.", v:"profile", c:`${BADGES.length} badges`}
+    {i:"award", t:"XP, levels & badges", d:"Every lesson, problem, step and hour adds up. XP is recomputed from what you've really done, so it can't be gamed, and badges mark the milestones.", v:"profile", c:`${BADGES.length} badges`},
+    {i:"target", t:"Coins, challenges & leaderboard", d:"Earn coins for every lesson, problem, project, badge, level and streak, plus three new challenges a day and three a week. Spend them on streak freezes and new looks, and see who practised most this week.", v:"rewards", c:"New challenges daily"}
   ];
   const featured=(PATHS.index||[]).slice(0,8);
   el.innerHTML = `
@@ -421,7 +436,7 @@ function viewProfile(el){
   el.innerHTML=`<section class="head"><span class="eyebrow">Your profile</span><h1 class="h1">${esc(Game.rank(s.level))}</h1><p class="lede">Every lesson, exam, problem and roadmap topic earns XP. Level up by learning, not by grinding: XP is recomputed from your real progress, so it always reflects what you've actually done.</p></section>
   <div class="grid2">
     <section class="panel"><div class="lvcardx">${Game.ringSVG(s,150)}<div style="display:grid;gap:8px"><b class="h2"><span class="gt">${s.xp.toLocaleString()}</span> XP</b><span class="muted">${(s.next-s.xp).toLocaleString()} XP to level ${s.level+1} · next rank: ${esc(Game.rank(RANKS.find(r=>r[0]>s.level)?.[0]||s.level))}</span><div class="bar"><i style="width:${100*(s.xp-s.cur)/Math.max(1,s.next-s.cur)}%"></i></div>
-      <div class="row" style="gap:6px">${[["flame",`${s.streak}-day streak`],["clock",`${s.hours<10?s.hours.toFixed(1):Math.round(s.hours).toLocaleString()} h practised`],["award",`${got.length}/${BADGES.length} badges`],["braces",`${s.solved} solved`]].map(([i,t])=>`<span class="pill">${icon(i,"sm")}${t}</span>`).join("")}</div></div></div></section>
+      <div class="row" style="gap:6px">${[["flame",`${s.streak}-day streak`],["clock",`${s.hours<10?s.hours.toFixed(1):Math.round(s.hours).toLocaleString()} h practised`],["award",`${got.length}/${BADGES.length} badges`],["braces",`${s.solved} solved`]].map(([i,t])=>`<span class="pill">${icon(i,"sm")}${t}</span>`).join("")}${typeof Rewards!=="undefined"?`<button type="button" class="pill acc" data-act="rewards" style="cursor:pointer;border:0">${COIN_SVG}${Rewards.balance(s).toLocaleString()} coins</button>${Rewards.title()?`<span class="pill acc">${esc(Rewards.title())}</span>`:""}`:""}</div></div></div></section>
     <section class="panel"><h2 class="h3">Where your XP comes from</h2><div class="mast">${parts.map(([t,k])=>`<div class="r"><span>${t}</span><span class="t" data-tip="${s.parts[k].toLocaleString()} XP"><i style="width:${100*s.parts[k]/mx}%"></i></span><span class="n">${s.parts[k].toLocaleString()}</span></div>`).join("")}</div>
       <p class="muted" style="margin:0;font-size:.84rem">Lesson ${XPV.lesson} · exam ${XPV.exam} · milestone ${XPV.milestone} · card ${XPV.card} · Easy/Medium/Hard ${XPV.Easy}/${XPV.Medium}/${XPV.Hard} · step ${XPV.step} · roadmap topic ${XPV.node}</p></section>
   </div>
