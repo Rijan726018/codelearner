@@ -19,9 +19,9 @@ let INTERVALS = [1,3,7,16,35,90,180];
 
 /* ---------- state ---------- */
 const D = {stages:[], research:null, q:{}, mods:[], lessons:{}, modById:{}};
-const P0 = () => ({lessons:{}, notes:{}, ms:{}, exams:{}, log:{}, solved:{}, tried:{}, steps:{}, nodes:{}, badges:{}, xpSeen:null, time:{}, manual:[], goal:null, calib:{}});
+const P0 = () => ({lessons:{}, notes:{}, ms:{}, exams:{}, log:{}, solved:{}, tried:{}, steps:{}, nodes:{}, badges:{}, xpSeen:null, time:{}, manual:[], goal:null, calib:{}, qa:{}, claimed:{}, buys:[], frozen:{}, equip:{}, board:{}, coinSeen:null});
 const normP = d => { const z=P0(); Object.keys(z).forEach(k=>{ if(d && d[k]!=null) z[k]=d[k]; }); return z; };
-let P = P0();   // progress doc: core lessons, notes, milestones, exams, activity log, problems, bootcamp steps, roadmap nodes, badges, practice time, confidence calibration
+let P = P0();   // progress doc: core lessons, notes, milestones, exams, activity log, problems, bootcamp steps, roadmap nodes, badges, practice time, confidence calibration, rewards (see rewards.js)
 let S = {cards:{}};                                        // spaced-repetition doc
 let route = {v:"home"};
 const EXTRA_LOADERS = [];   // other modules push async loaders (problems, bootcamp, paths) that boot awaits
@@ -130,8 +130,9 @@ function srs(qid, correct, conf){
   else if(lucky){ c.d=t+1; }
   else if(correct){ c.b=Math.min(c.b+1, INTERVALS.length-1); c.d=t+INTERVALS[c.b]; }
   else { c.b=0; c.d=t+1; c.l=(c.l||0)+1; }
-  if(conf){ const k=P.calib[conf] || (P.calib[conf]={n:0, ok:0}); k.n++; if(correct) k.ok++; save("p", true); }
-  logActivity(); save("s");
+  if(conf){ const k=P.calib[conf] || (P.calib[conf]={n:0, ok:0}); k.n++; if(correct) k.ok++; }
+  const q=P.qa[dayKey(t)] || (P.qa[dayKey(t)]={n:0, ok:0, sure:0}); q.n++; if(correct){ q.ok++; if(conf==="sure") q.sure++; }   // per-day counts for the daily challenges
+  save("p", true); logActivity(); save("s");
 }
 
 /* ---------- tooltip ---------- */
@@ -159,7 +160,9 @@ function render(){
 }
 
 /* ================= TODAY ================= */
-function streak(){ let t=today(), n=0; if(!P.log[dayKey(t)]) t--; while(P.log[dayKey(t)]){ n++; t--; } return n; }
+// a day counts if something was finished that day, or a streak freeze covered it (rewards.js)
+const activeDay = k => P.log[k]>0 || !!P.frozen?.[k];
+function streak(){ let t=today(), n=0; if(!activeDay(dayKey(t))) t--; while(activeDay(dayKey(t))){ n++; t--; } return n; }
 function viewToday(el){
   const due=dueCards().length, nl=nextLesson(), cm=currentModule();
   const wd=new Date().getDay(), deep=(wd===2||wd===4) && !!cm && lessonsDone(cm)>=2;
@@ -194,6 +197,7 @@ function viewToday(el){
     <span class="eyebrow">${esc(Game.rank(g.level))}</span><b class="h2"><span class="gt">${g.xp.toLocaleString()}</span> XP</b>
     <div class="bar"><i style="width:${100*(g.xp-g.cur)/Math.max(1,g.next-g.cur)}%"></i></div>
     <span class="muted" style="font-size:.88rem">${(g.next-g.xp).toLocaleString()} XP to level ${g.level+1} · ${Object.keys(P.badges||{}).length} badges · <button class="btn ghost sm" data-act="profile">View profile</button></span></div></div></section>
+  ${typeof Rewards!=="undefined"?Rewards.todayCard():""}
   ${typeof clockCard==="function"?clockCard():""}
   <div class="stats">
     <div class="stat">${icon("flame")}<b>${streak()}</b><span>day streak</span></div>

@@ -15,7 +15,8 @@ Around them:
 - **Practice clock**: counts active practice time per section and time you log by hand. It shows your hours toward 10,000, a daily goal, a year heatmap and a projected finish date.
 - **Sign in with Google**: progress, review cards, practice hours and editor projects sync to your account (see [Accounts and cloud sync](#accounts-and-cloud-sync)).
 - **Confidence ratings**: every answer is checked with *Guessing*, *Fairly sure* or *Certain*. Confident misses are flagged, lucky guesses come back tomorrow instead of moving up a box, and your profile shows how often each rating is right. The Method page explains the research behind each lesson step, with sources.
-- A dashboard with "continue" cards and a problem of the day, plus XP, levels, ranks and 28 badges.
+- **Rewards**: coins for every lesson, exam, problem, step, project, course, career path, badge, level, practice day and streak milestone, worked out from real progress like XP so nothing pays twice. Three daily and three weekly challenges (the same for everyone on a given date) pay extra, with a bonus for clearing them all. Coins buy streak freezes (used automatically when you miss a day), accent colours and titles; nothing educational costs coins. An opt-in leaderboard ranks signed-in learners by XP this week and all time, showing only a chosen display name and numbers.
+- A dashboard with "continue" cards, today's challenges and a problem of the day, plus XP, levels, ranks and 36 badges.
 - A Ctrl/⌘ K search across everything, light and dark themes, and backup/restore of progress.
 
 ## Run it locally
@@ -41,6 +42,7 @@ To republish it as an artifact, remove the first three lines of `index.html` (do
 How it works:
 - **Storage:** each person's data lives under `users/{uid}/docs/{docId}`. The docs are progress (`v2progress`), review cards (`v2srs`), code drafts, and one doc per editor project plus an index (`ws-index`). Each is stored as a JSON string.
 - **Access:** `firestore.rules` lets a signed-in person read and write only their own documents.
+- **Leaderboard:** people who join it get an entry in `boards/all/entries/{uid}` and `boards/w-YYYY-MM-DD/entries/{uid}` (the week starting Monday) holding a display name, title, XP, level, coins, streak and this week's XP. Any signed-in person can read the boards; only the owner can write or delete their entry, and the rules check every field's type and range. Leaving the board deletes the entries.
 - **Signing in:** progress from that browser is merged into the account, so nothing is lost. Maps are unioned, scores, reps and seconds keep the larger value, and editor projects keep the newest copy.
 - **Signing out:** the browser's copy is cleared, so the next person starts fresh.
 
@@ -56,6 +58,8 @@ To switch it on (about 10 minutes, free on the Spark plan):
 
 The web config values identify the project but aren't secrets; the rules decide who can read what.
 
+**Already set up before the leaderboard existed?** Repeat step 5: paste the current `firestore.rules` into **Firestore → Rules** and **Publish**. Until then the leaderboard tab says it isn't switched on, and everything else, coins and challenges included, keeps working. Scores are reported by each person's browser, so a determined person could post a fake score; the rules only bound the numbers. Treat the board as friendly motivation, not a contest with prizes.
+
 ## Layout
 
 | Path | What it is |
@@ -67,6 +71,7 @@ The web config values identify the project but aren't secrets; the rules decide 
 | `clock.js` | Practice clock: active-time tracking, time logged by hand, the clock view and the Today card |
 | `editor.js` | The Editor: multi-file projects, running and previews, autosave, and merging with the account |
 | `cloud.js`, `firebase-config.js`, `firestore.rules` | Sign in with Google and cloud sync through Firebase |
+| `rewards.js` | Coins, daily and weekly challenges, streak freezes, the rewards shop and the leaderboard |
 | `judge.js` | Test harnesses for problems (Python and JavaScript) and checkers for bootcamp and project steps (stdout, source, DOM/CSS, SQL results, and web apps driven in a sandboxed frame) |
 | `problems.js`, `bootcamp.js`, `paths.js` | The Problems, Bootcamp and Build & Learn, and Career Paths views |
 | `py-worker.js`, `sql-worker.js` | Run Python (Pyodide) and SQL (sql.js) off the main thread |

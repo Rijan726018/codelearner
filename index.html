@@ -111,6 +111,8 @@ kbd{font:600 10.5px var(--mono);padding:2px 6px;border-radius:6px;border:1px sol
 .chipx{all:unset;cursor:pointer;display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:99px;border:1px solid var(--line);background:var(--surface);font:600 13px var(--mono);white-space:nowrap}
 .chipx:hover{border-color:var(--line2)}
 .chipx.fire{color:#ff8a3d} .chipx.fire .ic{fill:color-mix(in oklab,#ff8a3d 35%,transparent)}
+.chipx.coin{color:var(--med)} .chipx.coin .coin{width:16px;height:16px}
+svg.coin{width:1em;height:1em;flex:none;fill:color-mix(in oklab,#fbbf24 30%,transparent);stroke:#d99a06;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;vertical-align:-.12em}
 .chipx.xp .lv{all:unset;font:700 11px var(--mono);background:var(--grad);color:#0a0b1a;border-radius:99px;padding:2px 7px}
 .iconbtn{all:unset;cursor:pointer;width:36px;height:36px;display:grid;place-items:center;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--muted)}
 .iconbtn:hover{color:var(--ink);border-color:var(--line2)}
@@ -159,7 +161,7 @@ kbd{font:600 10.5px var(--mono);padding:2px 6px;border-radius:6px;border:1px sol
 .top-in.tight .kbtn{padding:8px}
 .top-in.tight .acctbtn:not(.in) span{display:none}.top-in.tight .acctbtn:not(.in){width:36px;padding:0}
 .top-in.tight .chipx.xp .xpn{display:none}
-.top-in.snug .chipx.fire{display:none}.top-in.snug .tabs button{padding:8px 7px;gap:6px}.top-in.snug{gap:10px}
+.top-in.snug .chipx.fire,.top-in.tight .chipx.coin span{display:none}.top-in.snug .tabs button{padding:8px 7px;gap:6px}.top-in.snug{gap:10px}
 @media (max-width:980px){.kbtn span,.kbtn kbd{display:none}.kbtn{padding:8px}}
 .tabs.compact button span:not(.badge){display:none}
 .tabs.compact button{padding:8px 10px}
@@ -758,6 +760,55 @@ select.sel{border:1px solid var(--line);border-radius:11px;padding:8px 10px;font
 .edpre .err{color:var(--syn-err)}
 .edfoot{padding:6px 12px;border-top:1px solid var(--line);font:500 11px var(--mono);color:var(--muted)}
 .qrun{margin-top:4px}
+/* ---------- rewards: challenges, shop, leaderboard ---------- */
+.coinh{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.coinh svg.coin{width:.9em;height:.9em}
+.coins{display:inline-flex;align-items:center;gap:5px;font:700 13px var(--mono);color:var(--med)}
+.chals{display:grid;gap:8px}
+.chal{display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--surface2)}
+.chal .ci{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent)}
+.chal.done .ci{background:var(--ok-soft);color:var(--ok)}
+.chal .cb{display:grid;gap:5px;min-width:0}
+.chal .cb b{font:600 14px var(--body);overflow-wrap:anywhere}
+.chal .cm{font:500 11.5px var(--mono);color:var(--muted)}
+.chal .bar{height:6px}
+.chal.done .bar i{background:var(--ok)}
+.chal .cr{display:flex;align-items:center;gap:8px}
+@media (max-width:480px){.chal{grid-template-columns:30px minmax(0,1fr)}.chal .ci{width:30px;height:30px}.chal .cr{grid-column:2;justify-content:space-between}}
+.shop{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.shopc{display:grid;gap:12px;align-content:space-between;padding:16px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+.shopc.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.shopc .sv{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--sw,var(--accent-soft));color:var(--accent)}
+.lb{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.lb li{display:grid;grid-template-columns:34px 34px minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:8px 10px;border-radius:12px}
+.lb li:nth-child(odd){background:var(--surface2)}
+.lb li.me{background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent)}
+.lb .rk{font:600 13px var(--mono);color:var(--muted);text-align:center}
+.lb .medal{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font:800 13px var(--mono);color:#1b1300;justify-self:center}
+.lb .m1{background:#fbbf24}.lb .m2{background:#cbd5e1}.lb .m3{background:#e0a46b}
+.lb .av{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--grad);color:#0a0b1a;font:700 14px var(--display)}
+.lb .nm{display:grid;min-width:0}.lb .nm b{overflow-wrap:anywhere}.lb .nm span{font-size:.8rem}
+.lb .lvl{font:500 12px var(--mono);display:flex;align-items:center;gap:4px;white-space:nowrap}
+.lb .val{font:700 13px var(--mono);white-space:nowrap}
+@media (max-width:560px){.lb li{grid-template-columns:28px 30px minmax(0,1fr) auto}.lb .lvl{display:none}}
+/* accent colours bought in the rewards shop */
+:root[data-accent="ocean"]{--accent:#0369a1;--accent-soft:#e0f2fe}
+:root[data-accent="forest"]{--accent:#047857;--accent-soft:#dcfce7}
+:root[data-accent="sunset"]{--accent:#c2410c;--accent-soft:#ffedd5}
+:root[data-accent="rose"]{--accent:#be185d;--accent-soft:#fce7f3}
+:root[data-accent="gold"]{--accent:#a16207;--accent-soft:#fef3c7}
+@media (prefers-color-scheme: dark){
+  :root[data-accent="ocean"]:not([data-theme="light"]){--accent:#38bdf8;--accent-soft:#0b2a3d}
+  :root[data-accent="forest"]:not([data-theme="light"]){--accent:#34d399;--accent-soft:#0b2e22}
+  :root[data-accent="sunset"]:not([data-theme="light"]){--accent:#fb923c;--accent-soft:#3a1d0b}
+  :root[data-accent="rose"]:not([data-theme="light"]){--accent:#f472b6;--accent-soft:#3a1229}
+  :root[data-accent="gold"]:not([data-theme="light"]){--accent:#facc15;--accent-soft:#33280a}}
+:root[data-accent="ocean"][data-theme="dark"]{--accent:#38bdf8;--accent-soft:#0b2a3d}
+:root[data-accent="forest"][data-theme="dark"]{--accent:#34d399;--accent-soft:#0b2e22}
+:root[data-accent="sunset"][data-theme="dark"]{--accent:#fb923c;--accent-soft:#3a1d0b}
+:root[data-accent="rose"][data-theme="dark"]{--accent:#f472b6;--accent-soft:#3a1229}
+:root[data-accent="gold"][data-theme="dark"]{--accent:#facc15;--accent-soft:#33280a}
+
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.anim .rv{opacity:1;transform:none}html{scroll-behavior:auto}}
 </style>
 
@@ -768,6 +819,7 @@ select.sel{border:1px solid var(--line);border-radius:11px;padding:8px 10px;font
     <div class="top-r">
       <button type="button" class="kbtn" id="searchBtn" aria-label="Search everything"><svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span>Search</span><kbd>Ctrl K</kbd></button>
       <button type="button" class="chipx fire" id="streakChip" data-act="today" data-tip="Day streak"></button>
+      <button type="button" class="chipx coin" id="coinChip" data-act="rewards" data-tip="Your coins and challenges"></button>
       <button type="button" class="chipx xp" id="xpChip" data-act="profile" data-tip="Your level and XP"></button>
       <button type="button" class="iconbtn" id="themeBtn" aria-label="Switch light or dark theme"></button>
     </div>
@@ -801,4 +853,5 @@ select.sel{border:1px solid var(--line);border-radius:11px;padding:8px 10px;font
 <script src="clock.js" charset="utf-8"></script>
 <script src="firebase-config.js" charset="utf-8"></script>
 <script src="cloud.js" charset="utf-8"></script>
+<script src="rewards.js" charset="utf-8"></script>
 <script src="editor.js" charset="utf-8"></script>
