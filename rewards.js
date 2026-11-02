@@ -160,13 +160,30 @@ const Rewards = (() => {
   return {challenges, between, parts, earned, spent, balance, owns, freezesLeft, claim, settle, buy, equip, title, look, wkStart};
 })();
 
-/* ---------- leaderboard: boards/{all | w-YYYY-MM-DD}/entries/{uid} in Firestore, opt-in, name and numbers only ---------- */
+/* ---------- leaderboard: boards/{all | w-YYYY-MM-DD}/entries/{uid} in Firestore, opt-in, name and numbers only ----------
+   Ranked by progress: XP earned this week (lessons, exams, problems, steps, milestones since Monday) by default, plus
+   all-time XP, current streaks and coins earned. Your exact rank comes from a count query, so it is right even outside
+   the top 50, and the people just above and below you come from range queries on the same field. Weekly leagues are
+   set by this week's XP, and last week's top three collect a coin prize the next time they open the board. */
+const LEAGUES = [[0,"Bronze","#b86b2e"],[250,"Silver","#8e9bb0"],[750,"Gold","#d4a106"],[1500,"Platinum","#14b8c8"],[3000,"Diamond","#7c6cf0"],[6000,"Legend","#e2448f"]];
+const PODIUM_PRIZE = [500, 300, 150], PRIZE_MIN_XP = 100;
+const BOARD_MODES = [
+  {id:"week",   t:"This week",    field:"weekXp", unit:"XP",    sub:"XP earned since Monday from lessons, exams, problems, steps and milestones. Resets every Monday."},
+  {id:"all",    t:"All time",     field:"xp",     unit:"XP",    sub:"Total XP since you started."},
+  {id:"streak", t:"Streaks",      field:"streak", unit:"days",  sub:"Current daily streaks. A streak that's been idle for more than a day drops off."},
+  {id:"coins",  t:"Coins earned", field:"coins",  unit:"coins", sub:"Every coin earned, before anything spent in the shop."},
+  {id:"last",   t:"Last week",    field:"weekXp", unit:"XP",    sub:"Final standings for last week. The top three collect a prize."}
+];
+const leagueOf = xp => { let i = 0; LEAGUES.forEach(([min], k) => { if(xp >= min) i = k; }); return {i, name: LEAGUES[i][1], col: LEAGUES[i][2], next: LEAGUES[i+1] || null}; };
+
 const Board = (() => {
   let timer = null, lastSent = "", cache = {};
-  const weekId = () => "w-" + dayKey(Rewards.wkStart(today()));
+  const ws = () => Rewards.wkStart(today());
+  const weekId = () => "w-" + dayKey(ws()), lastWeekId = () => "w-" + dayKey(ws() - 7);
   const can = () => typeof Account !== "undefined" && Account.user && Account.board;
+  const boardOf = m => m.id === "week" ? weekId() : m.id === "last" ? lastWeekId() : "all";
   const entry = s => {
-    const w = Rewards.between(Rewards.wkStart(today()), today());
+    const w = Rewards.between(ws(), today());
     return {name: (P.board?.name || "").slice(0, 24), title: Rewards.title(), xp: s.xp, level: s.level, coins: Rewards.earned(s), streak: s.streak, weekXp: w.xp};
   };
   function queue(s){
@@ -179,19 +196,56 @@ const Board = (() => {
     try{ const uidv = Account.user.uid; await Promise.all([Account.board("all").put(uidv, e), Account.board(weekId()).put(uidv, e)]); lastSent = key; cache = {}; }
     catch(err){ console.warn("Leaderboard update failed:", err?.code || err); }
   }
-  async function top(which){
-    const name = which === "week" ? weekId() : "all", field = which === "week" ? "weekXp" : "xp";
-    if(cache[name] && Date.now() - cache[name].at < 60000) return cache[name].rows;
-    const rows = await Account.board(name).top(field, 50); cache[name] = {rows, at: Date.now()}; return rows;
+  const cached = async (k, f) => { if(cache[k] && Date.now() - cache[k].at < 60000) return cache[k].v; const v = await f(); cache[k] = {v, at: Date.now()}; return v; };
+  const fresh = r => r.updated == null || Date.now() - r.updated < 2*86400000;   // a streak idle for 2 days is broken
+  // everything one board view needs: the top rows, your rank among everyone, and your neighbours
+  async function load(mode){
+    const m = BOARD_MODES.find(x => x.id === mode) || BOARD_MODES[0], name = boardOf(m), me = Account.user.uid;
+    return cached(name + ":" + m.field, async () => {
+      const b = Account.board(name);
+      let rows = await b.top(m.field, m.id === "streak" ? 100 : 50);
+      if(m.id === "streak") rows = rows.filter(r => fresh(r) && r.streak > 0).slice(0, 50);
+      const mine = rows.find(r => r.uid === me) || null;
+      const myVal = mine ? +mine[m.field] || 0 : m.id === "last" ? null : +entry(Game.stats())[m.field] || 0;
+      let rank = null, total = rows.length, above = null, below = null;
+      if(m.id === "streak"){ const i = rows.findIndex(r => r.uid === me); rank = i >= 0 ? i + 1 : null; above = i > 0 ? rows[i-1] : null; below = i >= 0 ? rows[i+1] || null : null; }
+      else if(myVal != null){
+        const [rk, tot, nb] = await Promise.all([b.rank(m.field, myVal), b.count(), b.near(m.field, myVal)]);
+        rank = rk; total = tot; above = nb.above; below = nb.below;
+        if(above?.uid === me) above = null; if(below?.uid === me) below = null;
+      }
+      return {m, rows, rank, total, above, below, myVal};
+    });
+  }
+  // last week's top three get a prize once, the next time they open the board
+  async function claimPrize(){
+    if(!can() || !P.board?.on) return null;
+    const lw = lastWeekId(), key = "lb:" + lw; if(P.claimed?.[key] != null) return null;
+    const rows = await cached(lw + ":podium", () => Account.board(lw).top("weekXp", 3));
+    const i = rows.findIndex(r => r.uid === Account.user.uid);
+    if(i < 0 || (+rows[i].weekXp || 0) < PRIZE_MIN_XP) return null;
+    P.claimed[key] = PODIUM_PRIZE[i]; P.podium = P.podium || {}; P.podium[lw] = i + 1; save("p");
+    return {place: i + 1, coins: PODIUM_PRIZE[i]};
+  }
+  // remember yesterday's rank per board so the page can show movement
+  function movement(mode, rank){
+    if(rank == null) return 0;
+    const k = mode + ":" + (mode === "week" ? weekId() : mode === "last" ? lastWeekId() : "all"), t = today();
+    P.board.seen = P.board.seen || {}; const s = P.board.seen[k];
+    if(!s){ P.board.seen[k] = {r: rank, d: t, p: rank}; save("p", true); return 0; }
+    if(s.d < t){ s.p = s.r; s.d = t; }
+    if(s.r !== rank){ s.r = rank; save("p", true); }
+    return s.p - rank;
   }
   async function join(name){
-    P.board = {on: true, name: name.trim().replace(/\s+/g, " ").slice(0, 24)}; save("p"); lastSent = ""; await publish(); cache = {};
+    P.board = {...(P.board || {}), on: true, name: name.trim().replace(/\s+/g, " ").slice(0, 24)}; save("p"); lastSent = ""; cache = {}; await publish();
   }
   async function leave(){
-    const uidv = Account.user?.uid; P.board = {on: false, name: P.board?.name || ""}; save("p"); lastSent = ""; cache = {};
+    const uidv = Account.user?.uid; P.board = {...(P.board || {}), on: false}; save("p"); lastSent = ""; cache = {};
     if(uidv){ try{ await Promise.all([Account.board("all").remove(uidv), Account.board(weekId()).remove(uidv)]); }catch(e){} }
   }
-  return {queue, publish, top, join, leave, weekId, can};
+  const weekEndsIn = () => { const end = new Date((ws() + 7)*86400000); const local = new Date(end.getUTCFullYear(), end.getUTCMonth(), end.getUTCDate()); return Math.max(0, (local - new Date())/1000); };
+  return {queue, publish, load, claimPrize, movement, join, leave, weekId, lastWeekId, can, weekEndsIn};
 })();
 
 /* ================= REWARDS PAGE ================= */
@@ -269,37 +323,72 @@ function rwEarn(body, s){
     <p class="muted" style="margin:0;font-size:.88rem">Coins are worked out from what you've actually done, the same way XP is, so redoing a lesson or re-solving a problem doesn't pay twice. They're kept with the rest of your progress and sync to your account when you sign in.</p></section>`;
 }
 async function rwBoard(body, s){
-  const mode = route.board === "all" ? "all" : "week";
-  const head = `<div class="chips" role="group" aria-label="Leaderboard period"><button type="button" class="chip" data-bm="week" aria-pressed="${mode==="week"}">This week</button><button type="button" class="chip" data-bm="all" aria-pressed="${mode==="all"}">All time</button></div>`;
+  const mode = BOARD_MODES.some(m => m.id === route.board) ? route.board : "week";
+  const head = `<div class="chips" role="group" aria-label="Leaderboard">${BOARD_MODES.map(m=>`<button type="button" class="chip" data-bm="${m.id}" aria-pressed="${mode===m.id}">${m.t}</button>`).join("")}</div>`;
   const wire = () => body.querySelectorAll("[data-bm]").forEach(b => b.onclick = () => { route.board = b.dataset.bm; render(); });
   if(typeof Account === "undefined" || !Account.enabled){ body.innerHTML = `<section class="panel"><h2 class="h3">Leaderboard</h2><p class="muted" style="margin:0">The leaderboard needs accounts, and this copy of CodeLearner runs without them. Everything else, including coins and challenges, works in this browser.</p></section>`; return; }
-  if(!Account.user){ body.innerHTML = `<section class="panel"><h2 class="h3">Leaderboard</h2><p class="muted" style="margin:0">Sign in with Google to see who's practising most this week and to add yourself.</p></section>${Account.panel()}`; Account.wire(body); return; }
+  if(!Account.user){ body.innerHTML = `<section class="panel"><h2 class="h3">Leaderboard</h2><p class="muted" style="margin:0">Sign in with Google to see who's making the most progress this week, and to race them.</p></section>${Account.panel()}`; Account.wire(body); return; }
   if(!P.board?.on){
     const first = (Account.user.name || "").trim().split(/\s+/)[0] || "Learner";
-    body.innerHTML = `<section class="panel" style="max-width:640px"><h2 class="h3">Join the leaderboard</h2>
-      <p class="muted" style="margin:0">Other signed-in learners will see only the name below, your title, level, XP, coins and streak. Your email address and photo are never shown. You can leave at any time, which removes your entry.</p>
+    body.innerHTML = `<section class="panel" style="max-width:640px"><h2 class="h3">${icon("trophy")} Join the leaderboard</h2>
+      <p style="margin:0">Race other learners on progress: XP from lessons, exams, problems, steps and milestones, reset every Monday. Climb the leagues from Bronze to Legend, and finish in the top three to win ${PODIUM_PRIZE.join(" / ")} coins.</p>
+      <p class="muted" style="margin:0">Other signed-in learners see only the name below, your title, level, XP, coins and streak. Your email address and photo are never shown. You can leave at any time, which removes your entry.</p>
       <label style="display:grid;gap:6px"><span class="eyebrow">Name on the board</span><input class="pred" id="lbname" maxlength="24" value="${esc(P.board?.name || first)}" autocomplete="nickname"></label>
-      <div class="row"><button type="button" class="btn primary" id="lbjoin">Join as <span id="lbprev">${esc(P.board?.name || first)}</span></button></div><p class="err" id="lberr" role="alert" style="margin:0" hidden></p></section>`;
+      <div class="row"><button type="button" class="btn primary" id="lbjoin">Join as <span id="lbprev">${esc(P.board?.name || first)}</span></button></div></section>`;
     const inp = body.querySelector("#lbname"), prev = body.querySelector("#lbprev");
     inp.oninput = () => { prev.textContent = inp.value.trim() || "…"; };
     body.querySelector("#lbjoin").onclick = async () => { const n = inp.value.trim(); if(!n){ inp.focus(); return; } await Board.join(n); Game.sync(); render(); };
     return;
   }
   body.innerHTML = `${head}<section class="panel"><div class="loading" style="padding:12px 0">Loading the leaderboard…</div></section>`; wire();
-  let rows;
-  try{ await Board.publish(s); rows = await Board.top(mode); }
-  catch(e){
+  let d, prize = null, champs = null;
+  try{
+    await Board.publish(s);
+    [d, prize] = await Promise.all([Board.load(mode), Board.claimPrize().catch(() => null)]);
+    if(mode === "week") champs = await Board.load("last").catch(() => null);
+  }catch(e){
     const denied = e?.code === "permission-denied";
     body.innerHTML = `${head}<section class="panel"><h2 class="h3">Leaderboard</h2><p class="muted" style="margin:0">${denied?"The leaderboard isn't switched on for this site yet: the site's Firestore rules need the leaderboard section (see the README). Your coins and challenges still work.":"The leaderboard didn't load. Check your connection, then open this tab again."}</p></section>`; wire(); return;
   }
-  if(route.v !== "rewards" || (route.id||"challenges") !== "board") return;
-  const me = Account.user.uid, mine = rows.findIndex(r => r.uid === me);
-  const val = r => mode === "week" ? r.weekXp : r.xp;
-  const medal = i => i < 3 ? `<span class="medal m${i+1}">${i+1}</span>` : `<span class="rk">${i+1}</span>`;
-  body.innerHTML = `${head}<section class="panel"><div class="sec-h"><h2 class="h3">${mode==="week"?"This week":"All time"}</h2><span class="muted" style="font-size:.85rem">${mode==="week"?"XP from lessons, exams, problems, steps and milestones since Monday":"Total XP"}</span></div>
-    ${rows.length?`<ol class="lb">${rows.map((r,i)=>`<li class="${r.uid===me?"me":""}">${medal(i)}<span class="av">${esc((r.name||"?").trim()[0]||"?").toUpperCase()}</span><span class="nm"><b>${esc(r.name||"Learner")}${r.uid===me?" (you)":""}</b>${r.title?`<span class="muted">${esc(r.title)}</span>`:""}</span><span class="lvl muted">Lv ${+r.level||1} · ${icon("flame","sm")}${+r.streak||0}</span><b class="val">${(+val(r)||0).toLocaleString()} XP</b></li>`).join("")}</ol>`
-      :`<p class="muted" style="margin:0">Nobody's on the ${mode==="week"?"weekly ":""}board yet. Finish a lesson or solve a problem and you'll be first.</p>`}
-    ${rows.length && mine<0?`<p class="muted" style="margin:0;font-size:.88rem">You're not in the top ${rows.length} yet. Weekly XP comes from lessons, exams, problems, steps and milestones.</p>`:""}</section>
+  if(route.v !== "rewards" || (route.id||"challenges") !== "board" || (BOARD_MODES.some(m => m.id === route.board) ? route.board : "week") !== mode) return;
+  if(prize){ UI.toast(prize.place === 1 ? "You won last week" : `You finished #${prize.place} last week`, `+${prize.coins} coins`, "trophy", 6000); UI.confetti(160); Game.sync(); }
+  const {m, rows, rank, total, above, below, myVal} = d, me = Account.user.uid, unit = m.unit;
+  const v = r => +r?.[m.field] || 0, u = n => unit === "days" && Math.abs(n) === 1 ? "day" : unit, fmt = n => `${(+n||0).toLocaleString()} ${u(+n||0)}`;
+  const lg = r => leagueOf(+r?.weekXp || 0), chip = r => { const L = lg(r); return `<span class="lg" style="--lg:${L.col}">${L.name}</span>`; };
+  const nm = r => `${esc(r?.name || "Learner")}`;
+  const mv = Board.movement(mode, rank);
+  const myLeague = leagueOf(mode === "last" ? (myVal || 0) : Rewards.between(Rewards.wkStart(today()), today()).xp);
+  const lastWk = Rewards.between(Rewards.wkStart(today()) - 7, Rewards.wkStart(today()) - 1).xp, thisWk = Rewards.between(Rewards.wkStart(today()), today()).xp;
+
+  // your standing: rank, movement, the person to catch and the person chasing you
+  const standing = rank == null ? `<p class="muted" style="margin:0">${mode==="last"?"You weren't on last week's board.":mode==="streak"?"Start a streak to appear here: finish a lesson, a question, a step or a problem today.":"You'll appear here once your entry updates."}</p>` : `
+    <div class="stand"><div class="rkbig"><span>#${rank}</span><small>of ${total.toLocaleString()}</small></div>
+      <div style="display:grid;gap:6px;min-width:0">
+        <div class="row" style="gap:8px">${mv>0?`<span class="pill ok">▲ ${mv} since yesterday</span>`:mv<0?`<span class="pill bad">▼ ${-mv} since yesterday</span>`:""}<span class="pill">${fmt(myVal)}</span>${mode==="week"||mode==="last"?`<span class="lg" style="--lg:${myLeague.col}">${myLeague.name} league</span>`:""}</div>
+        ${above?`<span>${icon("target","sm")} <b>${fmt(v(above)-myVal+1)}</b> to pass <b>${nm(above)}</b> for #${rank-1}</span>`:rank===1?`<span>${icon("trophy","sm")} You're in first place. ${below?`<b>${nm(below)}</b> is ${fmt(myVal-v(below))} behind.`:""}</span>`:""}
+        ${below&&rank!==1?`<span class="muted">${nm(below)} is ${fmt(myVal-v(below))} behind you.</span>`:""}
+        ${mode==="week"?`<span class="muted">${thisWk.toLocaleString()} XP so far this week; ${lastWk.toLocaleString()} XP all of last week.${thisWk>lastWk&&lastWk>0?" Already ahead of last week.":""}</span>`:""}
+      </div></div>
+    ${mode==="week"&&myLeague.next?`<div style="display:grid;gap:4px"><div class="row" style="justify-content:space-between"><span class="muted" style="font-size:.85rem">${(myLeague.next[0]-thisWk).toLocaleString()} XP to ${myLeague.next[1]}</span><span class="muted" style="font-size:.85rem">${myLeague.name} → ${myLeague.next[1]}</span></div><div class="bar"><i style="width:${Math.min(100,100*(thisWk-LEAGUES[myLeague.i][0])/(myLeague.next[0]-LEAGUES[myLeague.i][0]))}%;background:${myLeague.next[2]}"></i></div></div>`:""}`;
+
+  const podium = rows.slice(0, 3), rest = rows.slice(3);
+  const pod = podium.length ? `<div class="podium">${[1,0,2].filter(i=>podium[i]).map(i=>{ const r=podium[i]; return `<div class="pd p${i+1} ${r.uid===me?"me":""}"><span class="av">${esc((r.name||"?").trim()[0]||"?").toUpperCase()}</span><b>${nm(r)}${r.uid===me?" (you)":""}</b>${r.title?`<span class="muted" style="font-size:.78rem">${esc(r.title)}</span>`:""}<span class="pv">${fmt(v(r))}</span>${(mode==="week"||mode==="last")?`<span class="muted" style="font-size:.78rem">${PODIUM_PRIZE[i]} coin prize</span>`:""}<div class="step"><span>${i+1}</span></div></div>`; }).join("")}</div>` : "";
+  const row = (r, i) => `<li class="${r.uid===me?"me":""}"><span class="rk">${i+1}</span><span class="av">${esc((r.name||"?").trim()[0]||"?").toUpperCase()}</span><span class="nm"><b>${nm(r)}${r.uid===me?" (you)":""}</b><span class="muted">${r.title?esc(r.title)+" · ":""}Lv ${+r.level||1} · ${icon("flame","sm")}${+r.streak||0}</span></span>${chip(r)}<b class="val">${fmt(v(r))}</b></li>`;
+  const meRow = rank != null && rank > rows.length ? `<li class="gap">⋯</li><li class="me"><span class="rk">${rank}</span><span class="av">${esc((P.board.name||"?")[0]).toUpperCase()}</span><span class="nm"><b>${esc(P.board.name)} (you)</b><span class="muted">Lv ${s.level} · ${icon("flame","sm")}${s.streak}</span></span><span class="lg" style="--lg:${myLeague.col}">${myLeague.name}</span><b class="val">${fmt(myVal)}</b></li>` : "";
+  const champStrip = champs && champs.rows.length ? `<section class="panel"><div class="sec-h"><h2 class="h3">${icon("trophy")} Last week's winners</h2><button type="button" class="btn ghost sm" data-bm="last">Final standings</button></div>
+    <div class="row" style="gap:8px">${champs.rows.slice(0,3).map((r,i)=>`<span class="pill ${i===0?"acc":""}">#${i+1} ${nm(r)} · ${fmt(v(r))}</span>`).join("")}</div></section>` : "";
+
+  body.innerHTML = `${head}
+    ${mode==="week"?`<div class="lbban">${icon("clock","sm")}<span>Week ends in <b>${(t=>{ const d=Math.floor(t/86400), h=Math.floor(t%86400/3600); return d?`${d} d ${h} h`:fmtDur(t); })(Board.weekEndsIn())}</b>. Top three win <b>${PODIUM_PRIZE.join(" / ")}</b> coins.</span></div>`:""}
+    <section class="panel"><div class="sec-h"><h2 class="h3">Your standing</h2><span class="muted" style="font-size:.85rem">${esc(m.sub)}</span></div>${standing}</section>
+    <section class="panel"><h2 class="h3">${m.t}${mode==="last"?` · week of ${esc(Board.lastWeekId().slice(2))}`:""}</h2>
+      ${rows.length?`${pod}${rest.length||meRow?`<ol class="lb" start="4">${rest.map((r,k)=>row(r,k+3)).join("")}${meRow}</ol>`:""}`
+        :`<p class="muted" style="margin:0">Nobody's on this board yet. ${mode==="last"?"Nobody finished last week with any progress.":"Finish a lesson or solve a problem and you'll be first."}</p>`}</section>
+    ${mode==="week"?champStrip:""}
+    <details class="panel"><summary><b>Leagues and prizes</b></summary><div style="display:grid;gap:8px;margin-top:10px">
+      <p class="muted" style="margin:0">Your league is set by this week's XP and starts again every Monday.</p>
+      <div class="row" style="gap:6px">${LEAGUES.map(([min,n,c])=>`<span class="lg" style="--lg:${c}">${n} · ${min.toLocaleString()}+ XP</span>`).join("")}</div>
+      <p class="muted" style="margin:0">The top three of each week win ${PODIUM_PRIZE.join(", ")} coins (with at least ${PRIZE_MIN_XP} XP that week), collected the next time they open this board. Scores are sent by each learner's browser, so treat the board as friendly competition.</p></div></details>
     <section class="panel"><h2 class="h3">Your entry</h2><p class="muted" style="margin:0">Shown as <b style="color:var(--ink)">${esc(P.board.name)}</b>${Rewards.title()?`, ${esc(Rewards.title())}`:""}. Change the name or leave the board here.</p>
       <div class="row"><input class="pred" id="lbname" maxlength="24" value="${esc(P.board.name)}" style="max-width:260px"><button type="button" class="btn sm" id="lbren">Save the name</button><button type="button" class="btn ghost sm" id="lbleave">Leave the leaderboard</button></div></section>`;
   wire();
@@ -309,11 +398,14 @@ async function rwBoard(body, s){
 /* compact card for the Today page */
 Rewards.todayCard = () => {
   const c = Rewards.challenges(), bal = Rewards.balance(), done = c.daily.filter(x => x.done).length;
+  const seen = P.board?.on ? P.board.seen?.["week:" + Board.weekId()] : null;
   return `<section class="panel"><div class="sec-h"><h2 class="h3">${icon("target")} Today's challenges <span class="pill">${done} of ${c.daily.length} done</span></h2><button type="button" class="btn ghost sm" data-act="rewards">${COIN_SVG}${bal.toLocaleString()} coins</button></div>
-    <div class="chals">${c.daily.map(x=>chalRow(x, true)).join("")}</div></section>`;
+    <div class="chals">${c.daily.map(x=>chalRow(x, true)).join("")}</div>
+    ${seen?`<button type="button" class="btn ghost sm" data-lbgo style="justify-self:start">${icon("trophy","sm")}You were #${seen.r} on this week's leaderboard${seen.p>seen.r?`, up ${seen.p-seen.r}`:""}. See who's close.</button>`:""}</section>`;
 };
 
 VIEWS.rewards = viewRewards;
+document.addEventListener("click", e => { if(e.target.closest("[data-lbgo]")){ route.board = "week"; go({v:"rewards", id:"board"}); } });
 SEARCH_SOURCES.push(() => [{t:"Rewards", sub:"Coins, daily and weekly challenges", kind:"Page", i:"target", r:{v:"rewards"}},
-  {t:"Leaderboard", sub:"This week and all time", kind:"Page", i:"trophy", r:{v:"rewards", id:"board"}},
+  {t:"Leaderboard", sub:"This week's progress, all time, streaks, coins and last week's winners", kind:"Page", i:"trophy", r:{v:"rewards", id:"board"}},
   {t:"Rewards shop", sub:"Streak freezes, accent colours and titles", kind:"Page", i:"palette", r:{v:"rewards", id:"shop"}}]);
