@@ -94,6 +94,9 @@ for p in P:
 order = {c["id"]: i for i, c in enumerate(CATS)}
 diff = {"Easy":0,"Medium":1,"Hard":2}
 out.sort(key=lambda r: (order[r["cat"]], diff[r["difficulty"]]))
-json.dump({"categories": CATS, "problems": out}, open("data/problems.json","w"), separators=(",",":"))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); import merge_extras   # pattern videos, takeaways, mistakes
+_data = {"categories": CATS, "problems": out}; _errs = merge_extras.apply_problems(_data)
+if _errs: print("\n".join(_errs)); sys.exit(1)
+json.dump(_data, open("data/problems.json","w"), separators=(",",":"))
 from collections import Counter
 print(len(out), "problems", dict(Counter(r["difficulty"] for r in out)), os.path.getsize("data/problems.json"), "bytes")

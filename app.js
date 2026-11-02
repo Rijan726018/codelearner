@@ -346,7 +346,7 @@ function viewLesson(el){
   quiz($("#lq"), l.questions.map(q=>D.q[q.id]), {mode:"lesson", onAnswer:(q,ok,conf)=>srs(q.id,ok,conf), onFinish:()=>showComplete(true), compactResult:true});
 }
 /* Videos load only when played (a click-to-play facade): no YouTube requests or cookies until then, and the page stays fast. */
-const ytSearch = l => "https://www.youtube.com/results?search_query="+encodeURIComponent(l.title+" explained");
+const ytSearch = l => "https://www.youtube.com/results?search_query="+encodeURIComponent(l.q || l.title+" explained");
 function videoBlock(l){
   if(!l.video) return `<div class="vidnone"><p>No hand-picked video for this lesson yet. A short one helps: watch at most 10 minutes, then come back and do the steps below.</p><a class="btn ghost sm" href="${esc(ytSearch(l))}" target="_blank" rel="noopener">Search YouTube for “${esc(l.title)}”</a></div>`;
   const id=esc(l.video.id);
