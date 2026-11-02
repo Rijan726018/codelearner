@@ -202,14 +202,16 @@ const BADGES = [
   {id:"hours-10", n:"Ten Hours", d:"Practise for 10 hours in total", i:"clock", t:s=>s.hours>=10},
   {id:"hours-100", n:"Century", d:"Practise for 100 hours in total", i:"clock", t:s=>s.hours>=100},
   {id:"hours-1000", n:"Thousand-Hour Club", d:"Practise for 1,000 hours in total", i:"mountain", t:s=>s.hours>=1000},
-  {id:"challenge-1", n:"Challenger", d:"Complete a daily or weekly challenge", i:"target", t:()=>Object.keys(P.claimed||{}).some(k=>!k.endsWith(":all"))},
-  {id:"challenge-25", n:"Quest Master", d:"Complete 25 challenges", i:"target", t:()=>Object.keys(P.claimed||{}).filter(k=>!k.endsWith(":all")).length>=25},
+  {id:"challenge-1", n:"Challenger", d:"Complete a daily or weekly challenge", i:"target", t:()=>Object.keys(P.claimed||{}).some(k=>/^[dw]:/.test(k)&&!k.endsWith(":all"))},
+  {id:"challenge-25", n:"Quest Master", d:"Complete 25 challenges", i:"target", t:()=>Object.keys(P.claimed||{}).filter(k=>/^[dw]:/.test(k)&&!k.endsWith(":all")).length>=25},
   {id:"day-sweep", n:"Full House", d:"Finish all three of a day's challenges", i:"check", t:()=>Object.keys(P.claimed||{}).some(k=>k.startsWith("d:")&&k.endsWith(":all"))},
   {id:"week-sweep", n:"Clean Sweep", d:"Clear all three weekly challenges in one week", i:"trophy", t:()=>Object.keys(P.claimed||{}).some(k=>k.startsWith("w:")&&k.endsWith(":all"))},
   {id:"coins-1000", n:"Saver", d:"Hold 1,000 coins at once", i:"star", t:s=>typeof Rewards!=="undefined"&&Rewards.balance(s)>=1000},
   {id:"shop-1", n:"First Purchase", d:"Buy something in the rewards shop", i:"palette", t:()=>(P.buys||[]).length>=1},
   {id:"freeze-1", n:"Saved by the Freeze", d:"Have a streak freeze keep your streak alive", i:"shield", t:()=>Object.keys(P.frozen||{}).length>=1},
-  {id:"board-1", n:"On the Board", d:"Join the leaderboard", i:"users", t:()=>!!P.board?.on}
+  {id:"board-1", n:"On the Board", d:"Join the leaderboard", i:"users", t:()=>!!P.board?.on},
+  {id:"podium-1", n:"Podium Finish", d:"Finish a week in the leaderboard's top three", i:"award", t:()=>Object.values(P.podium||{}).some(r=>r<=3)},
+  {id:"champion-1", n:"Weekly Champion", d:"Finish a week at #1 on the leaderboard", i:"trophy", t:()=>Object.values(P.podium||{}).some(r=>r===1)}
 ];
 const Game = {
   xpFor:n=>50*n*(n-1),

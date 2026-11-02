@@ -30,12 +30,24 @@ function firebaseProvider(cfg){
     // leaderboards: boards/{name}/entries/{uid}, readable by any signed-in person, writable only by the owner (firestore.rules)
     board(name){
       const ref = (fs, db, uid) => fs.doc(db, "boards", name, "entries", uid);
+      const col = (fs, db) => fs.collection(db, "boards", name, "entries");
+      const row = d => { const x = d.data(); return {uid: d.id, ...x, updated: x.updated?.toMillis ? x.updated.toMillis() : null}; };
       return {
         async put(uid, data){ const {fs, db} = await load(); await fs.setDoc(ref(fs, db, uid), {...data, updated: fs.serverTimestamp()}); },
         async remove(uid){ const {fs, db} = await load(); await fs.deleteDoc(ref(fs, db, uid)); },
         async top(field, n){ const {fs, db} = await load();
-          const snap = await fs.getDocs(fs.query(fs.collection(db, "boards", name, "entries"), fs.orderBy(field, "desc"), fs.limit(n)));
-          return snap.docs.map(d => ({uid: d.id, ...d.data()})); }
+          const snap = await fs.getDocs(fs.query(col(fs, db), fs.orderBy(field, "desc"), fs.limit(n)));
+          return snap.docs.map(row); },
+        // rank = 1 + how many entries score strictly higher (ties share a rank)
+        async rank(field, value){ const {fs, db} = await load();
+          return 1 + (await fs.getCountFromServer(fs.query(col(fs, db), fs.where(field, ">", value)))).data().count; },
+        async count(){ const {fs, db} = await load(); return (await fs.getCountFromServer(col(fs, db))).data().count; },
+        // the nearest entry above and below a score: who to catch, and who is chasing
+        async near(field, value){ const {fs, db} = await load();
+          const [a, b] = await Promise.all([
+            fs.getDocs(fs.query(col(fs, db), fs.where(field, ">", value), fs.orderBy(field, "asc"), fs.limit(1))),
+            fs.getDocs(fs.query(col(fs, db), fs.where(field, "<", value), fs.orderBy(field, "desc"), fs.limit(1)))]);
+          return {above: a.docs[0] ? row(a.docs[0]) : null, below: b.docs[0] ? row(b.docs[0]) : null}; }
       };
     }
   };
