@@ -42,7 +42,7 @@ function viewProblems(el){
   <section style="display:grid;gap:12px">
     <div class="chips" role="group" aria-label="Pattern"><button type="button" class="chip" data-cat="all" aria-pressed="${f.cat==="all"}">All patterns</button>${PB.cats.map(c=>{ const n=PB.list.filter(p=>p.cat===c.id), s=n.filter(p=>P.solved?.[p.id]).length; return `<button type="button" class="chip" data-cat="${c.id}" aria-pressed="${f.cat===c.id}">${esc(c.name)} <span class="muted" style="font:500 11px var(--mono)">${s}/${n.length}</span></button>`; }).join("")}</div>
     ${cat?`<div class="panel pattern"><div class="row" style="justify-content:space-between"><h2 class="h3">${icon(cat.icon)} ${esc(cat.name)}: the pattern</h2><span class="pill acc">${esc(cat.blurb)}</span></div>
-      <div class="grid2" style="align-items:start"><div class="prose">${cat.pattern.map(p=>`<p>${md(p)}</p>`).join("")}</div>${codeBlock(cat.template)}</div></div>`:""}
+      <div class="grid2" style="align-items:start"><div class="prose">${cat.pattern.map(p=>`<p>${md(p)}</p>`).join("")}</div><div style="display:grid;gap:12px;min-width:0">${codeBlock(cat.template)}${cat.video?videoBlock({title:cat.name, video:cat.video, q:`${cat.name} coding interview pattern`}):""}</div></div></div>`:""}
     <div class="row" style="justify-content:space-between">
       <input class="search" id="pq" placeholder="Search problems or tags…" value="${esc(f.q)}" aria-label="Search problems">
       <div class="row"><div class="seg" role="group" aria-label="Difficulty">${["all","Easy","Medium","Hard"].map(d=>`<button type="button" data-diff="${d}" aria-pressed="${f.diff===d}">${d==="all"?"Any":d}</button>`).join("")}</div>
@@ -59,6 +59,7 @@ function viewProblems(el){
   el.querySelectorAll("[data-st]").forEach(b=>b.onclick=()=>{ f.status=b.dataset.st; el.querySelectorAll("[data-st]").forEach(x=>x.setAttribute("aria-pressed",x===b)); drawList(); });
   el.querySelector("#pq").oninput=e=>{ f.q=e.target.value; drawList(); };
   el.querySelector("#rand").onclick=()=>{ const pool=PB.list.filter(p=>!P.solved?.[p.id]); const p=(pool.length?pool:PB.list)[Math.floor(Math.random()*(pool.length||PB.list.length))]; go({v:"problem", id:p.id}); };
+  bindVideos(el);
 }
 
 function exampleHTML(p, ex, i){
@@ -95,14 +96,17 @@ function viewProblem(el){
       <div style="margin-top:6px"><span class="eyebrow">Constraints</span><ul style="margin:8px 0 0;padding-left:18px;font:13px/1.7 var(--mono)">${p.constraints.map(c=>`<li>${esc(c)}</li>`).join("")}</ul></div>
       <p class="muted" style="font-size:.86rem;margin:10px 0 0">Pattern: <button class="btn ghost sm" data-act="problems" id="patlink">${esc(cat.name)}</button></p>`;
     else if(tab==="hints") box.innerHTML=`<div style="display:grid;gap:10px">${p.hints.map((h,i)=>`<details class="hint"><summary>${icon("bulb","sm")}Hint ${i+1}</summary><div>${md(h)}</div></details>`).join("")}
-      <details class="hint"><summary>${icon("layers","sm")}The ${esc(cat.name)} pattern</summary><div class="prose">${cat.pattern.map(x=>`<p>${md(x)}</p>`).join("")}${codeBlock(cat.template)}</div></details></div>`;
+      ${(p.mistakes||[]).length?`<details class="hint"><summary>${icon("bug","sm")}Common mistakes on this problem</summary><div class="mist" style="margin-top:8px">${p.mistakes.map(x=>`<div class="mi"><div class="w"><span class="eyebrow">Tempting</span><p>${md(x.wrong)}</p></div><div class="r"><span class="eyebrow">Instead</span><p>${md(x.right)}</p></div></div>`).join("")}</div></details>`:""}
+      <details class="hint"><summary>${icon("layers","sm")}The ${esc(cat.name)} pattern</summary><div class="prose">${cat.pattern.map(x=>`<p>${md(x)}</p>`).join("")}${codeBlock(cat.template)}</div>${cat.video?`<div style="display:grid;gap:8px;margin-top:10px"><span class="eyebrow">Watch: the pattern</span>${videoBlock({title:cat.name, video:cat.video, q:`${cat.name} coding interview pattern`})}</div>`:""}</details>
+      <p class="muted" style="margin:0;font-size:.86rem">Want to see someone talk through it? <a href="${esc(ytSearch({q:`${p.title} leetcode explained`}))}" target="_blank" rel="noopener">Search YouTube for a ${esc(p.title)} walkthrough</a>, ideally after you've tried it.</p></div>`;
     else { const show=P.solved?.[p.id]||route.reveal;
-      box.innerHTML = show ? `<div class="prose" style="gap:12px">${p.editorial.map(x=>`<p>${md(x)}</p>`).join("")}<p><b>Complexity:</b> ${md(p.complexity)}</p></div>
+      box.innerHTML = show ? `${p.takeaway?`<div class="recall" style="margin-bottom:12px"><span class="eyebrow">Key takeaway</span><p>${md(p.takeaway)}</p></div>`:""}<div class="prose" style="gap:12px">${p.editorial.map(x=>`<p>${md(x)}</p>`).join("")}<p><b>Complexity:</b> ${md(p.complexity)}</p></div>
         <div class="seg" style="margin:12px 0 8px"><button type="button" data-sl="py" aria-pressed="${key==="py"}">Python</button><button type="button" data-sl="js" aria-pressed="${key==="js"}">JavaScript</button></div><div id="solcode">${codeBlock(p.solution[key])}</div>`
       : `<div class="empty" style="display:grid;gap:12px;justify-items:center">${icon("lock","xl")}<b>The editorial unlocks when you solve it.</b><span>Struggling productively is where the learning happens. Try the hints first. Still stuck after 20 minutes? Reading a solution is fine, then close it and write it again from memory tomorrow.</span><button class="btn" id="reveal">Reveal anyway</button></div>`;
       box.querySelector("#reveal")?.addEventListener("click",()=>{ route.reveal=true; drawTab(); });
       box.querySelectorAll("[data-sl]").forEach(b=>b.onclick=()=>{ box.querySelectorAll("[data-sl]").forEach(x=>x.setAttribute("aria-pressed",x===b)); box.querySelector("#solcode").innerHTML=codeBlock(p.solution[b.dataset.sl]); }); }
     el.querySelector("#patlink")?.addEventListener("click",()=>{ pbFilter.cat=p.cat; });
+    bindVideos(box);
   };
   drawTab();
   el.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{ tab=route.tab=b.dataset.tab; el.querySelectorAll("[data-tab]").forEach(x=>x.setAttribute("aria-selected",x===b)); drawTab(); });

@@ -192,6 +192,7 @@ function viewProject(el){
       ${p.prereq?`<p class="muted" style="margin:0;font-size:.9rem"><b style="color:var(--ink)">Before you start:</b> ${md(p.prereq)}</p>`:""}
       ${mods.length?`<div style="display:grid;gap:6px"><span class="eyebrow">Matching core-curriculum modules</span>${mods.map(m=>`<button class="btn ghost sm" style="justify-content:flex-start;text-align:left" data-act="map" data-stage-go="${m.si}">${icon("book","sm")}${esc(m.title)}</button>`).join("")}</div>`:""}</section>
   </div>
+  ${projectExtras(p)}
   <section class="road" style="--h:${esc(p.hue)}">
     <div class="head" style="margin-bottom:22px"><span class="eyebrow">The pathway</span><h2 class="h2">${p.milestones.length} milestones, each ending in something that works</h2></div>
     ${p.milestones.map((m,mi)=>{ const idx=p.steps.map((x,k)=>k).filter(k=>p.steps[k].ms===mi), dn=idx.filter(k=>P.steps?.[p.steps[k].id]).length, all=dn===idx.length;
@@ -204,6 +205,17 @@ function viewProject(el){
     <p class="muted" style="margin:0;font-size:.9rem">${visual?"When you're happy with it, copy your code into an <code>index.html</code> file and publish it free on GitHub Pages or Netlify Drop.":"When you're happy with it, copy your code into a file on your computer, run it there, and push it to GitHub with a short README."}</p></section>`:""}
   <section style="display:grid;gap:14px"><h2 class="h2">More projects</h2><div class="grid3 pj">${PJ.list.filter(x=>x.id!==p.id).sort((a,b)=>(a.lang===p.lang?0:1)-(b.lang===p.lang?0:1)).slice(0,3).map(projectCard).join("")}</div></section>`;
   if(visual){ const pv=mountPreview(el.querySelector("#demo"), p.lang, p.steps[p.steps.length-1].storage); pv.show(p.steps[p.steps.length-1].solution); }
+  bindVideos(el);
+}
+// Why build it, a video to watch first, the mistakes people make and what to take away (tools/project_extra.py).
+function projectExtras(p){
+  if(!p.why && !p.video && !(p.mistakes||[]).length) return "";
+  return `<div class="grid2" style="align-items:start">
+    <section class="panel"><h2 class="h3">${icon("play")} Watch first</h2>${p.why?`<p class="why"><b>Why build it.</b> ${md(p.why)}</p>`:""}${videoBlock({title:p.title, video:p.video, q:`${p.title} tutorial`})}</section>
+    <section class="panel"><h2 class="h3">${icon("bug")} Common mistakes</h2>
+      ${(p.mistakes||[]).length?`<div class="mist">${p.mistakes.map(x=>`<div class="mi"><div class="w"><span class="eyebrow">Myth</span><p>${md(x.wrong)}</p></div><div class="r"><span class="eyebrow">Actually</span><p>${md(x.right)}</p></div></div>`).join("")}</div>`:""}
+      ${(p.takeaways||[]).length?`<div style="display:grid;gap:6px"><span class="eyebrow">Key takeaways</span><ul style="margin:0;padding-left:20px;display:grid;gap:6px">${p.takeaways.map(t=>`<li>${md(t)}</li>`).join("")}</ul></div>`:""}</section>
+  </div>`;
 }
 function viewMake(el){
   const p=PJ.byId[route.id]; if(!p){ go({v:"build"}); return; }

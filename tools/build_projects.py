@@ -2,7 +2,7 @@
 For SQL steps, expected rows come from running each solution on SQLite; for Python projects the demo output is
 captured by running the finished program. Checks are verified by check_bootcamp.mjs (Python/JS) and in a browser (web/SQL)."""
 import json, os, sys, sqlite3, subprocess
-HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, os.path.join(HERE, "projects_src"))
+HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, os.path.join(HERE, "projects_src")); sys.path.insert(0, HERE)
 import _lib
 for m in ["web", "python_projects", "more", "more2", "more3"]:
     if os.path.exists(os.path.join(HERE, "projects_src", m + ".py")): __import__(m)
@@ -38,6 +38,9 @@ for p in _lib.PROJECTS:
         assert r.returncode == 0, (p["id"], r.stderr)
         p["demo"] = r.stdout.strip()
         p.pop("demo_stdin")
+if errs: print("\n".join(errs)); sys.exit(1)
+import merge_extras   # video, why, mistakes and takeaways per project
+errs = merge_extras.apply_projects(_lib.PROJECTS)
 if errs: print("\n".join(errs)); sys.exit(1)
 json.dump({"projects": _lib.PROJECTS}, open("data/projects.json", "w"), separators=(",", ":"), ensure_ascii=False)
 print(len(_lib.PROJECTS), "projects,", sum(len(m["steps"]) for p in _lib.PROJECTS for m in p["milestones"]), "steps,", os.path.getsize("data/projects.json"), "bytes")
