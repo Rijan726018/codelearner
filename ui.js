@@ -108,7 +108,7 @@ UI.confetti = (n=150) => {
   if(matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const c=document.getElementById("confetti"); if(!c) return; const x=c.getContext("2d"); const dpr=Math.min(2,devicePixelRatio||1);
   c.width=innerWidth*dpr; c.height=innerHeight*dpr; x.scale(dpr,dpr);
-  const cols=["#8b7dff","#38d3f0","#a3e635","#ff5c93","#fbbf24","#ffffff"];
+  const cols=["#1d1d1f","#48484c","#8e8e93","#c7c7cc","#e8e8ed","#ffffff"];
   const ps=Array.from({length:n},()=>({x:innerWidth/2+(Math.random()-.5)*innerWidth*.5, y:innerHeight*.35+(Math.random()-.5)*60, vx:(Math.random()-.5)*14, vy:-Math.random()*13-4,
     w:5+Math.random()*7, h:3+Math.random()*5, r:Math.random()*6, vr:(Math.random()-.5)*.4, c:cols[(Math.random()*cols.length)|0]}));
   const t0=performance.now();
@@ -259,7 +259,7 @@ const Game = {
     UI.syncNav(currentTab());
   },
   ringSVG(s, size=120){ const r=size/2-9, c=2*Math.PI*r, p=Math.max(0,Math.min(1,(s.xp-s.cur)/Math.max(1,s.next-s.cur)));
-    return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" role="img" aria-label="Level ${s.level}, ${Math.round(p*100)} percent to next level"><defs><linearGradient id="lg${size}" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#8b7dff"/><stop offset=".55" stop-color="#38d3f0"/><stop offset="1" stop-color="#a3e635"/></linearGradient></defs>
+    return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" role="img" aria-label="Level ${s.level}, ${Math.round(p*100)} percent to next level"><defs><linearGradient id="lg${size}" x1="0" x2="1" y1="0" y2="1"><stop offset="0" style="stop-color:var(--ink)"/><stop offset="1" style="stop-color:var(--muted)"/></linearGradient></defs>
     <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="var(--sunk)" stroke-width="10"/><circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="url(#lg${size})" stroke-width="10" stroke-linecap="round" stroke-dasharray="${c*p} ${c}" transform="rotate(-90 ${size/2} ${size/2})"/>
     <text x="50%" y="${size/2-4}" text-anchor="middle" style="font:600 ${size/11}px var(--mono);fill:var(--muted)">LEVEL</text><text x="50%" y="${size/2+size/5.2}" text-anchor="middle" style="font:800 ${size/3.6}px var(--display);fill:var(--ink)">${s.level}</text></svg>`; }
 };
@@ -326,7 +326,7 @@ function journeySVG(){
   return `<div class="journey rv"><svg viewBox="0 0 1000 400" role="img" aria-label="The nine-stage climb from Base Camp to Summit">
     <defs><linearGradient id="mtn" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--accent)" stop-opacity=".35"/><stop offset="1" stop-color="var(--accent)" stop-opacity="0"/></linearGradient>
     <linearGradient id="mtn2" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--accent-2)" stop-opacity=".22"/><stop offset="1" stop-color="var(--accent-2)" stop-opacity="0"/></linearGradient>
-    <linearGradient id="trail" x1="0" x2="1"><stop offset="0" stop-color="#8b7dff"/><stop offset=".55" stop-color="#38d3f0"/><stop offset="1" stop-color="#a3e635"/></linearGradient></defs>
+    <linearGradient id="trail" x1="0" x2="1"><stop offset="0" style="stop-color:var(--ink)"/><stop offset="1" style="stop-color:var(--muted)"/></linearGradient></defs>
     <path d="M0 400 L120 300 L210 330 L330 210 L420 250 L560 120 L640 160 L780 40 L860 90 L1000 20 L1000 400Z" fill="url(#mtn2)"/>
     <path d="M0 400 L160 330 L260 350 L380 250 L470 280 L600 170 L690 200 L820 70 L900 110 L1000 60 L1000 400Z" fill="url(#mtn)"/>
     <path id="jtrail" d="M40 370 C140 360 170 320 230 318 S330 300 360 262 S450 240 500 222 S580 200 610 168 S700 150 730 122 S800 100 820 80 S900 52 950 34" fill="none" stroke="var(--line2)" stroke-width="3" stroke-dasharray="2 9" stroke-linecap="round"/>
@@ -401,10 +401,10 @@ function viewHome(el){
     </ol>
   </section>
   <section class="cta rv">
-    <span class="eyebrow" style="color:#0a0b1a;opacity:.7">Your first hour</span>
+    <span class="eyebrow" style="color:var(--on-accent);opacity:.7">Your first hour</span>
     <h2>Write your first program in the next five minutes.</h2>
     <p>No installs. Open the bootcamp, type one line, press Run. That's the whole setup.</p>
-    <div class="row"><button class="btn lg" ${firstCourse?`data-course="${firstCourse.id}"`:`data-act="bootcamp"`}>${icon("play")}Start the bootcamp</button><button class="btn lg" style="background:transparent;color:#0a0b1a;border-color:rgba(10,11,26,.35)" data-act="method">Why this works</button></div>
+    <div class="row"><button class="btn lg" ${firstCourse?`data-course="${firstCourse.id}"`:`data-act="bootcamp"`}>${icon("play")}Start the bootcamp</button><button class="btn lg" style="background:transparent;color:var(--on-accent);border-color:color-mix(in oklab,var(--on-accent) 35%,transparent)" data-act="method">Why this works</button></div>
   </section>`;
   typeTerminal(el.querySelector("#termp"), el.querySelector("#termf"));
   placeJourney(el);
