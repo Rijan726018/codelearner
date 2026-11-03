@@ -152,7 +152,7 @@ ax("ax10", "Tables with real headers",
  h10, [dict(sel="table caption", nonempty=True, msg="The table has a `caption`."), dict(sel="thead th[scope='col']", count=2, msg="There are two column headers with `scope=\"col\"`."),
        dict(sel="tbody tr", count=2, msg="There are at least two rows of books."), dict(sel="h2#books", msg="The section heading has `id=\"books\"`, so the nav link works.")],
  ref=("WAVE accessibility checker", "https://wave.webaim.org/"))
-C.append(dict(id="a11y-html", title="Accessible HTML", lang="html", hue="#22d3ee", icon="eye", art="♿ <main>", hours="1.5 h",
+C.append(dict(id="a11y-html", title="Accessible HTML", lang="html", hue="#22d3ee", icon="eye", art="<main>", hours="1.5 h",
  tagline="Pages everyone can use: landmarks, headings, alt text, labels and real buttons.",
  desc="Build a club sign-up page that works with screen readers, keyboards and phones. Language, landmarks, a skip link, heading order, alt text, labelled forms, hints, real buttons and data tables.",
  project="an accessible sign-up page", steps=AX))
@@ -359,7 +359,7 @@ er("er10", "Test first",
  '\n\ndef test_grades():\n    assert [grade(s) for s in (95, 90, 85, 70, 69, 0)] == ["A", "A", "B", "C", "F", "F"]\n\n\ndef test_grade_range():\n    for bad in (-1, 101):\n        try:\n            grade(bad)\n        except ValueError:\n            continue\n        assert False, f"{bad} should raise"\n\n\ndef grade(score):\n    if not 0 <= score <= 100:\n        raise ValueError("score must be 0-100")\n    if score >= 90:\n        return "A"\n    if score >= 80:\n        return "B"\n    if score >= 70:\n        return "C"\n    return "F"\n\n\nprint(run_tests([test_withdraw_ok, test_withdraw_exact, test_to_int_bad, test_overdraw_raises, test_grades, test_grade_range]))\n',
  [dict(py='[grade(s) for s in (100, 90, 89, 80, 79, 70, 69)] == ["A", "A", "B", "B", "C", "C", "F"]', msg="`grade` follows the boundaries exactly."), dict(py="_raises(lambda: grade(101), ValueError) and _raises(lambda: grade(-5), ValueError)", msg="Out-of-range scores raise."),
   dict(outHas="(6, 0)", msg="All six tests pass.")])
-C.append(dict(id="py-testing", title="Python Errors & Testing", lang="python", hue="#f87171", icon="bug", art="assert ✓", hours="1.5 h",
+C.append(dict(id="py-testing", title="Python Errors & Testing", lang="python", hue="#f87171", icon="bug", art="assert ==", hours="1.5 h",
  tagline="Catch, raise and design exceptions, then prove your code works with tests.",
  desc="Professional code fails loudly and is tested. Catch specific errors, use else and finally, raise your own and custom exceptions, then write asserts, test functions, a tiny test runner, tests for errors, and finish test-first.",
  project="a tested banking helper and test runner", steps=ER))

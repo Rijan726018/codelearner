@@ -152,7 +152,7 @@ S.append(step("td12", "Load saved to-dos",
    T("$('#list li:last-child').classList.contains('done') && _text('#count')==='1 item left'", "Saved state (done, count) comes back too.", storage=SEED),
    T("$$('#list li').length===0", "With nothing saved, the list starts empty.", storage={})],
   storage=SEED))
-project(id="todo-app", title="To-Do List App", lang="web", level="Beginner", hours="1.5 h", hue="#38d3f0", icon="checkc", art="☑ ☐",
+project(id="todo-app", title="To-Do List App", lang="web", level="Beginner", hours="1.5 h", hue="#38d3f0", icon="checkc", art="[x] [ ]",
   tagline="The classic first app: add, tick off, filter and save your tasks.",
   desc=["You'll build a complete to-do app from an empty file: an HTML form, CSS that makes it look like an app, and JavaScript that handles adding, completing, deleting and filtering, with everything saved in the browser.",
         "Along the way you'll learn the pattern behind React, Vue and every other framework: keep your data in an array, and re-draw the page from it whenever it changes."],
