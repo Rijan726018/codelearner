@@ -64,7 +64,7 @@ The web config values identify the project but aren't secrets; the rules decide 
 
 | Path | What it is |
 |---|---|
-| `index.html` | Page shell and the whole design system (CSS) |
+| `index.html` | Page shell and the whole design system (CSS): a black-and-white theme, with green and red kept only for passed and failed |
 | `ui.js` | Icons, theme, toasts, confetti, search palette, XP/levels/badges, Home and Profile views |
 | `app.js` | Routing, persistence, Dashboard, Learn map, lessons, exams, review, practice, projects, method; quiz engine; spaced repetition |
 | `runner.js` | Code editor widget (CodeMirror 5), runners and drafts |
@@ -102,4 +102,4 @@ Core curriculum content follows `tools/SCHEMA.md`. Each lesson's videos are list
 - [Pyodide](https://github.com/pyodide/pyodide) 0.26.4, Mozilla Public License 2.0. Files in `pyodide/` are unmodified, apart from the base64 encoding of the standard library zip.
 - [sql.js](https://github.com/sql-js/sql.js) 1.10.3, MIT License.
 - [CodeMirror 5](https://codemirror.net/5/) 5.65.16, MIT License, loaded from cdnjs; its base CSS is inlined in `index.html`.
-- Fonts: Bricolage Grotesque, IBM Plex Sans and JetBrains Mono from Google Fonts (SIL Open Font License).
+- Fonts: the system font (San Francisco on Apple devices), with Inter and JetBrains Mono from Google Fonts (SIL Open Font License) everywhere else.
