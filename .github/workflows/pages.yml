@@ -1,4 +1,5 @@
-# Publishes the site to GitHub Pages on every push to main.
+# Publishes the site to GitHub Pages on every push to main, then asks Vercel to rebuild codebay.org
+# (the Rijan726018/codebay project copies this repository at build time).
 # Requires Settings → Pages → Build and deployment → Source: "GitHub Actions".
 name: Deploy to GitHub Pages
 
@@ -30,3 +31,11 @@ jobs:
           path: .
       - id: deployment
         uses: actions/deploy-pages@v4
+      # codebay.org: set the repository secret VERCEL_DEPLOY_HOOK to the Deploy Hook URL from
+      # Vercel → codebay project → Settings → Git → Deploy Hooks. Without it this step does nothing.
+      - name: Rebuild codebay.org
+        env:
+          HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$HOOK" ]; then echo "VERCEL_DEPLOY_HOOK not set; codebay.org updates on its next Vercel deploy."; exit 0; fi
+          curl -fsS -X POST "$HOOK" > /dev/null && echo "Asked Vercel to rebuild codebay.org."
