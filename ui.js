@@ -1,6 +1,7 @@
 "use strict";
 /* ---------- UI kit: icons, theme, toasts, confetti, glow, reveal, nav, search palette, XP + badges, Home and Profile ---------- */
 const ICONS = {
+  gavel:'<path d="m14 4 6 6"/><path d="m11.5 6.5 6 6"/><path d="m12.75 5.25-4.5 4.5 6 6 4.5-4.5"/><path d="m9.5 11.5-6.5 6.5 2 2 6.5-6.5"/><path d="M13 21h8"/>',
   home:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9.5 21v-6h5v6"/>',
   dash:'<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',
   map:'<path d="M9 4 3 6.5v13.5L9 17.5l6 2.5 6-2.5V4l-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/>',
@@ -134,7 +135,7 @@ new MutationObserver(()=>UI.scan(document.getElementById("main"))).observe(docum
 /* ---------- navigation ---------- */
 const NAV = [
   {v:"today", t:"Today", i:"dash"}, {v:"map", t:"Learn", i:"map"},
-  {v:"paths", t:"Paths", i:"route"}, {v:"problems", t:"Problems", i:"braces"}, {v:"bootcamp", t:"Bootcamp", i:"cap"}, {v:"build", t:"Build", i:"rocket"}, {v:"editor", t:"Editor", i:"terminal"},
+  {v:"paths", t:"Paths", i:"route"}, {v:"problems", t:"Problems", i:"braces"}, {v:"bootcamp", t:"Bootcamp", i:"cap"}, {v:"build", t:"Build", i:"rocket"}, {v:"editor", t:"Editor", i:"terminal"}, {v:"auction", t:"Auction", i:"gavel"},
   {v:"review", t:"Review", i:"refresh", badge:true}, {v:"rewards", t:"Rewards", i:"target"}
 ];
 const NAV_MORE = [{v:"home", t:"Home", i:"home"}, {v:"practice", t:"Practice by level", i:"target"}, {v:"projects", t:"Projects", i:"rocket"}, {v:"clock", t:"Practice clock", i:"clock"}, {v:"method", t:"The Method", i:"book"}, {v:"profile", t:"Profile & badges", i:"award"}, {v:"rewards", id:"board", t:"Leaderboard", i:"trophy"}, {v:"rewards", id:"shop", t:"Rewards shop", i:"palette"}];
@@ -366,7 +367,7 @@ function viewHome(el){
     <div style="display:grid;gap:22px;align-content:center">
       <span class="badge-line"><b>FREE</b> Everything runs in your browser. No sign-up, no paywall.</span>
       <h1>From your first line of code to <span class="gt">world-class engineer.</span></h1>
-      <p class="lede">CodeLearner, the free coding school from <a href="https://codebay.org/" target="_blank" rel="noopener">CodeBay</a>, is one place to learn programming end to end: an interactive bootcamp for total beginners, guided projects you build step by step, a 10,000-hour core curriculum, career roadmaps for every specialty and a problem judge to sharpen your skills. Built on the science of how people actually learn.</p>
+      <p class="lede">CodeBay is one place to learn programming end to end, and to trade what you build: an interactive bootcamp for total beginners, guided projects you build step by step, a 10,000-hour core curriculum, career roadmaps for every specialty and a problem judge to sharpen your skills, and a Code Auction where you can sell the projects you make. Built on the science of how people actually learn.</p>
       <div class="row" style="gap:12px">
         ${started?`<button class="btn grad lg" data-act="today">${icon("dash")}Continue learning</button>`:`<button class="btn grad lg" ${firstCourse?`data-course="${firstCourse.id}"`:`data-act="bootcamp"`}>${icon("play")}Start from zero</button>`}
         <button class="btn lg" data-act="paths">${icon("route")}Choose a career</button>
@@ -380,7 +381,7 @@ function viewHome(el){
     ${[[nL,"core lessons"],[nQ,"quiz questions"],[nP,"judged problems"],[nC,"career roadmaps"],[nS,"bootcamp steps"],[nB,"guided projects"]].map(([n,t])=>`<div class="counter rv"><b class="gt" data-count="${n}">0</b><span>${t}</span></div>`).join("")}
   </section>
   <section style="display:grid;gap:18px">
-    <div class="sec-h rv"><div class="head"><span class="eyebrow">Everything in one place</span><h2 class="h2">Nine ways to level up</h2></div><p class="lede" style="max-width:48ch">The structure of a university degree, the hands-on feel of a bootcamp and the practice volume of an interview grind.</p></div>
+    <div class="sec-h rv"><div class="head"><span class="eyebrow">Everything in one place</span><h2 class="h2">Nine ways to get better</h2></div><p class="lede" style="max-width:48ch">The structure of a university degree, the hands-on feel of a bootcamp and the practice volume of an interview grind.</p></div>
     <div class="feat">${feats.map(f=>`<button type="button" class="fcard glow rv" data-act="${f.v}"><span class="fi">${icon(f.i,"lg")}</span><h3>${f.t}</h3><p>${f.d}</p><span class="row" style="justify-content:space-between"><span class="pill acc">${f.c}</span><span class="go">Open ${icon("arrow","sm")}</span></span></button>`).join("")}</div>
   </section>
   <section style="display:grid;gap:18px">

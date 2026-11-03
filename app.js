@@ -19,7 +19,7 @@ let INTERVALS = [1,3,7,16,35,90,180];
 
 /* ---------- state ---------- */
 const D = {stages:[], research:null, q:{}, mods:[], lessons:{}, modById:{}};
-const P0 = () => ({lessons:{}, notes:{}, ms:{}, exams:{}, log:{}, solved:{}, tried:{}, steps:{}, nodes:{}, badges:{}, xpSeen:null, time:{}, manual:[], goal:null, calib:{}, qa:{}, claimed:{}, buys:[], frozen:{}, equip:{}, board:{}, coinSeen:null, podium:{}});
+const P0 = () => ({lessons:{}, notes:{}, ms:{}, exams:{}, log:{}, solved:{}, tried:{}, steps:{}, nodes:{}, badges:{}, xpSeen:null, time:{}, manual:[], goal:null, calib:{}, qa:{}, claimed:{}, buys:[], frozen:{}, equip:{}, board:{}, coinSeen:null, podium:{}, auction:{}});
 const normP = d => { const z=P0(); Object.keys(z).forEach(k=>{ if(d && d[k]!=null) z[k]=d[k]; }); return z; };
 let P = P0();   // progress doc: core lessons, notes, milestones, exams, activity log, problems, bootcamp steps, roadmap nodes, badges, practice time, confidence calibration, rewards (see rewards.js)
 let S = {cards:{}};                                        // spaced-repetition doc
@@ -150,13 +150,13 @@ function go(r){ route=r; tip.hidden=true; Palette.close?.();
 window.addEventListener("popstate",()=>{ const r=parseHash(); route=r||{v:"home"}; render(); });
 $("#tabs").addEventListener("click",e=>{ const b=e.target.closest("[data-v]"); if(b) go({v:b.dataset.v}); });
 function updateBadge(){ const n=dueCards().length, bd=$("#duebadge"); if(!bd) return; bd.hidden=!n; bd.textContent=n; }
-const TAB_OF = {lesson:"map", exam:"map", path:"paths", problem:"problems", course:"bootcamp", project:"build", make:"build"};
+const TAB_OF = {lesson:"map", exam:"map", path:"paths", problem:"problems", course:"bootcamp", project:"build", make:"build", lot:"auction", sell:"auction"};
 const currentTab = () => TAB_OF[route.v] || route.v;
 function render(){
   UI.syncNav(currentTab());
   updateBadge();
   const v = VIEWS[route.v] || VIEWS.home; v($("#main"));
-  document.title = (route.v==="home"?"CodeLearner · Learn to code, from zero to world-class":(document.querySelector("#main .h1, #main h1")?.textContent?.trim()||"CodeLearner")+" · CodeLearner");
+  document.title = (route.v==="home"?"CodeBay · Learn to code, build projects, auction your code":(document.querySelector("#main .h1, #main h1")?.textContent?.trim()||"CodeBay")+" · CodeBay");
 }
 
 /* ================= TODAY ================= */

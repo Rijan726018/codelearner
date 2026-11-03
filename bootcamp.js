@@ -42,7 +42,7 @@ function viewBootcamp(el){
       <h3 class="h3" style="font-size:1.35rem">${esc(c.title)}</h3><p class="muted" style="margin:0">${esc(c.desc)}</p>
       <div class="bar"><i style="width:${pct}%;background:var(--h)"></i></div>
       <span class="muted" style="font-size:.86rem">${icon("rocket","sm")} You'll build: <b style="color:var(--ink)">${esc(c.project)}</b></span></button>`; }).join("")}</div></section>`; }).join("")}
-  <section class="panel"><h2 class="h3">How the bootcamp fits the rest of CodeLearner</h2>
+  <section class="panel"><h2 class="h3">How the bootcamp fits the rest of CodeBay</h2>
     <div class="grid3">${[["cap","1. Bootcamp","Your first 10–20 hours: the syntax and the feeling of making things work."],["rocket","2. Build & Learn","Pick a real project and build it step by step, learning each idea at the moment you need it."],["map","3. Core curriculum","The 10,000-Hour Map: daily lessons, exams and spaced review, from Python basics to distributed systems."]].map(([i,t,d])=>`<div style="display:grid;gap:6px"><span class="row" style="gap:8px;color:var(--accent)">${icon(i)}<b style="color:var(--ink)">${t}</b></span><span class="muted" style="font-size:.92rem">${d}</span></div>`).join("")}</div></section>`;
   el.querySelectorAll("[data-bct]").forEach(b=>b.onclick=()=>{ bcTrack=b.dataset.bct; render(); });
 }

@@ -326,7 +326,7 @@ async function rwBoard(body, s){
   const mode = BOARD_MODES.some(m => m.id === route.board) ? route.board : "week";
   const head = `<div class="chips" role="group" aria-label="Leaderboard">${BOARD_MODES.map(m=>`<button type="button" class="chip" data-bm="${m.id}" aria-pressed="${mode===m.id}">${m.t}</button>`).join("")}</div>`;
   const wire = () => body.querySelectorAll("[data-bm]").forEach(b => b.onclick = () => { route.board = b.dataset.bm; render(); });
-  if(typeof Account === "undefined" || !Account.enabled){ body.innerHTML = `<section class="panel"><h2 class="h3">Leaderboard</h2><p class="muted" style="margin:0">The leaderboard needs accounts, and this copy of CodeLearner runs without them. Everything else, including coins and challenges, works in this browser.</p></section>`; return; }
+  if(typeof Account === "undefined" || !Account.enabled){ body.innerHTML = `<section class="panel"><h2 class="h3">Leaderboard</h2><p class="muted" style="margin:0">The leaderboard needs accounts, and this copy of CodeBay runs without them. Everything else, including coins and challenges, works in this browser.</p></section>`; return; }
   if(!Account.user){ body.innerHTML = `<section class="panel"><h2 class="h3">Leaderboard</h2><p class="muted" style="margin:0">Sign in with Google to see who's making the most progress this week, and to race them.</p></section>${Account.panel()}`; Account.wire(body); return; }
   if(!P.board?.on){
     const first = (Account.user.name || "").trim().split(/\s+/)[0] || "Learner";

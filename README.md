@@ -1,6 +1,6 @@
-# CodeLearner
+# CodeBay
 
-Learn to code from your first line to world-class engineering, in one place, entirely in the browser. CodeLearner is the free coding school that is part of [CodeBay](https://codebay.org/), and it is live at https://rijan726018.github.io/codelearner/. It combines five ways of learning:
+Learn to code from your first line to world-class engineering, then auction the projects you build. Everything runs in the browser, and it is live at https://rijan726018.github.io/codelearner/. (This site used to be called CodeLearner; the repository keeps that name so the address doesn't change.) It combines five ways of learning and a Code Auction:
 
 | Section | Inspired by | What's in it |
 |---|---|---|
@@ -11,6 +11,7 @@ Learn to code from your first line to world-class engineering, in one place, ent
 | **Problems** | LeetCode | 144 problems across 15 patterns, judged in the browser in Python or JavaScript against hidden tests, with hints, common mistakes for every problem, pattern guides with a video for each pattern, a key takeaway in each editorial, and a link to find a walkthrough |
 
 Around them:
+- **Code Auction**: list one of your cloud projects from the Editor, with a title, description, starting price and an end time (1 to 7 days). Others bid in US dollars; each bid must beat the last by at least $1, the seller can't bid on their own lot, and nobody can bid after the end. Buyers see the file names and sizes, not the code. CodeBay doesn't take payment yet: when a lot ends with a bid, the seller and the winner get a private deal thread to agree how to pay, and the seller releases the files once paid. The winner then copies them into their own projects. See [Code Auction](#code-auction).
 - **Editor**: your own multi-file projects in Python (with importable modules), JavaScript, SQL or HTML/CSS/JS with a live preview and console. It autosaves, downloads files, and any Build & Learn project can be copied in to keep building.
 - **Practice clock**: counts active practice time per section and time you log by hand. It shows your hours toward 10,000, a daily goal, a year heatmap and a projected finish date.
 - **Sign in with Google**: progress, review cards, practice hours and editor projects sync to your account (see [Accounts and cloud sync](#accounts-and-cloud-sync)).
@@ -58,7 +59,24 @@ To switch it on (about 10 minutes, free on the Spark plan):
 
 The web config values identify the project but aren't secrets; the rules decide who can read what.
 
-**Already set up before the leaderboard existed?** Repeat step 5: paste the current `firestore.rules` into **Firestore → Rules** and **Publish**. Until then the leaderboard tab says it isn't switched on, and everything else, coins and challenges included, keeps working. Scores are reported by each person's browser, so a determined person could post a fake score; the rules only bound the numbers. Treat the board as friendly motivation, not a contest with prizes.
+**Already set up before the leaderboard or the Code Auction existed?** Repeat step 5: paste the current `firestore.rules` into **Firestore → Rules** and **Publish**. Until then the leaderboard tab says it isn't switched on, and everything else, coins and challenges included, keeps working. Scores are reported by each person's browser, so a determined person could post a fake score; the rules only bound the numbers. Treat the board as friendly motivation, not a contest with prizes.
+
+## Code Auction
+
+Each lot is `auctions/{id}`, readable by anyone, with three subcollections:
+
+| Path | Holds | Who can read | Who can write |
+|---|---|---|---|
+| `auctions/{id}` | title, description, language, file names and sizes, starting price, end time, top bid, top bidder, bid count, status, released | anyone | the seller creates it; bidders update only the top-bid fields; the seller can withdraw it before the first bid and release the files after the end |
+| `bids/{n}` | bidder, public name, amount, time | anyone | the bidder, in the same write as the lot update, with `n` = the new bid count |
+| `vault/files` | the project files as JSON | the seller; the winner once released | the seller, once, together with the lot |
+| `deal/{msg}` | messages between seller and winner | those two, after the end | those two, after the end |
+
+`firestore.rules` checks every bid: signed in, not the seller, not already the top bidder, before the end, at least the starting price for the first bid and at least $1 over the last one after that, and matched by a bid record with the same amount. Lots can't be deleted. `tools/test_auction_rules.mjs` runs 43 checks against the Firestore emulator.
+
+The lists use single-field queries on `endsAt` and `sellerUid`, covered by Firestore's automatic indexes. Each person's public trading name and the lots they bid on live in their progress doc (`P.auction`).
+
+Not built yet: payments (Stripe Connect with escrow would replace the deal thread), extending the end time when a bid lands in the last minutes, reporting a lot, and email notifications when you're outbid or win. Until payment is built in, a winner can fail to pay and a seller can fail to release. The deal thread and the bid history are the only record.
 
 ## Layout
 
@@ -71,6 +89,7 @@ The web config values identify the project but aren't secrets; the rules decide 
 | `clock.js` | Practice clock: active-time tracking, time logged by hand, the clock view and the Today card |
 | `editor.js` | The Editor: multi-file projects, running and previews, autosave, and merging with the account |
 | `cloud.js`, `firebase-config.js`, `firestore.rules` | Sign in with Google and cloud sync through Firebase |
+| `auction.js` | The Code Auction: browse lots, a lot page with live bids, list a project, the deal thread |
 | `rewards.js` | Coins, daily and weekly challenges, streak freezes, the rewards shop and the leaderboard |
 | `judge.js` | Test harnesses for problems (Python and JavaScript) and checkers for bootcamp and project steps (stdout, source, DOM/CSS, SQL results, and web apps driven in a sandboxed frame) |
 | `problems.js`, `bootcamp.js`, `paths.js` | The Problems, Bootcamp and Build & Learn, and Career Paths views |

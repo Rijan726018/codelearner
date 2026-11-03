@@ -1,13 +1,13 @@
 <!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>CodeLearner · part of CodeBay</title>
-<meta name="description" content="Learn to code from zero to world-class: interactive lessons, career roadmaps, a coding-problem judge and step-by-step bootcamps, all in your browser.">
+<title>CodeBay · Learn to code, build projects, auction your code</title>
+<meta name="description" content="CodeBay: learn to code from zero to world-class with interactive lessons, career roadmaps, a problem judge and step-by-step bootcamps, then auction the projects you build. All in your browser.">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
 <style>
-/* CodeLearner design system: monochrome.
+/* CodeBay design system: monochrome.
    Black, white and greys only, in the spirit of Apple's product pages: system type, quiet hairlines,
    generous space, no glows. Colour is reserved for meaning: green = passed, red = failed.
    The one gradient (--grad) is a graphite-to-silver sheen for brand moments. */
@@ -73,7 +73,7 @@ a{color:var(--accent);text-underline-offset:3px}
 button{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
 ::selection{background:color-mix(in oklab,var(--accent) 35%,transparent)}
-.wrap{max-width:1240px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-bottom:80px}
+.wrap{max-width:1600px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-bottom:80px}
 code{font:0.86em var(--mono);background:var(--sunk);padding:1.5px 6px;border-radius:6px;border:1px solid var(--line)}
 h1,h2,h3,h4{text-wrap:balance}
 p{text-wrap:pretty}
@@ -86,7 +86,7 @@ p{text-wrap:pretty}
 
 /* ---------- top bar ---------- */
 .top{position:sticky;top:0;z-index:30;background:var(--glass);backdrop-filter:saturate(1.6) blur(16px);-webkit-backdrop-filter:saturate(1.6) blur(16px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
-.top-in{max-width:1320px;margin:0 auto;padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));display:flex;align-items:center;gap:14px}
+.top-in{max-width:1632px;margin:0 auto;padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));display:flex;align-items:center;gap:14px}
 .logo{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;font:800 1.18rem/1 var(--display);letter-spacing:-.02em;white-space:nowrap}
 .logo .mk{width:32px;height:32px;border-radius:10px;background:var(--grad);display:grid;place-items:center;box-shadow:var(--glow);color:var(--on-accent)}
 .logo .mk svg{width:19px;height:19px;stroke:var(--on-accent);stroke-width:2.4}
@@ -950,12 +950,63 @@ body:has(.ws) .top-in{max-width:1712px}
 .wsmain .CodeMirror-scroll{max-height:calc(100vh - 180px)}
 @media (max-width:1000px){.ws{--edh:clamp(360px,62vh,720px)}}
 
+/* ---------- Code Auction ---------- */
+.brand .by{pointer-events:none}.brand .by:hover{color:var(--muted);text-decoration:none}
+.aunote{display:flex;gap:10px;align-items:flex-start;padding:14px 18px;border-radius:16px;background:var(--sunk);font-size:.93rem;color:var(--muted);max-width:90ch}
+.aunote .ic{color:var(--ink);margin-top:3px}
+.lots{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.lot{all:unset;cursor:pointer;box-sizing:border-box;display:grid;gap:8px;align-content:start;padding:20px;border-radius:22px;border:1px solid var(--line);background:var(--surface);transition:border-color .15s,transform .2s}
+.lot:hover{border-color:var(--line2);transform:translateY(-2px)}
+.lot:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.lot .lt{font:600 1.15rem/1.3 var(--display);letter-spacing:-.015em;overflow-wrap:anywhere}
+.lot .ls{font-size:.88rem}
+.lot .lp{display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding-top:12px;margin-top:6px}
+.lot .lp small,.auprice small,.auclock small{display:block;font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.lot .lp strong{font:600 1.05rem var(--mono);font-variant-numeric:tabular-nums}
+.lotpage{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(300px,.8fr);gap:24px;align-items:start}
+@media (max-width:900px){.lotpage{grid-template-columns:minmax(0,1fr)}}
+.aubox{position:sticky;top:84px}
+@media (max-width:900px){.aubox{position:static}}
+.audesc{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.65}
+.aufiles{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:2px}
+.aufiles li{display:flex;justify-content:space-between;gap:12px;padding:8px 12px;border-radius:10px;background:var(--surface2);font:500 13px var(--mono);overflow-wrap:anywhere}
+.aufiles li span:first-child{display:flex;gap:8px;align-items:center;min-width:0}
+.auprice strong{display:block;font:700 2.4rem/1.1 var(--display);letter-spacing:-.03em;font-variant-numeric:tabular-nums;margin:4px 0}
+.auclock{border-top:1px solid var(--line);padding-top:12px;display:grid;gap:2px}
+.auclock strong{font:600 1.25rem var(--mono);font-variant-numeric:tabular-nums}
+.aubid{display:grid;gap:10px}
+.fl{display:grid;gap:6px;border:0;margin:0;padding:0;min-width:0}
+.fl>span,.fl>legend{font:500 13px var(--body);color:var(--muted);padding:0}
+.aumoney{display:flex;align-items:center;gap:8px}.aumoney>span{font:600 1.1rem var(--mono)}
+.aumoney .field{font:600 1.1rem var(--mono)}
+.chk{display:flex;gap:10px;align-items:flex-start;font-size:.92rem;cursor:pointer}
+.chk input{margin-top:4px;accent-color:var(--ink);width:16px;height:16px;flex:none}
+.aumsg{padding:10px 14px;border-radius:12px;background:var(--sunk);font-size:.92rem}
+.aumsg.ok{display:flex;gap:8px;align-items:center;color:var(--ok);background:var(--ok-soft)}
+.aubids{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:2px}
+.aubids li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:baseline;padding:7px 0;border-bottom:1px solid var(--line);font-size:.9rem}
+.aubids li b{font:600 13.5px var(--mono);font-variant-numeric:tabular-nums}
+.aubids li span{overflow-wrap:anywhere}
+.aubids li .muted{font-size:.8rem;white-space:nowrap}
+.deal{max-width:900px}
+.aumsgs{display:grid;gap:8px;max-height:420px;overflow:auto;padding:4px}
+.aumsgs .m{display:grid;gap:2px;padding:10px 14px;border-radius:14px;background:var(--surface2);max-width:80%;justify-self:start;overflow-wrap:anywhere;white-space:pre-wrap}
+.aumsgs .m.me{justify-self:end;background:var(--sunk)}
+.aumsgs .m b{font-size:.82rem}
+.wspick{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px}
+.wsopt{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border:1px solid var(--line);border-radius:14px;cursor:pointer}
+.wsopt:has(input:checked){border-color:var(--ink)}
+.wsopt input{margin-top:4px;accent-color:var(--ink)}
+.wsopt span{display:grid;gap:2px;min-width:0}.wsopt b{overflow-wrap:anywhere}.wsopt small{font-size:.8rem}
+.sellform{max-width:900px}
+textarea.field{resize:vertical;font:15px/1.5 var(--body)}
+
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.anim .rv{opacity:1;transform:none}html{scroll-behavior:auto}}
 </style>
 
 <header class="top">
   <div class="top-in">
-    <div class="brand"><button type="button" class="logo" data-act="home" aria-label="CodeLearner home"><span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M13.5 4l-3 16"/></svg></span><span class="lt"><span>Code<b>Learner</b></span><small aria-hidden="true">part of CodeBay</small></span></button><a class="by" href="https://codebay.org/" target="_blank" rel="noopener">part of CodeBay</a></div>
+    <div class="brand"><button type="button" class="logo" data-act="home" aria-label="CodeBay home"><span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M13.5 4l-3 16"/></svg></span><span class="lt"><span>Code<b>Bay</b></span><small aria-hidden="true">learn · build · trade</small></span></button><span class="by">learn · build · trade</span></div>
     <nav class="tabs" id="tabs" aria-label="Sections"></nav>
     <div class="top-r">
       <button type="button" class="kbtn" id="searchBtn" aria-label="Search everything"><svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span>Search</span><kbd>Ctrl K</kbd></button>
@@ -969,7 +1020,7 @@ body:has(.ws) .top-in{max-width:1712px}
 <div class="wrap">
   <main id="main"><div class="loading">Loading your curriculum…</div></main>
   <footer>
-    <span>CodeLearner, part of <a href="https://codebay.org/" target="_blank" rel="noopener">CodeBay</a> · <span class="sync" id="sync">Loading…</span></span>
+    <span>CodeBay · <span class="sync" id="sync">Loading…</span></span>
     <span id="resetwrap"><button type="button" id="reset">Clear all progress</button></span>
   </footer>
 </div>
@@ -996,3 +1047,4 @@ body:has(.ws) .top-in{max-width:1712px}
 <script src="cloud.js" charset="utf-8"></script>
 <script src="rewards.js" charset="utf-8"></script>
 <script src="editor.js" charset="utf-8"></script>
+<script src="auction.js" charset="utf-8"></script>
