@@ -1,6 +1,6 @@
 # CodeBay
 
-Learn to code from your first line to world-class engineering, then auction the projects you build. Everything runs in the browser, and it is live at https://rijan726018.github.io/codelearner/. (This site used to be called CodeLearner; the repository keeps that name so the address doesn't change.) It combines five ways of learning and a Code Auction:
+Learn to code from your first line to world-class engineering, then auction the projects you build. Everything runs in the browser, and it is live at **https://codebay.org/**. (This site used to be called CodeLearner; the repository keeps that name. See [Hosting and the codebay.org address](#hosting-and-the-codebayorg-address).) It combines five ways of learning and a Code Auction:
 
 | Section | Inspired by | What's in it |
 |---|---|---|
@@ -19,6 +19,18 @@ Around them:
 - **Rewards**: coins for every lesson, exam, problem, step, project, course, career path, badge, level, practice day and streak milestone, worked out from real progress like XP so nothing pays twice. Three daily and three weekly challenges (the same for everyone on a given date) pay extra, with a bonus for clearing them all. Coins buy streak freezes (used automatically when you miss a day), accent colours and titles; nothing educational costs coins. An opt-in leaderboard ranks signed-in learners by progress: XP earned this week (the default), all-time XP, current streaks and coins earned, plus last week's final standings. It shows your exact rank among everyone, who you need to pass and by how much, who is chasing you, how far you've moved since yesterday, and your league for the week (Bronze, Silver, Gold, Platinum, Diamond, Legend). Each week's top three win 500 / 300 / 150 coins. Only a chosen display name and numbers are shown.
 - A dashboard with "continue" cards, today's challenges and a problem of the day, plus XP, levels, ranks and 38 badges.
 - A Ctrl/⌘ K search across everything, light and dark themes, and backup/restore of progress.
+
+## Hosting and the codebay.org address
+
+GitHub Pages builds and hosts the files (`.github/workflows/pages.yml`, on every push to `main`). People reach them at **codebay.org**:
+- The codebay.org Vercel project (repository `Rijan726018/codebay`) has a `vercel.json` rewrite that fetches every path from the GitHub Pages copy. It's a rewrite, not a redirect, so the address bar stays on codebay.org.
+- A short script at the top of `index.html` moves anyone who opens the old `rijan726018.github.io/codelearner` address to codebay.org. It first checks that `https://codebay.org/site.json` answers as this site, so it never sends people to a broken address.
+- Browsers keep saved progress per address. The move carries this browser's `tenk2-*` and `cl-*` keys in the URL fragment, which is never sent to a server, and codebay.org writes them only where it has nothing of its own yet. Above about 1.5 MB it shows a notice instead, pointing to sign-in or Profile → backup.
+- Signing in is per address too. After the move, people sign in once more on codebay.org, which only works once `codebay.org` is in Firebase's authorized domains (step 3 below).
+
+Search engines get `<link rel="canonical" href="https://codebay.org/">`, Open Graph tags and `og-image.png` for link previews, a WebSite JSON-LD block, `robots.txt` and `sitemap.xml`.
+
+To get into Google, add `codebay.org` as a **Domain** property in [Google Search Console](https://search.google.com/search-console), prove you own it with the TXT record it gives you (at your DNS provider; Vercel's **Domains → codebay.org → DNS Records** if Vercel runs the DNS), then submit `https://codebay.org/sitemap.xml` under **Sitemaps** and request indexing of the home page under **URL inspection**. Routes are hash URLs (`#/problems`), which search engines treat as the one home page.
 
 ## Run it locally
 
@@ -51,7 +63,7 @@ To switch it on (about 10 minutes, free on the Spark plan):
 
 1. In the [Firebase console](https://console.firebase.google.com/), create a project. Google Analytics is optional.
 2. Turn on Google sign-in: **Build → Authentication → Get started → Sign-in method → Google → Enable**, then choose a support email and save.
-3. Allow the site's address: **Authentication → Settings → Authorized domains → Add domain**, and add `rijan726018.github.io`. `localhost` is already listed.
+3. Allow the site's address: **Authentication → Settings → Authorized domains → Add domain**, and add `codebay.org` (and `www.codebay.org` if you use it) plus `rijan726018.github.io`. `localhost` is already listed.
 4. Create the database: **Build → Firestore Database → Create database**. Pick a location near your users and start in **production mode**.
 5. Paste in the access rules: on **Firestore → Rules**, replace the contents with `firestore.rules` from this repository, then **Publish**.
 6. Get the web config: **Project settings (gear) → General → Your apps → Web (`</>`)**. Register an app (no hosting needed) and copy the `firebaseConfig` values into `firebase-config.js` as `window.CL_FIREBASE = {...}`.
