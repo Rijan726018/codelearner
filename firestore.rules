@@ -1,6 +1,6 @@
 rules_version = '2';
 // Each person can read and write only their own documents: users/{uid}/docs/{docId}.
-// Leaderboard entries are the one shared collection, below.
+// Leaderboard entries and the Code Auction are the shared collections, below.
 // Every document is {json: string, updated: timestamp}; the size cap stays under Firestore's 1 MiB document limit.
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -26,6 +26,102 @@ service cloud.firestore {
                             && request.resource.data.streak is int && request.resource.data.streak >= 0 && request.resource.data.streak <= 100000
                             && request.resource.data.weekXp is int && request.resource.data.weekXp >= 0 && request.resource.data.weekXp <= request.resource.data.xp
                             && request.resource.data.updated == request.time;
+    }
+
+    // ---------- Code Auction ----------
+    // auctions/{id}: one lot, readable by anyone. The seller creates it together with its private vault (the project files).
+    // Bids are written by the bidder in one batch with the lot's top-bid fields, so these rules can check that every
+    // bid beats the last one by at least $1, arrives before the end time, and is not the seller's.
+    // Money never moves through CodeBay yet: after the end, the seller and the winner get a private deal thread, and the
+    // seller releases the files once they have been paid.
+    function signedIn() { return request.auth != null; }
+    function lot(id) { return get(/databases/$(database)/documents/auctions/$(id)).data; }
+    function lotAfter(id) { return getAfter(/databases/$(database)/documents/auctions/$(id)).data; }
+    function ended(a) { return request.time >= a.endsAt; }
+    function party(a) { return signedIn() && (request.auth.uid == a.sellerUid || (a.bidCount > 0 && request.auth.uid == a.topUid)); }
+
+    match /auctions/{id} {
+      allow read: if true;
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['sellerUid', 'sellerName', 'title', 'desc', 'lang', 'files', 'startBid', 'endsAt', 'created', 'topBid', 'topUid', 'topName', 'bidCount', 'status', 'released'])
+        && request.resource.data.keys().hasAll(['sellerUid', 'sellerName', 'title', 'desc', 'lang', 'files', 'startBid', 'endsAt', 'created', 'topBid', 'topUid', 'topName', 'bidCount', 'status', 'released'])
+        && request.resource.data.sellerUid == request.auth.uid
+        && request.resource.data.sellerName is string && request.resource.data.sellerName.size() > 0 && request.resource.data.sellerName.size() <= 40
+        && request.resource.data.title is string && request.resource.data.title.size() >= 3 && request.resource.data.title.size() <= 80
+        && request.resource.data.desc is string && request.resource.data.desc.size() <= 3000
+        && request.resource.data.lang in ['python', 'js', 'web', 'sql']
+        && request.resource.data.files is list && request.resource.data.files.size() > 0 && request.resource.data.files.size() <= 30
+        && request.resource.data.startBid is int && request.resource.data.startBid >= 100 && request.resource.data.startBid <= 10000000
+        && request.resource.data.endsAt is timestamp
+        && request.resource.data.endsAt > request.time + duration.value(50, 'm')
+        && request.resource.data.endsAt < request.time + duration.value(15, 'd')
+        && request.resource.data.created == request.time
+        && request.resource.data.topBid == 0 && request.resource.data.topUid == '' && request.resource.data.topName == ''
+        && request.resource.data.bidCount == 0 && request.resource.data.status == 'live' && request.resource.data.released == false
+        && existsAfter(/databases/$(database)/documents/auctions/$(id)/vault/files);
+      allow update: if signedIn() && (
+        // a bid: not the seller, not already the top bidder, before the end, at least $1 over the last bid
+        (request.auth.uid != resource.data.sellerUid
+          && resource.data.status == 'live' && !ended(resource.data)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['topBid', 'topUid', 'topName', 'bidCount'])
+          && (resource.data.bidCount == 0 || resource.data.topUid != request.auth.uid)
+          && request.resource.data.topUid == request.auth.uid
+          && request.resource.data.topName is string && request.resource.data.topName.size() > 0 && request.resource.data.topName.size() <= 40
+          && request.resource.data.bidCount == resource.data.bidCount + 1
+          && request.resource.data.topBid is int && request.resource.data.topBid <= 10000000
+          && (resource.data.bidCount == 0 ? request.resource.data.topBid >= resource.data.startBid
+                                          : request.resource.data.topBid >= resource.data.topBid + 100)
+          && existsAfter(/databases/$(database)/documents/auctions/$(id)/bids/$(string(request.resource.data.bidCount))))
+        // the seller edits the listing or cancels it, only while nobody has bid
+        || (request.auth.uid == resource.data.sellerUid && resource.data.bidCount == 0 && resource.data.status == 'live' && !ended(resource.data)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'desc', 'status'])
+          && request.resource.data.status in ['live', 'cancelled']
+          && request.resource.data.title is string && request.resource.data.title.size() >= 3 && request.resource.data.title.size() <= 80
+          && request.resource.data.desc is string && request.resource.data.desc.size() <= 3000)
+        // the seller releases the files to the winner after the end
+        || (request.auth.uid == resource.data.sellerUid && ended(resource.data) && resource.data.bidCount > 0 && resource.data.status == 'live'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['released'])
+          && request.resource.data.released == true)
+      );
+      allow delete: if false;
+
+      // bids/{n}: n is the lot's bid count after this bid ("1", "2", ...), so a bid can only be written with its lot update.
+      match /bids/{n} {
+        allow read: if true;
+        allow create: if signedIn()
+          && request.resource.data.keys().hasOnly(['uid', 'name', 'amount', 'at'])
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.at == request.time
+          && lotAfter(id).bidCount == int(n)
+          && lotAfter(id).topUid == request.auth.uid
+          && lotAfter(id).topBid == request.resource.data.amount
+          && lotAfter(id).topName == request.resource.data.name;
+        allow update, delete: if false;
+      }
+
+      // vault/files: the project files, {json, names}. The seller can read them; the winner can once the seller releases them.
+      match /vault/{doc} {
+        allow read: if signedIn() && (request.auth.uid == lot(id).sellerUid
+                                   || (lot(id).released == true && lot(id).bidCount > 0 && request.auth.uid == lot(id).topUid));
+        allow create: if signedIn() && doc == 'files'
+          && request.auth.uid == lotAfter(id).sellerUid
+          && !exists(/databases/$(database)/documents/auctions/$(id))
+          && request.resource.data.keys().hasOnly(['json'])
+          && request.resource.data.json is string && request.resource.data.json.size() < 900000;
+        allow update, delete: if false;
+      }
+
+      // deal/{msg}: the private thread between the seller and the winner, open once the auction has ended with a bid.
+      match /deal/{msg} {
+        allow read: if party(lot(id)) && ended(lot(id));
+        allow create: if party(lot(id)) && ended(lot(id))
+          && request.resource.data.keys().hasOnly(['uid', 'name', 'text', 'at'])
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.name is string && request.resource.data.name.size() <= 40
+          && request.resource.data.text is string && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 2000
+          && request.resource.data.at == request.time;
+        allow update, delete: if false;
+      }
     }
   }
 }

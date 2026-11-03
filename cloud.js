@@ -49,6 +49,54 @@ function firebaseProvider(cfg){
             fs.getDocs(fs.query(col(fs, db), fs.where(field, "<", value), fs.orderBy(field, "desc"), fs.limit(1)))]);
           return {above: a.docs[0] ? row(a.docs[0]) : null, below: b.docs[0] ? row(b.docs[0]) : null}; }
       };
+    },
+    // Code Auction (auction.js): auctions/{id} with bids/{n}, vault/files and deal/{msg}. firestore.rules enforces every rule
+    // that matters (bid order, $1 increments, end time, who sees the files); these calls only shape the data.
+    auctions(){
+      const ms = t => t?.toMillis ? t.toMillis() : t ?? null;
+      const lotRow = d => { const x = d.data(); return {id: d.id, ...x, endsAt: ms(x.endsAt), created: ms(x.created)}; };
+      const msgRow = d => { const x = d.data(); return {id: d.id, ...x, at: ms(x.at)}; };
+      const lotRef = (fs, db, id) => fs.doc(db, "auctions", id);
+      return {
+        async live(n = 60){ const {fs, db} = await load();
+          const snap = await fs.getDocs(fs.query(fs.collection(db, "auctions"), fs.where("endsAt", ">", fs.Timestamp.now()), fs.orderBy("endsAt", "asc"), fs.limit(n)));
+          return snap.docs.map(lotRow); },
+        async ended(n = 30){ const {fs, db} = await load();
+          const snap = await fs.getDocs(fs.query(fs.collection(db, "auctions"), fs.where("endsAt", "<=", fs.Timestamp.now()), fs.orderBy("endsAt", "desc"), fs.limit(n)));
+          return snap.docs.map(lotRow); },
+        async bySeller(uid){ const {fs, db} = await load();
+          const snap = await fs.getDocs(fs.query(fs.collection(db, "auctions"), fs.where("sellerUid", "==", uid)));
+          return snap.docs.map(lotRow); },
+        async get(id){ const {fs, db} = await load(); const d = await fs.getDoc(lotRef(fs, db, id)); return d.exists() ? lotRow(d) : null; },
+        async watch(id, cb){ const {fs, db} = await load(); return fs.onSnapshot(lotRef(fs, db, id), d => cb(d.exists() ? lotRow(d) : null), () => {}); },
+        async bids(id, n = 25){ const {fs, db} = await load();
+          const snap = await fs.getDocs(fs.query(fs.collection(db, "auctions", id, "bids"), fs.orderBy("amount", "desc"), fs.limit(n)));
+          return snap.docs.map(msgRow); },
+        // a new lot and its private vault, written together so the rules can see both
+        async create(user, lot, files){ const {fs, db} = await load();
+          const ref = fs.doc(fs.collection(db, "auctions")), b = fs.writeBatch(db);
+          b.set(ref, {...lot, sellerUid: user.uid, sellerName: user.name, endsAt: fs.Timestamp.fromMillis(lot.endsAt), created: fs.serverTimestamp(),
+            topBid: 0, topUid: "", topName: "", bidCount: 0, status: "live", released: false});
+          b.set(fs.doc(db, "auctions", ref.id, "vault", "files"), {json: JSON.stringify(files)});
+          await b.commit(); return ref.id; },
+        // a bid: read the lot, then write the lot's top fields and bids/{count} in one transaction
+        async bid(user, id, amount){ const {fs, db} = await load();
+          return fs.runTransaction(db, async tx => {
+            const ref = lotRef(fs, db, id), d = await tx.get(ref); if(!d.exists()) throw new Error("gone");
+            const a = d.data(), n = (a.bidCount || 0) + 1;
+            tx.update(ref, {topBid: amount, topUid: user.uid, topName: user.name, bidCount: n});
+            tx.set(fs.doc(db, "auctions", id, "bids", String(n)), {uid: user.uid, name: user.name, amount, at: fs.serverTimestamp()});
+            return n; }); },
+        async edit(id, fields){ const {fs, db} = await load(); await fs.updateDoc(lotRef(fs, db, id), fields); },
+        async release(id){ const {fs, db} = await load(); await fs.updateDoc(lotRef(fs, db, id), {released: true}); },
+        async vault(id){ const {fs, db} = await load(); const d = await fs.getDoc(fs.doc(db, "auctions", id, "vault", "files"));
+          return d.exists() ? JSON.parse(d.data().json) : null; },
+        async messages(id){ const {fs, db} = await load();
+          const snap = await fs.getDocs(fs.query(fs.collection(db, "auctions", id, "deal"), fs.orderBy("at", "asc"), fs.limit(200)));
+          return snap.docs.map(msgRow); },
+        async send(user, id, text){ const {fs, db} = await load();
+          await fs.addDoc(fs.collection(db, "auctions", id, "deal"), {uid: user.uid, name: user.name, text, at: fs.serverTimestamp()}); }
+      };
     }
   };
 }
@@ -132,6 +180,8 @@ const Account = (() => {
     },
     get user(){ return user; }, get enabled(){ return !!provider; },
     board(name){ return provider?.board && user ? provider.board(name) : null; },
+    // auctions can be browsed signed out; writes need a user (auction.js checks)
+    auctions(){ return provider?.auctions ? provider.auctions() : null; },
     signIn, signOut,
     panel(){   // for the profile page
       if(!provider) return "";

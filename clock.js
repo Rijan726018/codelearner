@@ -109,7 +109,7 @@ function viewClock(el){
   const recent = [...(P.manual || [])].sort((a, b) => b.day.localeCompare(a.day) || b.id.localeCompare(a.id)).slice(0, 8);
   const maxDay = dayKey(today());
   el.innerHTML = `<section class="head"><span class="eyebrow">The 10,000-hour clock</span><h1 class="h1">Practice clock</h1>
-    <p class="lede">Mastery takes deliberate practice, and lots of it. This clock counts your active time on CodeLearner, section by section, and you can add practice you do anywhere else. Time only counts while the page is open and you've been active in the last two minutes, so leaving a tab open doesn't inflate it.</p></section>
+    <p class="lede">Mastery takes deliberate practice, and lots of it. This clock counts your active time on CodeBay, section by section, and you can add practice you do anywhere else. Time only counts while the page is open and you've been active in the last two minutes, so leaving a tab open doesn't inflate it.</p></section>
   <section class="panel glow clockhero"><div class="clockbig"><b class="gt" data-clock="hours">${(c.total/3600).toFixed(2)}</b><span>hours of ${CLOCK_GOAL.toLocaleString()}</span></div>
     <div style="display:grid;gap:10px;min-width:0"><div class="bar big"><i style="width:${Math.max(pct, c.total ? 0.4 : 0)}%"></i></div>
       <span class="muted" style="font-size:.9rem">${pct.toFixed(pct < 1 ? 3 : 1)}% of the way${prev ? ` · reached <b style="color:var(--ink)">${esc(prev[1])}</b>` : ""} · next milestone: <b style="color:var(--ink)">${next[0].toLocaleString()} h, ${esc(next[1])}</b></span>
