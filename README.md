@@ -23,7 +23,7 @@ Around them:
 ## Hosting and the codebay.org address
 
 GitHub Pages builds and hosts the files (`.github/workflows/pages.yml`, on every push to `main`). People reach them at **codebay.org**:
-- The codebay.org Vercel project (repository `Rijan726018/codebay`) has a `vercel.json` rewrite that fetches every path from the GitHub Pages copy. It's a rewrite, not a redirect, so the address bar stays on codebay.org.
+- The codebay.org Vercel project (repository `Rijan726018/codebay`) clones this repository during its build and serves the files itself. After each GitHub Pages deploy, the workflow calls that project's Deploy Hook (repository secret `VERCEL_DEPLOY_HOOK`) so codebay.org rebuilds with the latest files.
 - A short script at the top of `index.html` moves anyone who opens the old `rijan726018.github.io/codelearner` address to codebay.org. It first checks that `https://codebay.org/site.json` answers as this site, so it never sends people to a broken address.
 - Browsers keep saved progress per address. The move carries this browser's `tenk2-*` and `cl-*` keys in the URL fragment, which is never sent to a server, and codebay.org writes them only where it has nothing of its own yet. Above about 1.5 MB it shows a notice instead, pointing to sign-in or Profile → backup.
 - Signing in is per address too. After the move, people sign in once more on codebay.org, which only works once `codebay.org` is in Firebase's authorized domains (step 3 below).
