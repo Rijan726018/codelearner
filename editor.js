@@ -100,6 +100,7 @@ function codeArea(host, {value, file, onChange, onRun, onSave}){
     const ext = extOf(file), cm = CodeMirror(host, {value, mode: FILE_MODE[ext] || null, lineNumbers: true, indentUnit: ext === "py" ? 4 : 2, tabSize: 4, matchBrackets: true, lineWrapping: ext === "md" || ext === "txt",
       extraKeys: {"Cmd-Enter": onRun, "Ctrl-Enter": onRun, "Cmd-S": onSave, "Ctrl-S": onSave, Tab: c => c.somethingSelected() ? c.indentSelection("add") : c.replaceSelection(" ".repeat(c.getOption("indentUnit")), "end"), "Shift-Tab": c => c.indentSelection("subtract"), Esc: c => c.getInputField().blur()}});
     cm.getInputField().setAttribute("aria-label", `Editing ${file}. Press Escape, then Tab, to leave the editor.`);
+    vsEnhance(cm, VS_LANG[ext] ?? "", t => { const p = document.getElementById("wspos"); if(p) p.textContent = t; });
     cm.on("change", () => onChange(cm.getValue()));
     return {get value(){ return cm.getValue(); }, focus: () => cm.focus(), refresh: () => cm.refresh()};
   }
@@ -161,16 +162,16 @@ function viewCode(el){
     <aside class="panel wsfiles"><div class="row" style="justify-content:space-between"><span class="eyebrow">Files</span><button type="button" class="btn ghost sm" id="wsadd" aria-label="New file">${icon("plus","sm")}New</button></div>
       <form id="wsaddf" hidden class="wsaddf"><input class="field" id="wsfname" placeholder="name.${L.ext[0]}" maxlength="40" aria-label="New file name"><button class="btn sm primary">Add</button></form>
       <p id="wsferr" class="err" role="alert" hidden style="margin:0;font-size:.82rem"></p>
-      <ul class="wsflist">${Object.keys(ws.files).sort((a, b) => (a === L.open ? -1 : b === L.open ? 1 : a.localeCompare(b))).map(f => `<li><button type="button" data-f="${esc(f)}" aria-current="${f === ws.open}">${icon(extOf(f) === "md" || extOf(f) === "txt" ? "book" : "code","sm")}<span>${esc(f)}</span></button></li>`).join("")}</ul>
+      <ul class="wsflist">${Object.keys(ws.files).sort((a, b) => (a === L.open ? -1 : b === L.open ? 1 : a.localeCompare(b))).map(f => `<li><button type="button" data-f="${esc(f)}" aria-current="${f === ws.open}">${vsFileIcon(f)}<span>${esc(f)}</span></button></li>`).join("")}</ul>
       <div class="wsfact"><button type="button" class="btn ghost sm" id="wsren">Rename</button><button type="button" class="btn ghost sm" id="wsdelf">Delete</button><button type="button" class="btn ghost sm" id="wsdl">${icon("download","sm")}Download</button></div>
       ${isWeb ? `<button type="button" class="btn ghost sm" id="wsdlweb">${icon("download","sm")}Download as one page</button>` : ""}</aside>
-    <section class="wsmain"><div class="ed"><div class="edbar"><span class="pill">${esc(ws.open)}</span><span class="edsp"></span>
+    <section class="wsmain"><div class="ed"><div class="edbar"><span class="vstab" title="${esc(ws.open)}">${vsFileIcon(ws.open)}<span>${esc(ws.open)}</span></span><span class="edsp"></span>
         ${ws.lang === "python" ? `<button type="button" class="btn ghost sm" id="wsin" aria-expanded="${!!ws.stdin}">Input</button>` : ""}
         <button type="button" class="btn primary sm" id="wsrun" title="Run (Ctrl+Enter)">${isWeb ? "Refresh preview ▶" : runLang && ws.lang === "python" ? "Run main.py ▶" : "Run ▶"}</button></div>
       <div class="edwrap" id="wsed"></div>
       <div class="edin" id="wsinbox" ${ws.stdin ? "" : "hidden"}><label class="eyebrow" for="wsstdin">Input · one line per input() call</label><textarea id="wsstdin" rows="3" spellcheck="false">${esc(ws.stdin || "")}</textarea></div>
-      <div class="edfoot"><span class="edstat">Ctrl+Enter runs · Ctrl+S saves now · changes save automatically</span></div></div>
-      <div id="wsout">${isWeb ? "" : `<div class="edout"><div class="edouthead"><span class="eyebrow">Output</span><span class="edms" id="wsms"></span></div><pre class="edpre" id="wspre" aria-live="polite"><span class="muted">Press Run to see the output here.</span></pre></div>`}</div></section>
+      <div class="edfoot"><span class="edstat">Ctrl+Enter runs · Ctrl+S saves now · changes save automatically</span><span class="edsp"></span><span class="edpos" id="wspos"></span><span>Spaces: ${extOf(ws.open) === "py" ? 4 : 2}</span><span>UTF-8</span></div></div>
+      <div id="wsout">${isWeb ? "" : `<div class="edout"><div class="edouthead"><span class="vspanel">Output</span><span class="edms" id="wsms"></span></div><pre class="edpre" id="wspre" aria-live="polite"><span class="muted">Press Run to see the output here.</span></pre></div>`}</div></section>
   </div>`;
   const stat = () => { const s = el.querySelector("#wsstat"); if(s){ s.textContent = wsStatusText(WS.status); s.classList.toggle("ok", WS.status === "cloud"); } };
   const unsub = WS.on(() => { if(!el.contains(el.querySelector("#wsstat"))){ unsub(); return; } stat(); });

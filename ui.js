@@ -128,6 +128,9 @@ if(UI.io && !matchMedia("(prefers-reduced-motion: reduce)").matches) document.do
 UI.countUp = el => { const to=+el.dataset.count; if(!(to>0)){ el.textContent=el.dataset.count; return; } const t0=performance.now(), d=1300;
   (function f(t){ const k=Math.min(1,(t-t0)/d), v=Math.round(to*(1-Math.pow(1-k,3))); el.textContent=v.toLocaleString(); if(k<1) requestAnimationFrame(f); })(t0); };
 UI.scan = root => { (root||document).querySelectorAll(".rv:not(.in),[data-count]:not(.counted)").forEach(el=>{
+  if(el.classList.contains("rv") && !el.style.getPropertyValue("--d") && el.parentElement){   // grids reveal in a quick cascade
+    const sib=[...el.parentElement.children].filter(x=>x.classList.contains("rv")); const i=sib.indexOf(el);
+    if(sib.length>1 && i>0) el.style.setProperty("--d", Math.min(i,8)*70+"ms"); }
   if(el.dataset.count!=null){ el.classList.add("counted"); if(!UI.io){ el.textContent=(+el.dataset.count).toLocaleString(); return; } }
   if(UI.io) UI.io.observe(el); else el.classList.add("in"); }); };
 new MutationObserver(()=>UI.scan(document.getElementById("main"))).observe(document.getElementById("main"),{childList:true,subtree:true});
@@ -164,11 +167,56 @@ UI.fitNav = () => {
 };
 UI.syncNav = tabV => {
   document.querySelectorAll("#tabs [data-v], #moreMenu [data-v]").forEach(b=>b.setAttribute("aria-current", b.dataset.v===tabV?"page":"false"));
+  requestAnimationFrame(UI.navInd);
   const g=Game.stats(); const sc=document.getElementById("streakChip"), xc=document.getElementById("xpChip");
   if(sc) sc.innerHTML=`${icon("flame","sm")}${g.streak}`;
   if(xc) xc.innerHTML=`<span class="lv">Lv ${g.level}</span><span class="xpn">${g.xp.toLocaleString()} XP</span>`;
   const cc=document.getElementById("coinChip"); if(cc && typeof Rewards!=="undefined") cc.innerHTML=`${COIN_SVG}<span>${Rewards.balance(g).toLocaleString()}</span>`;
   UI.fitNav();
+};
+
+/* ---------- motion: a sliding nav pill, headline reveals, scroll-filled statements ---------- */
+const MOTION = !matchMedia("(prefers-reduced-motion: reduce)").matches;
+// One pill slides between nav tabs instead of each tab lighting up on its own.
+UI.navInd = () => {
+  const tabs=document.getElementById("tabs"); if(!tabs) return;
+  let ind=tabs.querySelector(".tabind"); if(!ind){ ind=document.createElement("span"); ind.className="tabind"; ind.setAttribute("aria-hidden","true"); tabs.prepend(ind); }
+  const b=tabs.querySelector('[aria-current="page"]');
+  if(!b || !b.offsetWidth){ ind.style.opacity="0"; return; }
+  ind.style.opacity="1"; ind.style.width=b.offsetWidth+"px"; ind.style.height=b.offsetHeight+"px";
+  ind.style.transform=`translate(${b.offsetLeft}px, ${b.offsetTop}px)`;
+  if(!ind.dataset.ready) requestAnimationFrame(()=>{ ind.dataset.ready="1"; });
+};
+addEventListener("resize", ()=>requestAnimationFrame(UI.navInd), {passive:true});
+// Headlines rise word by word from behind a mask, the way Apple's product pages open.
+UI.rise = root => {
+  if(!MOTION || !root) return;
+  root.querySelectorAll(".hero h1, .head > h1.h1").forEach(h=>{
+    if(h.dataset.risen) return; h.dataset.risen="1"; let i=0;
+    const walk=n=>{ [...n.childNodes].forEach(c=>{
+      if(c.nodeType===3){ const frag=document.createDocumentFragment();
+        c.textContent.split(/(\s+)/).forEach(part=>{ if(!part) return; if(/^\s+$/.test(part)){ frag.appendChild(document.createTextNode(part)); return; }
+          const w=document.createElement("span"); w.className="w"; const inner=document.createElement("span"); inner.textContent=part; inner.style.setProperty("--i", i++); w.appendChild(inner); frag.appendChild(w); });
+        c.replaceWith(frag); }
+      else if(c.nodeType===1) walk(c); }); };
+    walk(h); h.classList.add("rising");
+  });
+};
+// Big statements fill in word by word as they scroll through the middle of the screen.
+UI.fill = root => {
+  (root||document).querySelectorAll("[data-fill]:not([data-filled])").forEach(el=>{
+    el.dataset.filled="1";
+    el.innerHTML=el.textContent.trim().split(/\s+/).map(w=>`<span>${esc(w)}</span>`).join(" ");
+    const words=[...el.children];
+    if(!MOTION){ words.forEach(w=>w.classList.add("on")); return; }
+    let raf=0;
+    const tick=()=>{ raf=0; if(!el.isConnected){ removeEventListener("scroll", on); return; }
+      const r=el.getBoundingClientRect(), vh=innerHeight, start=vh*.88, end=vh*.38;
+      const p=Math.max(0, Math.min(1, (start-r.top)/(start-end+r.height*.5)));
+      const n=Math.round(p*words.length); words.forEach((w,i)=>w.classList.toggle("on", i<n)); };
+    const on=()=>{ if(!raf) raf=requestAnimationFrame(tick); };
+    addEventListener("scroll", on, {passive:true}); tick();
+  });
 };
 
 /* ================= GAME: XP, levels, badges (all derived from progress, so nothing double-counts) ================= */
@@ -362,9 +410,7 @@ function viewHome(el){
   const featured=(PATHS.index||[]).slice(0,8);
   el.innerHTML = `
   <section class="hero">
-    <div class="orb" style="width:340px;height:340px;background:#8b7dff;left:-120px;top:-60px"></div>
-    <div class="orb" style="width:300px;height:300px;background:#38d3f0;right:10%;top:40%;animation-delay:-5s"></div>
-    <div style="display:grid;gap:22px;align-content:center">
+    <div class="hcopy" style="display:grid;gap:22px;align-content:center">
       <span class="badge-line"><b>FREE</b> Everything runs in your browser. No sign-up, no paywall.</span>
       <h1>From your first line of code to <span class="gt">world-class engineer.</span></h1>
       <p class="lede">CodeBay is one place to learn programming end to end, and to trade what you build: an interactive bootcamp for total beginners, guided projects you build step by step, a 10,000-hour core curriculum, career roadmaps for every specialty and a problem judge to sharpen your skills, and a Code Auction where you can sell the projects you make. Built on the science of how people actually learn.</p>
@@ -375,11 +421,12 @@ function viewHome(el){
       </div>
       <div class="row muted" style="font-size:.88rem;gap:18px">${["Python 3.12 in-browser","Auto-graded","Progress saved"].map(t=>`<span class="row" style="gap:6px">${icon("check","sm")}${t}</span>`).join("")}</div>
     </div>
-    <div class="term rv"><div class="tb"><i></i><i></i><i></i><span id="termf">hello.py</span></div><pre id="termp"></pre></div>
+    <div class="term"><div class="tb"><i></i><i></i><i></i><span id="termf">hello.py</span></div><pre id="termp"></pre></div>
   </section>
   <section class="counters">
     ${[[nL,"core lessons"],[nQ,"quiz questions"],[nP,"judged problems"],[nC,"career roadmaps"],[nS,"bootcamp steps"],[nB,"guided projects"]].map(([n,t])=>`<div class="counter rv"><b class="gt" data-count="${n}">0</b><span>${t}</span></div>`).join("")}
   </section>
+  <section class="statement"><p data-fill>Learn to code from your first line, build real projects as you go, and put the best of them up for auction. Everything runs in your browser, with nothing to install.</p></section>
   <section style="display:grid;gap:18px">
     <div class="sec-h rv"><div class="head"><span class="eyebrow">Everything in one place</span><h2 class="h2">Nine ways to get better</h2></div><p class="lede" style="max-width:48ch">The structure of a university degree, the hands-on feel of a bootcamp and the practice volume of an interview grind.</p></div>
     <div class="feat">${feats.map(f=>`<button type="button" class="fcard glow rv" data-act="${f.v}"><span class="fi">${icon(f.i,"lg")}</span><h3>${f.t}</h3><p>${f.d}</p><span class="row" style="justify-content:space-between"><span class="pill acc">${f.c}</span><span class="go">Open ${icon("arrow","sm")}</span></span></button>`).join("")}</div>

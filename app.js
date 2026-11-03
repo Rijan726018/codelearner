@@ -156,6 +156,7 @@ function render(){
   UI.syncNav(currentTab());
   updateBadge();
   const v = VIEWS[route.v] || VIEWS.home; v($("#main"));
+  UI.rise?.($("#main")); UI.fill?.($("#main"));
   document.title = (route.v==="home"?"CodeBay · Learn to code, build projects, auction your code":(document.querySelector("#main .h1, #main h1")?.textContent?.trim()||"CodeBay")+" · CodeBay");
 }
 
@@ -362,7 +363,7 @@ function bindVideos(root){
     v.replaceChildren(f); v.classList.add("on");
   }));
 }
-function codeBlock(code, cur){ return `<pre class="code">${String(code||"").split("\n").map((ln,i)=>`<span class="l ${cur===i+1?"cur":""}">${esc(ln)||" "}</span>`).join("")}</pre>`; }
+function codeBlock(code, cur, mode){ const hl=typeof vsHighlight==="function"?vsHighlight(code, mode):null; return `<pre class="code">${String(code||"").split("\n").map((ln,i)=>`<span class="l ${cur===i+1?"cur":""}">${(hl&&hl[i]!=null?hl[i]:esc(ln))||" "}</span>`).join("")}</pre>`; }
 function visual(v){
   const h = v.title?`<h4>${esc(v.title)}</h4>`:"";
   if(v.type==="steps") return `<div class="vis">${h}<ol class="flow">${(v.steps||[]).map((s,i)=>`<li><span class="sn">${i+1}${i<v.steps.length-1?" →":""}</span><b>${md(s.label)}</b><span>${md(s.detail)}</span></li>`).join("")}</ol></div>`;

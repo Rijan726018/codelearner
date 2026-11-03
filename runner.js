@@ -132,17 +132,110 @@ const Drafts = {
 
 /* ---------- editor widget ---------- */
 const CM_MODE = {python:"python", js:"javascript", sql:"text/x-sqlite", html:"htmlmixed", web:"htmlmixed"};
+
+/* ---------- VS Code look and feel for CodeMirror ----------
+   CodeMirror's modes give the base colours. An overlay adds what VS Code's Dark+/Light+ themes colour on top:
+   control-flow keywords (purple), function calls (yellow), class names after class/new (teal), self/cls, indent guides
+   and brackets. Bracket pairs are coloured by nesting depth like VS Code's bracket-pair colorization: the depth at the
+   start of every line is recomputed on each change (skipping strings and comments), and each rendered line colours its
+   brackets from there. Also: auto-closing brackets, the active line, and Ln/Col for the status bar. */
+const VS_CONTROL = {
+  python: new Set("if elif else for while return import from as try except finally raise with yield break continue pass await assert del global nonlocal match case".split(" ")),
+  js: new Set("if else for while do switch case default return break continue throw try catch finally import export from await yield".split(" ")),
+};
+const VS_EDITOR_FILE = {python: "main.py", js: "main.js", sql: "query.sql", html: "index.html", web: "index.html"};
+const VS_LANG = {py: "python", js: "js", json: "js", sql: "sql", html: "web", css: "web", md: "", txt: "", csv: ""};
+function vsFileIcon(name){
+  const e = (String(name).match(/\.([a-z0-9]+)$/i) || [])[1]?.toLowerCase() || "";
+  const [t, c] = ({py: ["py", "py"], js: ["JS", "js"], json: ["{}", "json"], html: ["<>", "html"], css: ["#", "css"], sql: ["db", "sql"], md: ["M↓", "md"], txt: ["≡", "txt"], csv: ["≡", "csv"]})[e] || ["·", "txt"];
+  return `<i class="fi fi-${c}" aria-hidden="true">${t}</i>`;
+}
+function vsOverlay(lang, unit){
+  const ctl = VS_CONTROL[lang] || new Set(), html = lang === "html" || lang === "web";
+  return {token(stream){
+    const before = stream.string.slice(0, stream.pos);
+    if(/^\s*$/.test(before) && stream.pos % unit === 0 && stream.match(" ".repeat(unit), false) && /\S/.test(stream.string)){ stream.pos += unit; return "vsguide"; }
+    if(/^\s*$/.test(before) && stream.eatSpace()) return null;
+    if(!html && stream.match(/^[()[\]{}]/)) return "vsbr";
+    const m = !html && stream.match(/^[A-Za-z_$][\w$]*/);
+    if(m){ const w = m[0];
+      if(ctl.has(w)) return "vsctl";
+      if(lang === "python" && (w === "self" || w === "cls")) return "vsself";
+      if(/\b(class|new|extends)\s+$/.test(before) && /^[A-Z]/.test(w)) return "vstype";
+      if(/^\s*\(/.test(stream.string.slice(stream.pos)) && !/\b(def|function|class)\s+$/.test(before)) return "vsfn";
+      return null; }
+    stream.next(); return null;
+  }};
+}
+function vsEnhance(cm, lang, onPos){
+  const unit = cm.getOption("indentUnit"), html = lang === "html" || lang === "web";
+  cm.setOption("styleActiveLine", true);
+  // brackets only: CodeMirror can't pair a quote after a prefix (f"...", r"..."), so auto-closed quotes would double up
+  cm.setOption("autoCloseBrackets", {pairs: "()[]{}", explode: "[]{}", override: true});   // override: the python mode would otherwise swap in its own quote-pairing config
+  cm.addOverlay(vsOverlay(lang, unit));
+  if(onPos){ const pos = () => { const c = cm.getCursor(), sel = cm.getSelection().length; onPos(`Ln ${c.line + 1}, Col ${c.ch + 1}${sel ? ` (${sel} selected)` : ""}`); }; cm.on("cursorActivity", pos); pos(); }
+  if(html) return cm;
+  let depth = [];
+  const OPEN = "([{", CLOSE = ")]}";
+  const recompute = () => {
+    const next = [], n = cm.lineCount(); let d = 0;
+    for(let i = 0; i < n; i++){ next.push(d);
+      for(const tk of cm.getLineTokens(i, true)){ if(/string|comment/.test(tk.type || "")) continue;
+        for(const ch of tk.string){ if(OPEN.includes(ch)) d++; else if(CLOSE.includes(ch)) d = Math.max(0, d - 1); } } }
+    const stale = []; for(let i = 0; i < n; i++) if(depth[i] !== next[i]) stale.push(i);
+    depth = next; return stale;
+  };
+  cm.on("renderLine", (c, line, el) => {
+    let d = depth[line.lineNo()] || 0;
+    el.querySelectorAll(".cm-vsbr").forEach(sp => {
+      if(/cm-string|cm-comment/.test(sp.className)) return;
+      const ch = sp.textContent;
+      if(OPEN.includes(ch)){ sp.classList.add("vsb" + (d % 3)); d++; } else { d = Math.max(0, d - 1); sp.classList.add("vsb" + (d % 3)); }
+    });
+  });
+  // a line whose starting depth changed must re-render; toggling a line class makes CodeMirror redraw just that line
+  cm.on("change", () => { recompute().forEach(i => { const h = cm.getLineHandle(i); if(!h) return; const on = (h.wrapClass || "").includes("vsr"); on ? cm.removeLineClass(h, "wrap", "vsr") : cm.addLineClass(h, "wrap", "vsr"); }); });
+  recompute(); cm.refresh();
+  return cm;
+}
+// Static code samples get the same colours through CodeMirror's runMode (null until it loads).
+function vsGuessMode(code){
+  const c = String(code || "");
+  if(/^\s*</.test(c)) return "htmlmixed";
+  if(/\b(SELECT|INSERT|CREATE TABLE|UPDATE|DELETE FROM)\b/i.test(c) && !/\bdef |console\.|=>/.test(c)) return "text/x-sqlite";
+  if(/\b(const|let|var|function)\b|=>|console\.|===|\bdocument\./.test(c)) return "javascript";
+  return "python";
+}
+function vsHighlight(code, mode){
+  if(!window.CodeMirror?.runMode) return null;
+  mode = mode || vsGuessMode(code);
+  const lang = mode === "python" ? "python" : mode === "javascript" ? "js" : "", ctl = VS_CONTROL[lang] || new Set();
+  const lines = [[]];
+  try{
+    CodeMirror.runMode(String(code || ""), mode, (text, style) => {
+      if(text === "\n"){ lines.push([]); return; }
+      let cls = style ? style.split(/\s+/).map(x => "cm-" + x).join(" ") : "";
+      if(lang && /^[A-Za-z_$][\w$]*$/.test(text)){
+        if(ctl.has(text)) cls += " cm-vsctl"; else if(lang === "python" && (text === "self" || text === "cls")) cls += " cm-vsself";
+      }
+      lines[lines.length - 1].push(cls.trim() ? `<span class="${cls.trim()}">${esc(text)}</span>` : esc(text));
+    });
+  }catch(e){ return null; }
+  // function calls: a plain or variable token directly followed by "("
+  return lines.map(parts => parts.join("").replace(/(<span class="cm-(?:variable|property|builtin|variable-2)[^"]*">[^<]+<\/span>|\b[A-Za-z_$][\w$]*)(?=\()/g, m => m.startsWith("<span") ? m.replace('class="', 'class="cm-vsfn ') : `<span class="cm-vsfn">${m}</span>`));
+}
 function mountEditor(host, {lang, code, draftKey=null, resetTo=code, compact=false, label="", onRun=null, runLabel="Run ▶", onChange=null, tall=false}){
   const isMac=/Mac|iPhone|iPad/.test(navigator.platform||""), kb=isMac?"⌘↵":"Ctrl+↵";
   host.classList.add("ed"); host.classList.toggle("tall", !!tall);
-  host.innerHTML = `<div class="edbar"><span class="pill acc">${esc(LANGNAME[lang])}</span>${label?`<span class="edlabel">${esc(label)}</span>`:""}<span class="edsp"></span>
+  const file=/\.[a-z0-9]+$/i.test(label)?label:VS_EDITOR_FILE[lang]||"main", crumb=label&&label!==file?label:"";
+  host.innerHTML = `<div class="edbar"><span class="vstab" title="${esc(file)}">${vsFileIcon(file)}<span>${esc(file)}</span></span>${crumb?`<span class="vscrumb">${esc(crumb)}</span>`:""}<span class="edsp"></span>
     ${lang==="python"?`<button type="button" class="btn ghost sm" data-in aria-expanded="false">Input</button>`:""}
     <button type="button" class="btn ghost sm" data-reset title="Restore the original code">Reset</button>
     <button type="button" class="btn primary sm" data-run title="Run (${kb})">${esc(runLabel)}</button></div>
     <div class="edwrap"></div>
     <div class="edin" hidden><label class="eyebrow" for="">Input · one line per input() call</label><textarea rows="3" spellcheck="false" placeholder="Ada&#10;1815"></textarea></div>
-    <div class="edout" hidden><div class="edouthead"><span class="eyebrow">Output</span><span class="edms"></span></div><pre class="edpre" aria-live="polite"></pre></div>
-    <div class="edfoot"><span class="edstat"></span></div>`;
+    <div class="edout" hidden><div class="edouthead"><span class="vspanel">Output</span><span class="edms"></span></div><pre class="edpre" aria-live="polite"></pre></div>
+    <div class="edfoot"><span class="edstat"></span><span class="edsp"></span><span class="edpos"></span><span>Spaces: ${lang==="python"?4:2}</span><span>UTF-8</span><span>${esc({python:"Python",js:"JavaScript",sql:"SQL",html:"HTML",web:"HTML"}[lang]||lang)}</span></div>`;
   const wrap=host.querySelector(".edwrap"), runB=host.querySelector("[data-run]"), out=host.querySelector(".edout"), pre=host.querySelector(".edpre"),
         ms=host.querySelector(".edms"), stat=host.querySelector(".edstat"), inBox=host.querySelector(".edin"), inTa=inBox.querySelector("textarea"), inB=host.querySelector("[data-in]");
   const uid="ed"+Math.random().toString(36).slice(2,8); inTa.id=uid+"-in"; inBox.querySelector("label").setAttribute("for",inTa.id);
@@ -154,6 +247,7 @@ function mountEditor(host, {lang, code, draftKey=null, resetTo=code, compact=fal
         Tab:c=>c.somethingSelected()?c.indentSelection("add"):c.replaceSelection(" ".repeat(c.getOption("indentUnit")),"end"),
         "Shift-Tab":c=>c.indentSelection("subtract"), Esc:c=>c.getInputField().blur()}});
     cm.getInputField().setAttribute("aria-label", (LANGNAME[lang]||"Code")+" editor. Press Escape, then Tab, to leave.");
+    vsEnhance(cm, lang, t=>{ const p=host.querySelector(".edpos"); if(p) p.textContent=t; });
   } else {
     ta=document.createElement("textarea"); ta.className="edta"; ta.value=code; ta.spellcheck=false; ta.setAttribute("aria-label","Code editor"); wrap.appendChild(ta);
     ta.addEventListener("keydown",e=>{ if(e.key==="Enter"&&(e.metaKey||e.ctrlKey)){ e.preventDefault(); run(); } else if(e.key==="Tab"&&!e.shiftKey){ e.preventDefault(); const s=ta.selectionStart; ta.setRangeText(" ".repeat(lang==="python"?4:2),s,ta.selectionEnd,"end"); } });

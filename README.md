@@ -94,7 +94,7 @@ Not built yet: payments (Stripe Connect with escrow would replace the deal threa
 
 | Path | What it is |
 |---|---|
-| `index.html` | Page shell and the whole design system (CSS): a black-and-white theme, with green and red kept only for passed and failed |
+| `index.html` | Page shell and the whole design system (CSS): a minimal monochrome interface (charcoal in dark mode), green and red only for passed and failed, code in VS Code's own colours (Light/Dark Modern), and the motion layer (headline reveals, scroll reveals, the scroll-filled statement, the sliding nav pill, page transitions), all off under reduced motion |
 | `ui.js` | Icons, theme, toasts, confetti, search palette, XP/levels/badges, Home and Profile views |
 | `app.js` | Routing, persistence, Dashboard, Learn map, lessons, exams, review, practice, projects, method; quiz engine; spaced repetition |
 | `runner.js` | Code editor widget (CodeMirror 5), runners and drafts |
