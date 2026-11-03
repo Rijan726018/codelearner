@@ -63,7 +63,8 @@
 <style>
 /* CodeBay design system: monochrome.
    Black, white and greys only, in the spirit of Apple's product pages: system type, quiet hairlines,
-   generous space, no glows. Colour is reserved for meaning: green = passed, red = failed.
+   generous space, no glows. Colour is reserved for meaning (green = passed, red = failed) and for code, which uses
+   VS Code's own palettes (Light Modern / Dark Modern chrome, Light+ / Dark+ syntax) so it reads like the editor people will use.
    The one gradient (--grad) is a graphite-to-silver sheen for brand moments. */
 :root{
   --bg:#ffffff; --bg2:#f5f5f7; --surface:#ffffff; --surface2:#fbfbfd; --sunk:#f5f5f7; --ink:#1d1d1f; --muted:#6e6e73; --line:#e8e8ed; --line2:#d2d2d7;
@@ -77,39 +78,51 @@
   --glow:none;
   --shadow:0 1px 2px rgba(0,0,0,.04);
   --glass:rgba(255,255,255,.8);
-  --syn-kw:#1d1d1f; --syn-str:#6e6e73; --syn-num:#424245; --syn-com:#a1a1a6; --syn-def:#1d1d1f; --syn-bi:#424245; --syn-err:#c4161c; --cursor:#1d1d1f; --sel:#e3e3e8;
+  --syn-kw:#0000ff; --syn-str:#a31515; --syn-num:#098658; --syn-com:#008000; --syn-def:#795e26; --syn-bi:#795e26; --syn-err:#e51400; --cursor:#000000; --sel:#add6ff;
+  /* VS Code "Light Modern" chrome + "Light+" syntax */
+  --vs-bg:#ffffff; --vs-bar:#f8f8f8; --vs-tab:#ffffff; --vs-border:#e5e5e5; --vs-fg:#3b3b3b; --vs-text:#000000; --vs-dim:#6e6e6e; --vs-ln:#6e7681; --vs-ln-act:#171184;
+  --vs-accent:#005fb8; --vs-line:#eeeeee; --vs-guide:#d3d3d3; --vs-guide-act:#939393; --vs-hover:#ebebeb; --vs-match:rgba(0,100,0,.1);
+  --vs-ctl:#af00db; --vs-var:#001080; --vs-type:#267f99; --vs-tag:#800000; --vs-attr:#e50000; --vs-sel:#800000; --vs-punc:#800000; --vs-br1:#0431fa; --vs-br2:#319331; --vs-br3:#7b3814;
   --display:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter","Helvetica Neue",Arial,sans-serif;
   --body:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Helvetica Neue",Arial,sans-serif;
   --mono:"SF Mono","JetBrains Mono",ui-monospace,Menlo,monospace;
   --r:20px;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#000000; --bg2:#0a0a0a; --surface:#0e0e0f; --surface2:#141415; --sunk:#1c1c1e; --ink:#f5f5f7; --muted:#8e8e93; --line:#222224; --line2:#38383b;
-  --accent:#f5f5f7; --accent-2:#c7c7cc; --accent-3:#8e8e93; --accent-soft:#1c1c1e; --on-accent:#000000;
-  --hot:#f5f5f7; --hot-soft:#1c1c1e;
-  --summit:#f5f5f7; --summit-soft:#1c1c1e; --ok:#32d74b; --ok-soft:#0d2413; --bad:#ff453a; --bad-soft:#2a0f0d;
-  --easy:#8e8e93; --med:#c7c7cc; --hard:#f5f5f7;
-  --code-bg:#070707;
+  --bg:#131315; --bg2:#17171a; --surface:#1b1b1f; --surface2:#202024; --sunk:#27272c; --ink:#ececf1; --muted:#9c9ca5; --line:#2b2b31; --line2:#3b3b42;
+  --accent:#ececf1; --accent-2:#c7c7cc; --accent-3:#8e8e93; --accent-soft:#27272c; --on-accent:#131315;
+  --hot:#ececf1; --hot-soft:#27272c;
+  --summit:#ececf1; --summit-soft:#27272c; --ok:#32d74b; --ok-soft:#10261a; --bad:#ff6b61; --bad-soft:#2c1514;
+  --easy:#8e8e93; --med:#c7c7cc; --hard:#ececf1;
+  --code-bg:#1f1f1f;
   --grad:linear-gradient(135deg,#ffffff 0%,#a1a1a6 100%);
   --grad-soft:linear-gradient(135deg,rgba(255,255,255,.05),rgba(255,255,255,.02));
   --glow:none;
   --shadow:0 0 0 1px rgba(255,255,255,.02) inset;
-  --glass:rgba(0,0,0,.72);
-  --syn-kw:#f5f5f7; --syn-str:#a1a1a6; --syn-num:#d1d1d6; --syn-com:#5f5f64; --syn-def:#ffffff; --syn-bi:#c7c7cc; --syn-err:#ff453a; --cursor:#f5f5f7; --sel:#2c2c2e;
+  --glass:rgba(19,19,21,.74);
+  --syn-kw:#569cd6; --syn-str:#ce9178; --syn-num:#b5cea8; --syn-com:#6a9955; --syn-def:#dcdcaa; --syn-bi:#dcdcaa; --syn-err:#f14c4c; --cursor:#aeafad; --sel:#264f78;
+  /* VS Code "Dark Modern" chrome + "Dark+" syntax */
+  --vs-bg:#1f1f1f; --vs-bar:#181818; --vs-tab:#1f1f1f; --vs-border:#2b2b2b; --vs-fg:#cccccc; --vs-text:#d4d4d4; --vs-dim:#9d9d9d; --vs-ln:#6e7681; --vs-ln-act:#cccccc;
+  --vs-accent:#0078d4; --vs-line:#282828; --vs-guide:#404040; --vs-guide-act:#707070; --vs-hover:#2b2b2b; --vs-match:rgba(0,100,0,.25);
+  --vs-ctl:#c586c0; --vs-var:#9cdcfe; --vs-type:#4ec9b0; --vs-tag:#569cd6; --vs-attr:#9cdcfe; --vs-sel:#d7ba7d; --vs-punc:#808080; --vs-br1:#ffd700; --vs-br2:#da70d6; --vs-br3:#179fff;
   color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#000000; --bg2:#0a0a0a; --surface:#0e0e0f; --surface2:#141415; --sunk:#1c1c1e; --ink:#f5f5f7; --muted:#8e8e93; --line:#222224; --line2:#38383b;
-  --accent:#f5f5f7; --accent-2:#c7c7cc; --accent-3:#8e8e93; --accent-soft:#1c1c1e; --on-accent:#000000;
-  --hot:#f5f5f7; --hot-soft:#1c1c1e;
-  --summit:#f5f5f7; --summit-soft:#1c1c1e; --ok:#32d74b; --ok-soft:#0d2413; --bad:#ff453a; --bad-soft:#2a0f0d;
-  --easy:#8e8e93; --med:#c7c7cc; --hard:#f5f5f7;
-  --code-bg:#070707;
+  --bg:#131315; --bg2:#17171a; --surface:#1b1b1f; --surface2:#202024; --sunk:#27272c; --ink:#ececf1; --muted:#9c9ca5; --line:#2b2b31; --line2:#3b3b42;
+  --accent:#ececf1; --accent-2:#c7c7cc; --accent-3:#8e8e93; --accent-soft:#27272c; --on-accent:#131315;
+  --hot:#ececf1; --hot-soft:#27272c;
+  --summit:#ececf1; --summit-soft:#27272c; --ok:#32d74b; --ok-soft:#10261a; --bad:#ff6b61; --bad-soft:#2c1514;
+  --easy:#8e8e93; --med:#c7c7cc; --hard:#ececf1;
+  --code-bg:#1f1f1f;
   --grad:linear-gradient(135deg,#ffffff 0%,#a1a1a6 100%);
   --grad-soft:linear-gradient(135deg,rgba(255,255,255,.05),rgba(255,255,255,.02));
   --glow:none;
   --shadow:0 0 0 1px rgba(255,255,255,.02) inset;
-  --glass:rgba(0,0,0,.72);
-  --syn-kw:#f5f5f7; --syn-str:#a1a1a6; --syn-num:#d1d1d6; --syn-com:#5f5f64; --syn-def:#ffffff; --syn-bi:#c7c7cc; --syn-err:#ff453a; --cursor:#f5f5f7; --sel:#2c2c2e;
+  --glass:rgba(19,19,21,.74);
+  --syn-kw:#569cd6; --syn-str:#ce9178; --syn-num:#b5cea8; --syn-com:#6a9955; --syn-def:#dcdcaa; --syn-bi:#dcdcaa; --syn-err:#f14c4c; --cursor:#aeafad; --sel:#264f78;
+  /* VS Code "Dark Modern" chrome + "Dark+" syntax */
+  --vs-bg:#1f1f1f; --vs-bar:#181818; --vs-tab:#1f1f1f; --vs-border:#2b2b2b; --vs-fg:#cccccc; --vs-text:#d4d4d4; --vs-dim:#9d9d9d; --vs-ln:#6e7681; --vs-ln-act:#cccccc;
+  --vs-accent:#0078d4; --vs-line:#282828; --vs-guide:#404040; --vs-guide-act:#707070; --vs-hover:#2b2b2b; --vs-match:rgba(0,100,0,.25);
+  --vs-ctl:#c586c0; --vs-var:#9cdcfe; --vs-type:#4ec9b0; --vs-tag:#569cd6; --vs-attr:#9cdcfe; --vs-sel:#d7ba7d; --vs-punc:#808080; --vs-br1:#ffd700; --vs-br2:#da70d6; --vs-br3:#179fff;
   color-scheme:dark}
 
 *{box-sizing:border-box}
@@ -1055,7 +1068,144 @@ body:has(.ws) .top-in{max-width:1712px}
 .sellform{max-width:900px}
 textarea.field{resize:vertical;font:15px/1.5 var(--body)}
 
-@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.anim .rv{opacity:1;transform:none}html{scroll-behavior:auto}}
+/* ---------- VS Code editor ----------
+   The editor, the Explorer, output panels and every code sample use VS Code's own palettes (tokens --vs-* above):
+   Light Modern / Dark Modern chrome, Light+ / Dark+ syntax, its default fonts, gutter, guides and bracket colours. */
+.ed,pre.code,.wsfiles{--vs-font:Menlo,Monaco,Consolas,"Droid Sans Mono","Cascadia Mono","Courier New",monospace;--vs-ui:-apple-system,BlinkMacSystemFont,"Segoe WPC","Segoe UI","Ubuntu","Droid Sans",sans-serif}
+.ed{background:var(--vs-bg);border:1px solid var(--vs-border);border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.06),0 18px 50px -30px rgba(0,0,0,.45);color:var(--vs-text)}
+.ed:focus-within{border-color:var(--vs-border)}
+.edbar{background:var(--vs-bar);border-bottom:1px solid var(--vs-border);padding:0 8px 0 0;min-height:36px;gap:6px;flex-wrap:nowrap;align-items:stretch}
+.vstab{display:flex;align-items:center;gap:7px;padding:0 14px 0 12px;background:var(--vs-tab);color:var(--vs-text);font:13px var(--vs-ui);border-right:1px solid var(--vs-border);
+  box-shadow:inset 0 1px 0 var(--vs-accent);margin-bottom:-1px;white-space:nowrap;min-width:0}
+.vstab span{overflow:hidden;text-overflow:ellipsis}
+.vscrumb{display:flex;align-items:center;font:12.5px var(--vs-font);color:var(--vs-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;padding-left:4px}
+.vscrumb::before{content:"›";margin-right:8px;color:var(--vs-dim)}
+.edbar .edsp{flex:1}
+.edbar .btn{align-self:center;border-radius:5px;padding:4px 10px;font:500 12.5px var(--vs-ui);letter-spacing:0;background:transparent;border:1px solid transparent;color:var(--vs-fg);flex:none}
+.edbar .btn:hover{background:var(--vs-hover);border-color:transparent}
+.edbar .btn.primary{background:var(--vs-accent);color:#fff;border-color:transparent}
+.edbar .btn.primary:hover{opacity:1;filter:brightness(1.1);background:var(--vs-accent)}
+.fi{font:700 9.5px/1 var(--vs-font);font-style:normal;letter-spacing:-.02em;min-width:14px;text-align:center}
+.fi-py{color:#3e7cb1}.fi-js{color:#cbcb41}.fi-json{color:#cbcb41}.fi-html{color:#e37933}.fi-css{color:#519aba}.fi-sql{color:#f55385}.fi-md{color:#519aba}.fi-txt,.fi-csv{color:var(--vs-dim)}
+.ed .CodeMirror{font:14px/1.5 var(--vs-font);background:var(--vs-bg);color:var(--vs-text);font-variant-ligatures:none}
+.ed .CodeMirror-lines{padding:6px 0}
+.ed .CodeMirror pre.CodeMirror-line,.ed .CodeMirror pre.CodeMirror-line-like{padding:0 16px 0 22px}
+.ed .CodeMirror-gutters{background:var(--vs-bg);border-right:0}
+.ed .CodeMirror-linenumber{color:var(--vs-ln);opacity:1;padding:0 0 0 18px;min-width:26px}
+.ed .CodeMirror-activeline-gutter .CodeMirror-linenumber{color:var(--vs-ln-act)}
+.ed .CodeMirror-activeline-background{background:transparent;box-shadow:inset 0 0 0 2px var(--vs-line)}
+.ed .CodeMirror-focused .CodeMirror-activeline-background{box-shadow:inset 0 0 0 2px var(--vs-line)}
+.ed .CodeMirror-cursor{border-left:2px solid var(--cursor)}
+.ed .CodeMirror-selected,.ed .CodeMirror-focused .CodeMirror-selected,.ed .CodeMirror-line::selection,.ed .CodeMirror-line>span::selection,.ed .CodeMirror-line>span>span::selection{background:var(--sel)}
+.ed .CodeMirror-matchingbracket{color:inherit!important;background:var(--vs-match);outline:1px solid var(--vs-guide-act);outline-offset:-1px}
+.ed .cm-vsguide{box-shadow:inset 1px 0 0 var(--vs-guide)}
+.ed .edta{background:var(--vs-bg);color:var(--vs-text);font:14px/1.5 var(--vs-font)}
+/* syntax: Dark+ / Light+ */
+.ed .CodeMirror,pre.code{--t-kw:var(--syn-kw)}
+.ed .cm-keyword,pre.code .cm-keyword,.ed .cm-atom,pre.code .cm-atom{color:var(--syn-kw)}
+.ed .cm-vsctl,pre.code .cm-vsctl{color:var(--vs-ctl)}
+.ed .cm-def,pre.code .cm-def,.ed .cm-vsfn,pre.code .cm-vsfn,.ed .cm-builtin,pre.code .cm-builtin{color:var(--syn-def)}
+.ed .cm-vstype,pre.code .cm-vstype,.ed .cm-type,pre.code .cm-type{color:var(--vs-type)}
+.ed .cm-vsself,pre.code .cm-vsself{color:var(--syn-kw)}
+.ed .cm-variable,pre.code .cm-variable,.ed .cm-variable-2,pre.code .cm-variable-2,.ed .cm-property,pre.code .cm-property{color:var(--vs-var)}
+.ed .cm-variable-3,pre.code .cm-variable-3{color:var(--vs-type)}
+.ed .cm-number,pre.code .cm-number{color:var(--syn-num)}
+.ed .cm-operator,pre.code .cm-operator,.ed .cm-punctuation,pre.code .cm-punctuation{color:var(--vs-text)}
+.ed .cm-meta,pre.code .cm-meta{color:var(--syn-def)}
+.ed .cm-tag,pre.code .cm-tag{color:var(--vs-tag)}
+.ed .cm-attribute,pre.code .cm-attribute{color:var(--vs-attr)}
+.ed .cm-bracket,pre.code .cm-bracket{color:var(--vs-punc)}
+.ed .cm-qualifier,pre.code .cm-qualifier,.ed .cm-tag.cm-builtin{color:var(--vs-sel)}
+.ed .cm-error,pre.code .cm-error{color:var(--syn-err);background:none}
+.ed .vsb0{color:var(--vs-br1)}.ed .vsb1{color:var(--vs-br2)}.ed .vsb2{color:var(--vs-br3)}
+.ed span.cm-string,pre.code span.cm-string,.ed span.cm-string-2,pre.code span.cm-string-2{color:var(--syn-str)}
+.ed span.cm-comment,pre.code span.cm-comment{color:var(--syn-com);font-style:normal}
+pre.code .cm-string .cm-vsfn,pre.code .cm-comment .cm-vsfn{color:inherit}
+/* status bar and panels */
+.edfoot{display:flex;gap:14px;align-items:center;background:var(--vs-bar);border-top:1px solid var(--vs-border);color:var(--vs-dim);font:12px var(--vs-ui);padding:4px 12px;letter-spacing:0;white-space:nowrap;overflow:hidden}
+.edfoot .edstat{overflow:hidden;text-overflow:ellipsis;min-width:0}
+.edfoot .edsp{flex:1}
+@media (max-width:640px){.edfoot>span:nth-child(n+4){display:none}}
+.edout,.edin{background:var(--vs-bg);border-top:1px solid var(--vs-border);color:var(--vs-text)}
+.edouthead{padding:8px 16px 0;align-items:center}
+.vspanel{font:500 11px var(--vs-ui);letter-spacing:.06em;text-transform:uppercase;color:var(--vs-text);padding-bottom:5px;box-shadow:inset 0 -1px 0 var(--vs-accent)}
+.edms{color:var(--vs-dim)}
+.edpre{font:13px/1.5 var(--vs-font);color:var(--vs-text);padding:8px 16px 14px}
+.edin .eyebrow{color:var(--vs-dim)}
+.edin textarea{background:var(--vs-bar);border-color:var(--vs-border);color:var(--vs-text);font:13px/1.5 var(--vs-font);border-radius:4px}
+.ed .err,.edpre .err{color:var(--syn-err)}
+/* code samples in lessons */
+pre.code{background:var(--vs-bg);border:1px solid var(--vs-border);border-radius:10px;font:13.5px/1.55 var(--vs-font);color:var(--vs-text);padding:12px 0}
+pre.code span.l::before{color:var(--vs-ln);opacity:1;width:40px;padding-right:18px}
+pre.code span.l.cur{background:transparent;box-shadow:inset 0 0 0 2px var(--vs-line)}
+pre.code span.l.cur::before{color:var(--vs-ln-act)}
+/* the Editor's file list, as VS Code's Explorer */
+.wsfiles{background:var(--vs-bar);border-color:var(--vs-border);color:var(--vs-fg)}
+.wsfiles .eyebrow{font:600 11px var(--vs-ui);letter-spacing:.04em;color:var(--vs-fg)}
+.wsflist button{font:13px var(--vs-ui);color:var(--vs-fg);border-radius:4px;padding:5px 8px}
+.wsflist button:hover{background:var(--vs-hover)}
+.wsflist button[aria-current="true"]{background:var(--sel);color:var(--vs-text)}
+/* home terminal: always VS Code Dark Modern */
+.term{background:#1f1f1f;color:#cccccc;border:1px solid #2b2b2b;border-radius:14px;box-shadow:0 40px 90px -40px rgba(0,0,0,.55)}
+.term .tb{background:#181818;border-bottom-color:#2b2b2b}
+.term .tb i,.term .tb i:nth-child(2),.term .tb i:nth-child(3){background:#3c3c3c}
+.term .tb span{color:#cccccc;font:13px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.term pre{font:14px/1.6 Menlo,Monaco,Consolas,"Courier New",monospace}
+.term .k{color:#569cd6;font-weight:400}.term .s{color:#ce9178}.term .n{color:#b5cea8}.term .c{color:#6a9955}.term .f{color:#dcdcaa}.term .o{color:#cccccc}
+.caret{background:#aeafad}
+.console{background:#181818;color:#cccccc}
+
+/* ---------- motion ----------
+   Long, soft ease-outs (no bounces), small distances, one idea at a time. Everything here is off under
+   prefers-reduced-motion (the rule after this block). */
+:root{--ease-out:cubic-bezier(.16,1,.3,1);--ease-io:cubic-bezier(.65,0,.35,1)}
+.anim .rv{opacity:0;transform:translateY(28px);filter:blur(6px);transition:opacity .9s var(--ease-out),transform .9s var(--ease-out),filter .9s var(--ease-out);transition-delay:var(--d,0s)}
+.anim .rv.in{opacity:1;transform:none;filter:none}
+/* headline: words rise from behind a mask */
+h1.rising .w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.1em;margin-bottom:-.1em}
+h1.rising .w>span{display:inline-block;transform:translateY(105%);animation:rise 1.1s var(--ease-out) forwards;animation-delay:calc(var(--i)*45ms + 60ms)}
+h1.rising .gt{background:none;color:inherit}
+h1.rising .gt .w>span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+@keyframes rise{to{transform:none}}
+/* hero: copy and buttons follow the headline, the terminal settles in from a tilt */
+.anim .hero>.hcopy>*:not(h1){animation:fadeUp 1s var(--ease-out) both}
+.anim .hero>.hcopy>*:nth-child(1){animation-delay:.05s}
+.anim .hero>.hcopy>p{animation-delay:.45s}
+.anim .hero>.hcopy>.row{animation-delay:.6s}
+.anim .hero>.hcopy>.row.muted{animation-delay:.75s}
+.anim .hero .term{animation:settle 1.4s var(--ease-out) .35s both;transform-origin:50% 100%}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}}
+@keyframes settle{from{opacity:0;transform:perspective(1400px) rotateX(16deg) translateY(48px) scale(.96)}}
+/* the statement fills in as you scroll */
+.statement{padding:clamp(40px,9vw,120px) 0}
+.statement p{margin:0;max-width:26ch;font:600 clamp(1.9rem,4.4vw,3.6rem)/1.12 var(--display);letter-spacing:-.035em}
+.statement p span{color:var(--ink);opacity:.18;transition:opacity .5s var(--ease-out)}
+.statement p span.on{opacity:1}
+/* scroll-linked scale for the closing band, where the browser supports it */
+@supports (animation-timeline: view()){
+  .anim .cta{animation:grow linear both;animation-timeline:view();animation-range:entry 0% cover 40%}
+  @keyframes grow{from{transform:scale(.9);opacity:.3;border-radius:44px}to{transform:none;opacity:1}}
+}
+/* nav: one sliding pill */
+.tabs{position:relative}
+.tabs button{position:relative;z-index:1}
+.tabs button[aria-current="page"]{background:transparent}
+.tabind{position:absolute;left:0;top:0;border-radius:980px;background:var(--sunk);z-index:0;pointer-events:none;transition:opacity .2s}
+.tabind[data-ready]{transition:transform .55s var(--ease-out),width .55s var(--ease-out),opacity .2s}
+/* tactile controls */
+.btn,.chip,.kbtn,.iconbtn,.chipx{transition:transform .25s var(--ease-out),background-color .2s,border-color .2s,color .2s,opacity .2s}
+.btn:active,.chip:active,.kbtn:active,.iconbtn:active,.chipx:active{transform:scale(.96)}
+.fcard,.course,.pcard,.lot,.wscard,.counter{transition:transform .6s var(--ease-out),box-shadow .6s var(--ease-out),border-color .3s}
+.fcard:hover,.course:hover,.pcard:hover,.lot:hover,.wscard:hover{transform:translateY(-4px);box-shadow:0 30px 60px -36px rgba(0,0,0,.45);border-color:var(--line2)}
+/* page changes: the old page lifts away, the new one settles in; the top bar stays put */
+.top{view-transition-name:topbar}
+::view-transition-group(topbar){animation:none}
+::view-transition-old(root){animation:vtOut .2s var(--ease-io) both}
+::view-transition-new(root){animation:vtIn .5s var(--ease-out) both}
+@keyframes vtOut{to{opacity:0;transform:translateY(-6px)}}
+@keyframes vtIn{from{opacity:0;transform:translateY(12px)}}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.anim .rv{opacity:1;transform:none;filter:none}.statement p span{opacity:1}h1.rising .w>span{transform:none}html{scroll-behavior:auto}::view-transition-old(root),::view-transition-new(root){animation:none}}
 </style>
 
 <header class="top">
@@ -1090,6 +1240,9 @@ textarea.field{resize:vertical;font:15px/1.5 var(--body)}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/selection/active-line.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/runmode/runmode.min.js"></script>
 <script src="ui.js" charset="utf-8"></script>
 <script src="app.js" charset="utf-8"></script>
 <script src="runner.js" charset="utf-8"></script>
