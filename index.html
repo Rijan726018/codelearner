@@ -9,6 +9,55 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://codebay.org/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="CodeBay">
+<meta property="og:url" content="https://codebay.org/">
+<meta property="og:title" content="CodeBay · Learn to code, build projects, auction your code">
+<meta property="og:description" content="Free interactive coding lessons, a bootcamp, career roadmaps and a problem judge, all in your browser. Then put the projects you build up for auction.">
+<meta property="og:image" content="https://codebay.org/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"CodeBay","url":"https://codebay.org/","description":"Learn to code from zero to world-class with interactive lessons, a bootcamp, career roadmaps and a problem judge, then auction the projects you build."}</script>
+<script>
+/* CodeBay lives at codebay.org. A visit to the old GitHub Pages address moves there once codebay.org is confirmed to
+   serve this same site (site.json). Browsers keep saved progress per address, so this browser's CodeBay keys travel
+   along in the URL fragment, which is never sent to any server, and are written on arrival only where codebay.org has
+   nothing of its own yet. The fragment is removed from the address bar before the app starts. */
+(function(){
+  var HOME = "https://codebay.org/", KEYS = /^(tenk2|cl)-/;
+  function enc(s){ var b = new TextEncoder().encode(s), out = ""; for(var i = 0; i < b.length; i += 32768) out += String.fromCharCode.apply(null, b.subarray(i, i + 32768)); return btoa(out).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); }
+  function dec(s){ var bin = atob(s.replace(/-/g, "+").replace(/_/g, "/")), b = new Uint8Array(bin.length); for(var i = 0; i < bin.length; i++) b[i] = bin.charCodeAt(i); return new TextDecoder().decode(b); }
+  function done(p){ try{ var x = JSON.parse(p || "null") || {}; return Object.keys(x.lessons || {}).length + Object.keys(x.solved || {}).length + Object.keys(x.steps || {}).length; }catch(e){ return 0; } }
+  try{
+    if(/\.github\.io$/.test(location.hostname)){
+      var ctl = window.AbortController ? new AbortController() : null, t = setTimeout(function(){ ctl && ctl.abort(); }, 5000);
+      fetch(HOME + "site.json", {cache: "no-store", signal: ctl && ctl.signal}).then(function(r){ return r.ok ? r.json() : null; }).then(function(j){
+        clearTimeout(t); if(!j || j.site !== "codebay") return;
+        var d = {}, n = 0; for(var i = 0; i < localStorage.length; i++){ var k = localStorage.key(i); if(KEYS.test(k)){ d[k] = localStorage.getItem(k); n++; } }
+        var to = location.hash && location.hash.length > 1 ? location.hash : "#/", data = n ? enc(JSON.stringify(d)) : "";
+        if(data.length > 1500000){   // too big for an address: point the way instead of moving without it
+          var bar = document.createElement("div"); bar.setAttribute("role", "status");
+          bar.style.cssText = "position:fixed;left:16px;right:16px;bottom:16px;z-index:99;padding:14px 18px;border-radius:14px;background:#000;color:#fff;font:15px/1.5 system-ui,sans-serif";
+          bar.innerHTML = 'CodeBay has moved to <a style="color:#fff" href="' + HOME + '">codebay.org</a>. Sign in here first so your progress follows you, or download a backup from your Profile and restore it there.';
+          document.body.appendChild(bar); return;
+        }
+        location.replace(HOME + (data ? "#cbimport=" + data + "&to=" + encodeURIComponent(to) : to));
+      }).catch(function(){});
+    } else {
+      var m = /^#cbimport=([^&]*)(?:&to=(.*))?$/.exec(location.hash);
+      if(m){
+        try{
+          var d = JSON.parse(dec(m[1])), fresh = done(localStorage.getItem("tenk2-progress")) === 0;
+          for(var k in d) if(KEYS.test(k) && typeof d[k] === "string" && (localStorage.getItem(k) == null || (fresh && (k === "tenk2-progress" || k === "tenk2-srs")))) localStorage.setItem(k, d[k]);
+        }catch(e){}
+        history.replaceState(null, "", location.pathname + location.search + (m[2] ? decodeURIComponent(m[2]) : "#/"));
+      }
+    }
+  }catch(e){}
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
 <style>
@@ -1023,7 +1072,8 @@ textarea.field{resize:vertical;font:15px/1.5 var(--body)}
   </div>
 </header>
 <div class="wrap">
-  <main id="main"><div class="loading">Loading your curriculum…</div></main>
+  <main id="main"><div class="loading">Loading your curriculum…</div>
+    <noscript><h1>CodeBay</h1><p>Learn to code from your first line to world-class engineering: a step-by-step bootcamp, guided projects, a 10,000-hour core curriculum, career roadmaps and a problem judge that runs Python and JavaScript in your browser. Then put the projects you build up for auction in the Code Auction. CodeBay needs JavaScript turned on.</p></noscript></main>
   <footer>
     <span>CodeBay · <span class="sync" id="sync">Loading…</span></span>
     <span id="resetwrap"><button type="button" id="reset">Clear all progress</button></span>
