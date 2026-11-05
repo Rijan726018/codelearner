@@ -108,9 +108,9 @@ C.append(dict(id="web-page", title="Build Your First Web Page", lang="html", hue
 
 # =====================================================================================================  PYTHON
 PY = []
-def py(id, title, body, task, add_code, tests, hint=None, example=None):
+def py(id, title, body, task, add_code, tests, hint=None, example=None, concept=None):
     prev = PY[-1]["solution"] if PY else ""
-    PY.append(dict(id=id, title=title, body=body, task=task, solution=prev + add_code, tests=tests, **({"hint":hint} if hint else {}), **({"example":example} if example else {})))
+    PY.append(dict(id=id, title=title, body=body, task=task, solution=prev + add_code, tests=tests, **({"hint":hint} if hint else {}), **({"example":example} if example else {}), **({"concept":concept} if concept else {})))
 
 py("p1","Hello, world!",
  ["A program is a list of instructions the computer runs from top to bottom. In Python, `print()` shows something on the screen.","Text in code is called a **string** and goes inside quotes. Press **Check your code** (or Ctrl/⌘ + Enter) to run your program and see the output."],
@@ -216,9 +216,9 @@ C.append(dict(id="python-zero", title="Python from Zero", lang="python", hue="#3
 
 # =====================================================================================================  JAVASCRIPT
 JS = []
-def js(id, title, body, task, add_code, tests, hint=None, example=None):
+def js(id, title, body, task, add_code, tests, hint=None, example=None, concept=None):
     prev = JS[-1]["solution"] if JS else ""
-    JS.append(dict(id=id, title=title, body=body, task=task, solution=prev + add_code, tests=tests, **({"hint":hint} if hint else {}), **({"example":example} if example else {})))
+    JS.append(dict(id=id, title=title, body=body, task=task, solution=prev + add_code, tests=tests, **({"hint":hint} if hint else {}), **({"example":example} if example else {}), **({"concept":concept} if concept else {})))
 js("j1","Hello, JavaScript",
  ["JavaScript is the language of the web: every browser runs it. `console.log()` prints a value to the console (the output panel).","Statements usually end with a semicolon `;`."],
  "Print exactly `Hello, JavaScript!`",
@@ -311,8 +311,8 @@ CREATE TABLE movies (id INTEGER PRIMARY KEY, title TEXT, year INTEGER, genre TEX
 INSERT INTO movies VALUES (1,'Inception',2010,'Sci-Fi',8.8,1),(2,'Interstellar',2014,'Sci-Fi',8.7,1),(3,'The Dark Knight',2008,'Action',9.0,1),(4,'Oppenheimer',2023,'Drama',8.4,1),(5,'Lady Bird',2017,'Drama',7.4,2),(6,'Little Women',2019,'Drama',7.8,2),(7,'Barbie',2023,'Comedy',6.9,2),(8,'Parasite',2019,'Thriller',8.5,3),(9,'Snowpiercer',2013,'Sci-Fi',7.1,3),(10,'Spirited Away',2001,'Animation',8.6,4),(11,'Princess Mononoke',1997,'Animation',8.3,4),(12,'Arrival',2016,'Sci-Fi',7.9,5),(13,'Dune',2021,'Sci-Fi',8.0,5);
 """
 SQ = []
-def sq(id, title, body, task, ref, tests, hint=None, example=None, ordered=False):
-    SQ.append(dict(id=id, title=title, body=body, task=task, solution=ref, ref=ref, ordered=ordered, starter="-- Write your query below\n", tests=tests, **({"hint":hint} if hint else {}), **({"example":example} if example else {})))
+def sq(id, title, body, task, ref, tests, hint=None, example=None, ordered=False, concept=None):
+    SQ.append(dict(id=id, title=title, body=body, task=task, solution=ref, ref=ref, ordered=ordered, starter="-- Write your query below\n", tests=tests, **({"hint":hint} if hint else {}), **({"example":example} if example else {}), **({"concept":concept} if concept else {})))
 sq("q1","SELECT everything",
  ["A database stores data in **tables**: rows (records) and columns (fields). SQL is the language for asking questions of it.","`SELECT * FROM movies;` returns every column (`*`) of every row in the `movies` table."],
  "Select every column from the `movies` table.", "SELECT * FROM movies;",
@@ -416,11 +416,11 @@ LAYOUT_HTML = """<!DOCTYPE html>
 </html>
 """
 LY = []
-def ly(id, title, body, task, css, tests, hint=None, example=None, html_change=None):
+def ly(id, title, body, task, css, tests, hint=None, example=None, html_change=None, concept=None):
     prev = LY[-1]["solution"] if LY else LAYOUT_HTML
     sol = prev.replace("\n  </style>", css + "\n  </style>", 1) if css else prev
     if html_change: sol = sol.replace(*html_change)
-    LY.append(dict(id=id, title=title, body=body, task=task, solution=sol, tests=tests, **({"starter": LAYOUT_HTML} if not LY else {}), **({"hint":hint} if hint else {}), **({"example":example} if example else {})))
+    LY.append(dict(id=id, title=title, body=body, task=task, solution=sol, tests=tests, **({"starter": LAYOUT_HTML} if not LY else {}), **({"hint":hint} if hint else {}), **({"example":example} if example else {}), **({"concept":concept} if concept else {})))
 ly("l1","Flexbox: a row of cards",
  ["Flexbox arranges a container's direct children along a line. Turn it on with `display: flex` on the **container**, not the children.","The three plan cards are inside `.cards`. Right now they stack vertically, because `div`s are blocks."],
  "Below the comment in the `<style>`, make `.cards` a flex container.",

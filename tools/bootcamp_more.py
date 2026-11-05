@@ -285,9 +285,9 @@ CREATE TABLE order_items (order_id INTEGER REFERENCES orders(id), product_id INT
 INSERT INTO order_items VALUES (1,1,3),(1,4,1),(2,5,1),(3,2,1),(3,1,2),(4,3,1),(4,6,2),(5,7,1),(6,4,4),(6,6,2),(7,5,1),(7,2,1),(8,3,1),(9,1,10),(10,7,1),(10,5,1);
 """
 SA = []
-def sa(id, title, body, task, ref, tests, hint=None, example=None, ordered=False):
+def sa(id, title, body, task, ref, tests, hint=None, example=None, ordered=False, concept=None):
     SA.append(dict(id=id, title=title, body=body, task=task, solution=ref, ref=ref, ordered=ordered, starter="-- Write your query below\n", tests=tests,
-                   **({"hint": hint} if hint else {}), **({"example": example} if example else {})))
+                   **({"hint": hint} if hint else {}), **({"example": example} if example else {}), **({"concept": concept} if concept else {})))
 ROWS = lambda msg: dict(rows=True, msg=msg)
 sa("a1", "Join two tables",
  ["Data is split across tables so nothing is stored twice: an order holds a `customer_id`, not the customer's name. A **JOIN** puts them back together.",

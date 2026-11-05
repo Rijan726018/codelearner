@@ -1155,6 +1155,30 @@ pre.code span.l.cur::before{color:var(--vs-ln-act)}
 .caret{background:#aeafad}
 .console{background:#181818;color:#cccccc}
 
+/* ---------- bootcamp: the concept panel above each task ---------- */
+.concept{display:grid;gap:10px;padding:16px 18px;border-radius:14px;background:var(--surface2);border:1px solid var(--line)}
+.concept>.eyebrow{display:flex;align-items:center;gap:6px;color:var(--ink)}
+.concept .prose{gap:10px}
+.concept .prose p{margin:0}
+.concept .cex{display:grid;gap:6px;margin-top:4px}
+/* ---------- home: this week's leaderboard ---------- */
+.lbhome{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:28px;align-items:start;padding:clamp(8px,3vw,32px) 0}
+@media (max-width:900px){.lbhome{grid-template-columns:minmax(0,1fr)}}
+.lbh-l{display:grid;gap:16px;align-content:start}
+.lbh-l .lede{max-width:46ch}
+.lbfacts{display:flex;flex-wrap:wrap;gap:28px;margin:0}
+.lbfacts div{display:grid;gap:2px}
+.lbfacts dt{font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.lbfacts dd{margin:0;font:600 1.35rem var(--display);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.lbleagues{display:flex;flex-wrap:wrap;gap:6px}
+.lbleagues small{font-weight:500;opacity:.7}
+.lbh-r{gap:12px;padding:18px}
+.lbtop li{grid-template-columns:34px 34px minmax(0,1fr) auto auto}
+.lbtop .medal{width:26px;height:26px;font-size:12px}
+.lbstatus{margin:4px 0 0;padding-top:12px;border-top:1px solid var(--line);font-size:.95rem}
+.lbh-out{display:grid;gap:10px;justify-items:start;padding:8px 4px}
+@media (max-width:560px){.lbtop li{grid-template-columns:28px 30px minmax(0,1fr) auto}.lbtop .lg{display:none}}
+
 /* ---------- motion ----------
    Long, soft ease-outs (no bounces), small distances, one idea at a time. Everything here is off under
    prefers-reduced-motion (the rule after this block). */

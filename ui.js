@@ -426,6 +426,7 @@ function viewHome(el){
   <section class="counters">
     ${[[nL,"core lessons"],[nQ,"quiz questions"],[nP,"judged problems"],[nC,"career roadmaps"],[nS,"bootcamp steps"],[nB,"guided projects"]].map(([n,t])=>`<div class="counter rv"><b class="gt" data-count="${n}">0</b><span>${t}</span></div>`).join("")}
   </section>
+  <section class="lbhome rv" id="lbhome" aria-label="This week's leaderboard"></section>
   <section class="statement"><p data-fill>Learn to code from your first line, build real projects as you go, and put the best of them up for auction. Everything runs in your browser, with nothing to install.</p></section>
   <section style="display:grid;gap:18px">
     <div class="sec-h rv"><div class="head"><span class="eyebrow">Everything in one place</span><h2 class="h2">Nine ways to get better</h2></div><p class="lede" style="max-width:48ch">The structure of a university degree, the hands-on feel of a bootcamp and the practice volume of an interview grind.</p></div>
@@ -455,6 +456,7 @@ function viewHome(el){
     <div class="row"><button class="btn lg" ${firstCourse?`data-course="${firstCourse.id}"`:`data-act="bootcamp"`}>${icon("play")}Start the bootcamp</button><button class="btn lg" style="background:transparent;color:var(--on-accent);border-color:color-mix(in oklab,var(--on-accent) 35%,transparent)" data-act="method">Why this works</button></div>
   </section>`;
   typeTerminal(el.querySelector("#termp"), el.querySelector("#termf"));
+  if(typeof homeLeaderboard === "function") homeLeaderboard(el.querySelector("#lbhome"));
   placeJourney(el);
 }
 function pathCard(p){
