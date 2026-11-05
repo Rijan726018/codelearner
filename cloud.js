@@ -4,7 +4,8 @@
    and firestore.rules lets a signed-in person read and write only their own documents. Documents are stored as one JSON
    string ({json, updated}) so any shape of progress data is accepted. A page can also supply window.CL_CLOUD_PROVIDER
    (same interface as firebaseProvider below), which is how the tests run the whole flow without a real project.
-   Leaderboard entries (rewards.js) live in boards/{all | w-YYYY-MM-DD}/entries/{uid}, only for people who opt in. */
+   Leaderboard entries (rewards.js) live in boards/{all | w-YYYY-MM-DD}/entries/{uid}, only for people who opt in, and
+   anyone can read them. */
 const FIREBASE_SDK = "https://www.gstatic.com/firebasejs/10.12.2/";
 
 function firebaseProvider(cfg){
@@ -181,7 +182,8 @@ const Account = (() => {
       catch(e){ provider = null; paint(); setSync("Saved in this browser"); settle(); }
     },
     get user(){ return user; }, get enabled(){ return !!provider; }, ready,
-    board(name){ return provider?.board && user ? provider.board(name) : null; },
+    // boards are public to read; writes go through Board, which only writes the signed-in person's own entry
+    board(name){ return provider?.board ? provider.board(name) : null; },
     // auctions can be browsed signed out; writes need a user (auction.js checks)
     auctions(){ return provider?.auctions ? provider.auctions() : null; },
     signIn, signOut,
