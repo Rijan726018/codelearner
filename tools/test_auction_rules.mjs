@@ -1,4 +1,4 @@
-// Firestore rules tests for the Code Auction (and a check that the per-user docs stay locked).
+// Firestore rules tests for the Code Auction and the public leaderboard (and a check that the per-user docs stay locked).
 // Run from an empty folder with firebase-tools, @firebase/rules-unit-testing and firebase installed, and firestore.rules copied in:
 //   npx firebase emulators:exec --only firestore --project demo-codebay "node test_auction_rules.mjs"
 // with firebase.json = {"firestore":{"rules":"firestore.rules"},"emulators":{"firestore":{"port":8085}}}. Needs Java.
@@ -67,6 +67,14 @@ await list("sam", "b1");
 await t("seller withdraws a lot with no bids", () => assertSucceeds(updateDoc(doc(db("sam"), "auctions", "b1"), { status: "cancelled" })));
 await t("nobody can bid on a withdrawn lot", () => assertFails(bid("ann", "b1", 500, 1)));
 await t("nobody can delete a lot", () => assertFails(deleteDoc(doc(db("sam"), "auctions", "b1"))));
+// leaderboard: public to read, owner-only to write
+const entry = (over = {}) => ({ name: "Ann", title: "", xp: 120, level: 2, coins: 40, streak: 3, weekXp: 60, updated: serverTimestamp(), ...over });
+await t("a member writes their own leaderboard entry", () => assertSucceeds(setDoc(doc(db("ann"), "boards", "all", "entries", "ann"), entry())));
+await t("anyone, signed out, can read the leaderboard", () => assertSucceeds(getDocs(collection(db(null), "boards", "all", "entries"))));
+await t("signed out can't write an entry", () => assertFails(setDoc(doc(db(null), "boards", "all", "entries", "ann"), entry())));
+await t("nobody writes someone else's entry", () => assertFails(setDoc(doc(db("eve"), "boards", "all", "entries", "ann"), entry())));
+await t("entries still can't carry extra fields (like an email)", () => assertFails(setDoc(doc(db("ann"), "boards", "all", "entries", "ann"), entry({ email: "ann@example.com" }))));
+await t("only the owner deletes their entry", () => assertFails(deleteDoc(doc(db("eve"), "boards", "all", "entries", "ann"))));
 await t("existing per-user docs still work", () => assertSucceeds(setDoc(doc(db("sam"), "users", "sam", "docs", "v2progress"), { json: "{}", updated: serverTimestamp() })));
 await t("other people's docs still locked", () => assertFails(getDoc(doc(db("eve"), "users", "sam", "docs", "v2progress"))));
 

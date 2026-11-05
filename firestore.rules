@@ -10,10 +10,11 @@ service cloud.firestore {
                             && request.resource.data.json is string
                             && request.resource.data.json.size() < 900000;
     }
-    // Leaderboards (opt-in): boards/all and boards/w-YYYY-MM-DD (week starting Monday). Any signed-in person can read them;
-    // each person can write or delete only their own entry, which holds a display name and numbers, never an email or photo.
+    // Leaderboards (opt-in): boards/all and boards/w-YYYY-MM-DD (week starting Monday). Public: anyone can read them,
+    // signed in or not. Each person can write or delete only their own entry, which holds a chosen display name and
+    // numbers, never an email or photo.
     match /boards/{board}/entries/{uid} {
-      allow read: if request.auth != null;
+      allow read: if true;
       allow delete: if request.auth != null && request.auth.uid == uid;
       allow create, update: if request.auth != null && request.auth.uid == uid
                             && board.matches('all|w-[0-9]{4}-[0-9]{2}-[0-9]{2}')
