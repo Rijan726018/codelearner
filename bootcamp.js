@@ -89,8 +89,9 @@ function stepWorkspace(el, c, o){
       <span class="eyebrow" style="color:var(--accent)">${ms?`Milestone ${s.ms+1}: ${esc(ms.title)} · `:""}Step ${i+1}</span>
       <h1 class="h2">${esc(s.title)}</h1>
       ${ms&&c.steps.findIndex(x=>x.ms===s.ms)===i&&ms.goal?`<div class="objective"><span class="eyebrow">This milestone</span>${md(ms.goal)}</div>`:""}
-      <div class="prose">${s.body.map(p=>`<p>${md(p)}</p>`).join("")}</div>
-      ${s.example?`<div><span class="eyebrow">Example</span>${codeBlock(s.example)}</div>`:""}
+      <section class="concept" aria-label="Concept"><span class="eyebrow">${icon("bulb","sm")} Concept</span>
+        <div class="prose">${[].concat(s.concept||s.body||[]).map(p=>`<p>${md(p)}</p>`).join("")}</div>
+        ${s.example?`<div class="cex"><span class="eyebrow">Example</span>${codeBlock(s.example)}</div>`:""}</section>
       <div class="task"><span class="eyebrow" style="color:var(--accent)">${icon("target","sm")} Your task</span><div>${md(s.task)}</div></div>
       <div><span class="eyebrow">Checks</span><ul class="checks" id="checks" style="margin-top:8px">${(s.tests||[]).map(t=>`<li><span class="m">·</span><span>${md(t.msg)}</span></li>`).join("")}</ul></div>
       ${s.hint?`<details class="hint"><summary>${icon("bulb","sm")}Hint</summary><div>${md(s.hint)}</div></details>`:""}

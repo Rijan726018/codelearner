@@ -105,6 +105,8 @@ const GOOGLE_G = `<svg class="gg" viewBox="0 0 48 48" aria-hidden="true"><path f
 
 const Account = (() => {
   let provider = null, user = null, busy = false, error = "";
+  // settles once we know whether accounts are on and who (if anyone) is signed in, so views can wait for it
+  let settle; const ready = new Promise(r => { settle = r; });
   const btn = () => document.getElementById("acctBtn"), menu = () => document.getElementById("acctMenu");
   function paint(){
     const b = btn(); if(!b) return;
@@ -143,7 +145,7 @@ const Account = (() => {
     try{ Clock.flush(); await new Promise(r => setTimeout(r, 900)); await provider.signOut(); }catch(e){}
   }
   async function onUser(u){
-    const was = user; user = u;
+    const was = user; user = u; settle();
     if(u && (!was || was.uid !== u.uid)){
       paint();
       try{ await attachStores(provider.collection(u.uid)); }
@@ -173,12 +175,12 @@ const Account = (() => {
       const cfg = window.CL_FIREBASE;
       provider = window.CL_CLOUD_PROVIDER || (cfg && cfg.apiKey && cfg.projectId ? firebaseProvider(cfg) : null);
       mountButton(); paint();
-      if(!provider){ setSync("Saved in this browser"); return; }
+      if(!provider){ setSync("Saved in this browser"); settle(); return; }
       setSync("Checking your account…");
       try{ await provider.init(onUser); }
-      catch(e){ provider = null; paint(); setSync("Saved in this browser"); }
+      catch(e){ provider = null; paint(); setSync("Saved in this browser"); settle(); }
     },
-    get user(){ return user; }, get enabled(){ return !!provider; },
+    get user(){ return user; }, get enabled(){ return !!provider; }, ready,
     board(name){ return provider?.board && user ? provider.board(name) : null; },
     // auctions can be browsed signed out; writes need a user (auction.js checks)
     auctions(){ return provider?.auctions ? provider.auctions() : null; },

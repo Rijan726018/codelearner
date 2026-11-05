@@ -404,6 +404,49 @@ Rewards.todayCard = () => {
     ${seen?`<button type="button" class="btn ghost sm" data-lbgo style="justify-self:start">${icon("trophy","sm")}You were #${seen.r} on this week's leaderboard${seen.p>seen.r?`, up ${seen.p-seen.r}`:""}. See who's close.</button>`:""}</section>`;
 };
 
+/* ================= HOME: this week's leaderboard ================= */
+// The landing page shows this week's race. Names are only ever shown to signed-in people, because that is what learners
+// agreed to when they joined (and what firestore.rules allows); signed-out visitors see how it works and a way in.
+function lbCountdown(){ const s = Board.weekEndsIn(), d = Math.floor(s/86400), h = Math.floor(s%86400/3600), m = Math.floor(s%3600/60); return d ? `${d} d ${h} h` : h ? `${h} h ${m} min` : `${m} min`; }
+async function homeLeaderboard(host){
+  if(!host || typeof Account === "undefined") return;
+  // the home page renders before sign-in has been checked; wait for that (a few seconds at most)
+  await Promise.race([Account.ready, new Promise(r => setTimeout(r, 6000))]);
+  if(!host.isConnected) return;
+  if(!Account.enabled){ host.remove(); return; }
+  const u = Account.user, joined = !!(P.board?.on && P.board?.name);
+  const intro = `<div class="lbh-l">
+      <span class="eyebrow">Leaderboard · this week</span>
+      <h2 class="h2">Who's putting in the work</h2>
+      <p class="lede">Ranked by XP earned since Monday from lessons, exams, problems, bootcamp steps and projects. Everyone starts from zero each week.</p>
+      <dl class="lbfacts"><div><dt>Resets in</dt><dd id="lbReset">${lbCountdown()}</dd></div><div><dt>Weekly prizes</dt><dd>${PODIUM_PRIZE.map(n=>n.toLocaleString()).join(" / ")} coins</dd></div></dl>
+      <div class="lbleagues" aria-label="Leagues by XP this week">${LEAGUES.map(([min,n,c])=>`<span class="lg" style="--lg:${c}">${n} <small>${min.toLocaleString()}+</small></span>`).join("")}</div>
+      <div class="row"><button class="btn primary" data-rwgo="board">${icon("trophy","sm")}${u && joined ? "Open the leaderboard" : u ? "Join the leaderboard" : "See the leaderboard"}</button></div>
+    </div>`;
+  const shell = right => { host.innerHTML = intro + `<div class="lbh-r panel">${right}</div>`;
+    host.querySelectorAll("[data-rwgo]").forEach(b => b.onclick = () => go({v: "rewards", id: b.dataset.rwgo}));
+    host.querySelector("[data-signin]")?.addEventListener("click", () => Account.signIn());
+    const t = host.querySelector("#lbReset"); const iv = setInterval(() => { if(!t.isConnected){ clearInterval(iv); return; } t.textContent = lbCountdown(); }, 30000); };
+  if(!u){ shell(`<div class="lbh-out"><b>See this week's standings</b><p class="muted" style="margin:0">Sign in to see who's leading, where you'd rank and how much XP it takes to pass the person above you.</p><button class="gbtn" data-signin>${GOOGLE_G}<span>Sign in with Google</span></button></div>`); return; }
+  shell(`<span class="muted">Loading this week's standings…</span>`);
+  let d;
+  try{ d = await Board.load("week"); }
+  catch(e){ console.warn("home leaderboard", e?.code || e); if(host.isConnected) shell(`<p class="muted" style="margin:0">The leaderboard couldn't load right now.</p>`); return; }
+  if(!host.isConnected || route.v !== "home") return;
+  const {rows, rank, total, above, myVal} = d, me = u.uid, top = rows.slice(0, 5);
+  const xp = n => `${(+n||0).toLocaleString()} XP`, nm = r => esc(r?.name || "Learner");
+  const chip = r => { const L = leagueOf(+r?.weekXp || 0); return `<span class="lg" style="--lg:${L.col}">${L.name}</span>`; };
+  const line = (r, i, you) => `<li class="${you?"me":""}"><span class="rk">${i<3&&!you?`<span class="medal m${i+1}">${i+1}</span>`:i+1}</span><span class="av">${esc((r.name||"?").trim()[0]||"?").toUpperCase()}</span><span class="nm"><b>${nm(r)}${you?" (you)":""}</b><span class="muted">Lv ${+r.level||1} · ${icon("flame","sm")}${+r.streak||0}</span></span>${chip(r)}<b class="val">${xp(r.weekXp)}</b></li>`;
+  const inTop = top.some(r => r.uid === me);
+  const meLine = joined && !inTop && rank != null ? `<li class="gap">⋯</li>${line({name: P.board.name, level: Game.stats().level, streak: Game.stats().streak, weekXp: myVal}, rank - 1, true)}` : "";
+  const status = joined
+    ? (rank == null ? `You'll appear here once your entry updates.` : rank === 1 ? `${icon("trophy","sm")} You're in first place this week.` : `You're <b>#${rank}</b> of ${total.toLocaleString()}.${above ? ` <b>${xp((+above.weekXp||0) - myVal + 1)}</b> to pass ${nm(above)}.` : ""}`)
+    : (rank != null && myVal > 0 ? `With your ${xp(myVal)} this week you'd be <b>#${rank}</b> of ${total.toLocaleString()}. Join to show up.` : `Earn XP this week and join to take a place.`);
+  shell(top.length
+    ? `<ol class="lb lbtop">${top.map((r, i) => line(r, i, r.uid === me)).join("")}${meLine}</ol><p class="lbstatus">${status}</p>`
+    : `<p style="margin:0"><b>Nobody's on the board this week yet.</b></p><p class="muted" style="margin:0">The first learner to join this week takes first place.</p><p class="lbstatus">${status}</p>`);
+}
+
 VIEWS.rewards = viewRewards;
 document.addEventListener("click", e => { if(e.target.closest("[data-lbgo]")){ route.board = "week"; go({v:"rewards", id:"board"}); } });
 SEARCH_SOURCES.push(() => [{t:"Rewards", sub:"Coins, daily and weekly challenges", kind:"Page", i:"target", r:{v:"rewards"}},

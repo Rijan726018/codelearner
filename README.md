@@ -126,6 +126,8 @@ python3 tools/merge_extras.py                                        # merges pr
 python3 tools/validate.py data/s*.json                               # core curriculum schema
 ```
 
+**Bootcamp and project steps.** Each step is `{id, title, body, task, solution, tests}` plus optional `example`, `starter`, `hint`, `ref` and `concept`. On the page, the **Concept** panel comes first and the task follows. The panel shows `concept` if the step has one (a list of paragraphs or a single string, with the same inline Markdown as `body`), otherwise `body`, then the `example`. Every step builder takes it, for example `py("p9", "True or False", body, task, code, tests, concept=["A comparison asks a yes-or-no question…"])`; in projects pass `concept=[...]` to `step()`.
+
 Core curriculum content follows `tools/SCHEMA.md`. Each lesson's videos are listed in `tools/lesson_videos.tsv` and its why/terms/mistakes/takeaways live in `tools/lesson_extra/sN.py`; edit those, then run `merge_lessons.py`. Projects and problems work the same way: `tools/project_videos.tsv`, `tools/project_extra.py`, `tools/problem_videos.tsv` (one video per pattern) and `tools/problem_extra.py`, merged by `merge_extras.py`; `build_projects.py` and `build_problems.py` apply them too, so a rebuild keeps them. Videos load only when played, from youtube-nocookie.com.
 
 ## Third-party code
