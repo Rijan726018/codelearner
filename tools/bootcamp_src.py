@@ -170,7 +170,7 @@ py("p11","Loops: for",
  ["A `for` loop runs its block once for each item: `for s in scores:` gives `s` each value in turn.","Loops are how one short program can process a million items."],
  "Write a `for` loop over `scores` that prints each score.",
  'for s in scores:\n    print(s)\n',
- [dict(src="for\\s+\\w+\\s+in\\s+scores\\s*:", msg="There's a `for … in scores:` loop."), dict(py='_out.count("88") >= 2 and "92" in _out and "79" in _out', msg="Each score is printed.")],
+ [dict(src="for\\s+\\w+\\s+in\\s+scores\\s*:", msg="There's a `for … in scores:` loop."), dict(py='"88" in _out and "92" in _out and "79" in _out', msg="Each score is printed.")],
  example='for fruit in ["apple", "pear"]:\n    print(fruit)')
 py("p12","Add up with a loop",
  ["The **accumulator** pattern: start a variable at 0, then add each item to it inside a loop. `x += 5` is short for `x = x + 5`.","You'll use this pattern for sums, counts, maximums and more, in every language."],

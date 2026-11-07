@@ -224,7 +224,7 @@ function vsHighlight(code, mode){
   // function calls: a plain or variable token directly followed by "("
   return lines.map(parts => parts.join("").replace(/(<span class="cm-(?:variable|property|builtin|variable-2)[^"]*">[^<]+<\/span>|\b[A-Za-z_$][\w$]*)(?=\()/g, m => m.startsWith("<span") ? m.replace('class="', 'class="cm-vsfn ') : `<span class="cm-vsfn">${m}</span>`));
 }
-function mountEditor(host, {lang, code, draftKey=null, resetTo=code, compact=false, label="", onRun=null, runLabel="Run ▶", onChange=null, tall=false}){
+function mountEditor(host, {lang, code, draftKey=null, resetTo=code, compact=false, label="", onRun=null, runLabel="Run ▶", onChange=null, tall=false, carried=0}){
   const isMac=/Mac|iPhone|iPad/.test(navigator.platform||""), kb=isMac?"⌘↵":"Ctrl+↵";
   host.classList.add("ed"); host.classList.toggle("tall", !!tall);
   const file=/\.[a-z0-9]+$/i.test(label)?label:VS_EDITOR_FILE[lang]||"main", crumb=label&&label!==file?label:"";
@@ -239,7 +239,7 @@ function mountEditor(host, {lang, code, draftKey=null, resetTo=code, compact=fal
   const wrap=host.querySelector(".edwrap"), runB=host.querySelector("[data-run]"), out=host.querySelector(".edout"), pre=host.querySelector(".edpre"),
         ms=host.querySelector(".edms"), stat=host.querySelector(".edstat"), inBox=host.querySelector(".edin"), inTa=inBox.querySelector("textarea"), inB=host.querySelector("[data-in]");
   const uid="ed"+Math.random().toString(36).slice(2,8); inTa.id=uid+"-in"; inBox.querySelector("label").setAttribute("for",inTa.id);
-  let cm=null, ta=null;
+  let cm=null, ta=null, markCarried=()=>{};
   const run=()=>onRun?onRun():doRun();
   if(window.CodeMirror){
     cm=CodeMirror(wrap,{value:code, mode:CM_MODE[lang], lineNumbers:true, indentUnit:lang==="python"?4:2, tabSize:4, matchBrackets:true, viewportMargin:Infinity, lineWrapping:false,
@@ -248,6 +248,12 @@ function mountEditor(host, {lang, code, draftKey=null, resetTo=code, compact=fal
         "Shift-Tab":c=>c.indentSelection("subtract"), Esc:c=>c.getInputField().blur()}});
     cm.getInputField().setAttribute("aria-label", (LANGNAME[lang]||"Code")+" editor. Press Escape, then Tab, to leave.");
     vsEnhance(cm, lang, t=>{ const p=host.querySelector(".edpos"); if(p) p.textContent=t; });
+    // lines carried over from earlier steps start dimmed; a line brightens once you edit it. The cursor waits at the end.
+    if(carried){
+      cm.on("change",(c,ch)=>{ for(let l=ch.from.line; l<=ch.from.line+ch.text.length-1; l++){ const h=c.getLineHandle(l); if(h) c.removeLineClass(h,"text","vscarried"); } });
+      markCarried=()=>{ const n=Math.min(carried, cm.lineCount()); for(let i=0;i<n;i++) if(cm.getLine(i).trim()) cm.addLineClass(i,"text","vscarried"); const last=cm.lastLine(); cm.setCursor({line:last, ch:cm.getLine(last).length}); };
+      markCarried();
+    }
   } else {
     ta=document.createElement("textarea"); ta.className="edta"; ta.value=code; ta.spellcheck=false; ta.setAttribute("aria-label","Code editor"); wrap.appendChild(ta);
     ta.addEventListener("keydown",e=>{ if(e.key==="Enter"&&(e.metaKey||e.ctrlKey)){ e.preventDefault(); run(); } else if(e.key==="Tab"&&!e.shiftKey){ e.preventDefault(); const s=ta.selectionStart; ta.setRangeText(" ".repeat(lang==="python"?4:2),s,ta.selectionEnd,"end"); } });
@@ -258,7 +264,7 @@ function mountEditor(host, {lang, code, draftKey=null, resetTo=code, compact=fal
   if(onChange){ let t; const f=()=>{ clearTimeout(t); t=setTimeout(()=>onChange(getV()),250); }; cm?cm.on("change",f):ta.addEventListener("input",f); }
   const usesInput=()=>lang==="python"&&/\binput\s*\(/.test(getV());
   if(inB){ const toggle=(open)=>{ inBox.hidden=!open; inB.setAttribute("aria-expanded",open); }; inB.onclick=()=>toggle(inBox.hidden); if(usesInput()) toggle(true); }
-  host.querySelector("[data-reset]").onclick=()=>{ setV(resetTo); out.hidden=true; if(draftKey) Drafts.set(draftKey,resetTo); onChange?.(resetTo); };
+  host.querySelector("[data-reset]").onclick=()=>{ setV(resetTo); markCarried(); out.hidden=true; if(draftKey) Drafts.set(draftKey,resetTo); onChange?.(resetTo); };
   const status=()=>{
     if(lang==="html"||lang==="web"){ stat.textContent=`The preview updates as you type · ${kb} checks your code`; return; }
     if(Runner.busy && host.dataset.running) { stat.textContent=!Runner.ready(lang)?`Starting ${lang==="sql"?"SQLite":"Python"} (the first run takes a few seconds)…`:"Running…"; return; }

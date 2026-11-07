@@ -1161,6 +1161,10 @@ pre.code span.l.cur::before{color:var(--vs-ln-act)}
 .concept .prose{gap:10px}
 .concept .prose p{margin:0}
 .concept .cex{display:grid;gap:6px;margin-top:4px}
+.carrynote{display:flex;gap:8px;align-items:flex-start;margin:0;font-size:.9rem;color:var(--muted)}
+.carrynote .ic{margin-top:3px;flex:none}
+.ed pre.CodeMirror-line.vscarried{opacity:.5;transition:opacity .2s}
+.ed .CodeMirror-focused pre.CodeMirror-line.vscarried{opacity:.6}
 /* ---------- home: this week's leaderboard ---------- */
 .lbhome{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:28px;align-items:start;padding:clamp(8px,3vw,32px) 0}
 @media (max-width:900px){.lbhome{grid-template-columns:minmax(0,1fr)}}

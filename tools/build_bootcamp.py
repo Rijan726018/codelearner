@@ -25,5 +25,11 @@ for c in C:
                     t["rows"] = rows
                     if s.get("ordered"): t["ordered"] = True
             s.pop("ref"); s.pop("ordered", None)
+# each step starts with only the earlier code it needs (tools/trim_context.py; proven by tools/check_bootcamp.mjs)
+from trim_context import trim
+totals = {"trimmed": 0, "full": 0, "fresh": 0}
+for c in C:
+    for k, v in trim(c).items(): totals[k] += v
+print(f"starters: {totals['trimmed']} trimmed to the code they need, {totals['fresh']} start empty, {totals['full']} keep the whole program")
 json.dump({"courses": C, "tracks": TRACKS}, open("data/bootcamp.json", "w"), separators=(",", ":"), ensure_ascii=False)
 print(len(C), "courses,", sum(len(c["steps"]) for c in C), "steps,", os.path.getsize("data/bootcamp.json"), "bytes")
