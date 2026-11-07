@@ -1,6 +1,6 @@
 "use strict";
 /* ---------- Bootcamp courses and Build projects share one step engine: instructions + starter code + automatic checks.
-   A step's starter is the previous step's solution, so the learner builds one program from start to finish.
+   Course steps start with only the earlier code they need (tools/trim_context.py); project steps start with the whole app so far.
    Projects group their steps into milestones and add a live demo of the finished app. ---------- */
 const BC = {courses:[], byId:{}, tracks:[],
   stepIndex(c){ return c.steps.findIndex(s=>!P.steps?.[s.id]); },
@@ -9,7 +9,11 @@ const BC = {courses:[], byId:{}, tracks:[],
 const PJ = {list:[], byId:{},
   next(){ for(const p of this.list){ const d=courseDone(p), i=BC.stepIndex(p); if(d>0 && i>=0) return {project:p, idx:i, step:p.steps[i]}; } return null; }
 };
-const linkSteps = c => c.steps.forEach((s,i)=>{ s.starter = s.starter ?? (i ? c.steps[i-1].solution : ""); if(c.seed) s.seed=c.seed; });
+// Bootcamp steps arrive with their own starter (only the earlier code they need: tools/trim_context.py). Project steps
+// still start from the previous step's whole program, because a project is one app built up from start to finish.
+const linkSteps = c => c.steps.forEach((s,i)=>{ if(s.starter==null){ s.starter = i ? c.steps[i-1].solution : ""; if(i) s.carried = s.carried || "all"; } if(c.seed) s.seed=c.seed; });
+const CARRY_NOTE = {some: "The dimmed lines come from earlier steps: only the ones this step needs. Add your code below them.",
+                    all: "This is your program so far, with earlier steps dimmed. Add to it or change it as the task says."};
 EXTRA_LOADERS.push(async()=>{
   const d=await fetch("data/bootcamp.json").then(r=>r.ok?r.json():null).catch(()=>null); if(!d) return;
   BC.courses=d.courses; BC.tracks=d.tracks||[]; d.courses.forEach(c=>{ BC.byId[c.id]=c; linkSteps(c); });
@@ -101,6 +105,7 @@ function stepWorkspace(el, c, o){
     </section>
     <section style="display:grid;gap:14px;min-width:0">
       <div class="row" style="justify-content:space-between"><span class="pill ${passed?"ok":"acc"}">${passed?"Passed ✓":"In progress"}</span><button class="btn grad" id="check">${icon("check","sm")}Check your code</button></div>
+      ${s.carried&&String(s.starter||"").trim()?`<p class="carrynote">${icon("layers","sm")}<span>${CARRY_NOTE[s.carried]||CARRY_NOTE.all}</span></p>`:""}
       <div id="sed"></div>
       ${lang==="html"||lang==="web"?`<div id="pvh"></div>`:""}
       ${lang==="sql"?`<div class="panel" style="padding:14px"><span class="eyebrow">Tables available</span><div class="muted" style="font:12.5px/1.6 var(--mono);white-space:pre-wrap">${esc(c.schema||"Your own: you create them in the code.")}</div><div id="sqlres" class="sqlres"></div></div>`:""}
@@ -110,7 +115,8 @@ function stepWorkspace(el, c, o){
   const pv = (lang==="html"||lang==="web") ? mountPreview(el.querySelector("#pvh"), lang, s.storage) : null;
   const visual = lang==="html"||lang==="web";
   const ed=mountEditor(el.querySelector("#sed"), {lang, code:s.starter, draftKey:`bc-${s.id}`, resetTo:s.starter, label:visual?"index.html":lang==="python"?"main.py":lang==="js"?"main.js":"query.sql",
-    onRun: visual ? ()=>check() : null, runLabel: visual?"Check ▶":"Run ▶", onChange: visual ? v=>pv.show(v) : null, tall:true});
+    onRun: visual ? ()=>check() : null, runLabel: visual?"Check ▶":"Run ▶", onChange: visual ? v=>pv.show(v) : null, tall:true,
+    carried: s.carried ? String(s.starter||"").replace(/\s+$/,"").split("\n").length : 0});
   if(visual) pv.show(s.starter);
   let fails=0;
   async function check(){
@@ -127,7 +133,7 @@ function stepWorkspace(el, c, o){
       const first=!P.steps?.[s.id]; P.steps=P.steps||{}; if(first){ P.steps[s.id]=today(); logActivity(1); save("p"); }
       const allNow=c.steps.every(x=>P.steps?.[x.id]);
       const msDone = c.milestones && c.steps.filter(x=>x.ms===s.ms).every(x=>P.steps?.[x.id]) && (c.steps[i+1]?.ms!==s.ms);
-      el.querySelector("#stepres").innerHTML=`<div class="fb r"><b>${allNow&&last?(c.milestones?"Project complete!":"Course complete!"):msDone?`Milestone ${s.ms+1} complete!`:"Step passed!"}</b><p>${first?`+${XPV.step} XP. `:""}${allNow&&last?o.done:msDone?`<b>${esc(ms.title)}</b> works. On to milestone ${s.ms+2}: ${esc(c.milestones[s.ms+1]?.title||"")}.`:"Nice work. Your code carries over to the next step."}</p>${outBox}
+      el.querySelector("#stepres").innerHTML=`<div class="fb r"><b>${allNow&&last?(c.milestones?"Project complete!":"Course complete!"):msDone?`Milestone ${s.ms+1} complete!`:"Step passed!"}</b><p>${first?`+${XPV.step} XP. `:""}${allNow&&last?o.done:msDone?`<b>${esc(ms.title)}</b> works. On to milestone ${s.ms+2}: ${esc(c.milestones[s.ms+1]?.title||"")}.`:(c.milestones?"Nice work. Your app carries over to the next step.":"Nice work. The next step starts with whatever earlier code it needs.")}</p>${outBox}
         <div class="row">${!last?`<button class="btn primary" data-goto2="${i+1}">Next step ${icon("arrow","sm")}</button>`:`<button class="btn primary" data-act="${o.back}">${esc(o.backLabel)}</button>${o.after||`<button class="btn" data-act="map">Continue to the core curriculum</button>`}`}</div></div>`;
       el.querySelector("[data-goto2]")?.addEventListener("click",()=>{ route.step=i+1; render(); window.scrollTo({top:0}); });
       if(first && allNow){ UI.confetti(220); } else if(first) UI.confetti(msDone?120:60);
