@@ -176,31 +176,64 @@ const BOARD_MODES = [
 ];
 const leagueOf = xp => { let i = 0; LEAGUES.forEach(([min], k) => { if(xp >= min) i = k; }); return {i, name: LEAGUES[i][1], col: LEAGUES[i][2], next: LEAGUES[i+1] || null}; };
 
+// Everyone who earns XP goes on the board automatically, under a random name they can change: no real name is ever
+// used unless they type it. Someone who hasn't signed in gets a guest (anonymous) Firebase session, only so their browser
+// may write its own entry. Leaving (P.board.on === false) is remembered, and nobody is put back on.
+const NAME_A = "Swift Quiet Bright Clever Brave Calm Bold Lucky Sunny Mighty Nimble Witty Jolly Keen Steady Daring Gentle Rapid Cosmic Silver Amber Crimson Azure Golden".split(" ");
+const NAME_B = "Otter Falcon Panda Lynx Tiger Koala Heron Fox Wolf Raven Dolphin Badger Gecko Hawk Moose Yak Orca Finch Bison Cobra Lemur Puffin Ibex Marten".split(" ");
+function randomBoardName(){
+  const r = n => { try{ const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % n; }catch(e){ return Math.floor(Math.random()*n); } };
+  return NAME_A[r(NAME_A.length)] + NAME_B[r(NAME_B.length)] + String(10 + r(90));
+}
 const Board = (() => {
-  let timer = null, lastSent = "", cache = {};
+  let timer = null, lastSent = "", cache = {}, guestId = null;
   const ws = () => Rewards.wkStart(today());
   const weekId = () => "w-" + dayKey(ws()), lastWeekId = () => "w-" + dayKey(ws() - 7);
-  const can = () => typeof Account !== "undefined" && Account.user && Account.board;
+  const can = () => typeof Account !== "undefined" && Account.enabled && !!Account.board("all");
+  // who this browser is on the board: the signed-in account, else a guest session (started on demand with create)
+  const me = () => Account.user?.uid || guestId || null;
+  async function uid(create){
+    if(Account.user) return Account.user.uid;
+    if(!guestId) guestId = await Account.guestUid(create);
+    return guestId;
+  }
+  // put a learner with some XP on the board, unless they have left it
+  function auto(s){
+    if(!can() || P.board?.on === false) return false;
+    if(P.board?.on && P.board?.name) return true;
+    if(!(s?.xp > 0)) return false;
+    P.board = {...(P.board || {}), on: true, auto: true, name: P.board?.name || randomBoardName()}; save("p", true);
+    return true;
+  }
   const boardOf = m => m.id === "week" ? weekId() : m.id === "last" ? lastWeekId() : "all";
   const entry = s => {
     const w = Rewards.between(ws(), today());
     return {name: (P.board?.name || "").slice(0, 24), title: Rewards.title(), xp: s.xp, level: s.level, coins: Rewards.earned(s), streak: s.streak, weekXp: w.xp};
   };
   function queue(s){
-    if(!can() || !P.board?.on || !P.board?.name) return;
+    if(!auto(s)) return;
     clearTimeout(timer); timer = setTimeout(() => publish(s), 4000);
   }
   async function publish(s){
-    if(!can() || !P.board?.on) return;
-    const e = entry(s || Game.stats()), key = JSON.stringify([weekId(), e]); if(key === lastSent) return;
-    try{ const uidv = Account.user.uid; await Promise.all([Account.board("all").put(uidv, e), Account.board(weekId()).put(uidv, e)]); lastSent = key; cache = {}; }
-    catch(err){ console.warn("Leaderboard update failed:", err?.code || err); }
+    s = s || Game.stats();
+    if(!auto(s)) return;
+    try{
+      const uidv = await uid(true); if(!uidv) return;   // guests need Anonymous sign-in switched on in Firebase
+      const e = entry(s), key = JSON.stringify([uidv, weekId(), e]); if(key === lastSent) return;
+      await Promise.all([Account.board("all").put(uidv, e), Account.board(weekId()).put(uidv, e)]); lastSent = key; cache = {};
+    }catch(err){ console.warn("Leaderboard update failed:", err?.code || err); }
   }
+  // A guest who signs in with Google becomes that account on the board, so their guest entry goes first.
+  if(typeof Account !== "undefined") Account.beforeSignIn.push(async () => {
+    const g = guestId || await Account.guestUid(false); if(!g) return;
+    await Promise.all([Account.board("all").remove(g), Account.board(weekId()).remove(g)]);
+    guestId = null; lastSent = ""; cache = {};
+  });
   const cached = async (k, f) => { if(cache[k] && Date.now() - cache[k].at < 60000) return cache[k].v; const v = await f(); cache[k] = {v, at: Date.now()}; return v; };
   const fresh = r => r.updated == null || Date.now() - r.updated < 2*86400000;   // a streak idle for 2 days is broken
   // everything one board view needs: the top rows, your rank among everyone, and your neighbours
   async function load(mode){
-    const m = BOARD_MODES.find(x => x.id === mode) || BOARD_MODES[0], name = boardOf(m), me = Account.user?.uid || null;
+    const m = BOARD_MODES.find(x => x.id === mode) || BOARD_MODES[0], name = boardOf(m), me = await uid(false);
     return cached(name + ":" + m.field + ":" + (me || "-"), async () => {
       const b = Account.board(name);
       let rows = await b.top(m.field, m.id === "streak" ? 100 : 50);
@@ -221,8 +254,9 @@ const Board = (() => {
   async function claimPrize(){
     if(!can() || !P.board?.on) return null;
     const lw = lastWeekId(), key = "lb:" + lw; if(P.claimed?.[key] != null) return null;
+    const mine = await uid(false); if(!mine) return null;
     const rows = await cached(lw + ":podium", () => Account.board(lw).top("weekXp", 3));
-    const i = rows.findIndex(r => r.uid === Account.user.uid);
+    const i = rows.findIndex(r => r.uid === mine);
     if(i < 0 || (+rows[i].weekXp || 0) < PRIZE_MIN_XP) return null;
     P.claimed[key] = PODIUM_PRIZE[i]; P.podium = P.podium || {}; P.podium[lw] = i + 1; save("p");
     return {place: i + 1, coins: PODIUM_PRIZE[i]};
@@ -238,14 +272,14 @@ const Board = (() => {
     return s.p - rank;
   }
   async function join(name){
-    P.board = {...(P.board || {}), on: true, pub: true, name: name.trim().replace(/\s+/g, " ").slice(0, 24)}; save("p"); lastSent = ""; cache = {}; await publish();
+    P.board = {...(P.board || {}), on: true, pub: true, auto: false, name: name.trim().replace(/\s+/g, " ").slice(0, 24)}; save("p"); lastSent = ""; cache = {}; await publish();
   }
   async function leave(){
-    const uidv = Account.user?.uid; P.board = {...(P.board || {}), on: false}; save("p"); lastSent = ""; cache = {};
+    const uidv = await uid(false); P.board = {...(P.board || {}), on: false}; save("p"); lastSent = ""; cache = {}; clearTimeout(timer);
     if(uidv){ try{ await Promise.all([Account.board("all").remove(uidv), Account.board(weekId()).remove(uidv)]); }catch(e){} }
   }
   const weekEndsIn = () => { const end = new Date((ws() + 7)*86400000); const local = new Date(end.getUTCFullYear(), end.getUTCMonth(), end.getUTCDate()); return Math.max(0, (local - new Date())/1000); };
-  return {queue, publish, load, claimPrize, movement, join, leave, weekId, lastWeekId, can, weekEndsIn};
+  return {queue, publish, load, claimPrize, movement, join, leave, weekId, lastWeekId, can, weekEndsIn, me, uid, ensure: auto};
 })();
 
 /* ================= REWARDS PAGE ================= */
@@ -333,22 +367,30 @@ async function rwBoard(body, s){
     if(!body.isConnected) return;
   }
   if(typeof Account === "undefined" || !Account.enabled){ body.innerHTML = `<section class="panel"><h2 class="h3">Leaderboard</h2><p class="muted" style="margin:0">The leaderboard needs accounts, and this copy of CodeBay runs without them. Everything else, including coins and challenges, works in this browser.</p></section>`; return; }
-  const user = Account.user, joined = !!(user && P.board?.on);
-  // above the board: a way in for visitors and non-members, and a one-time notice for members who joined while it was private
+  Board.ensure(s);   // anyone with XP is on the board unless they left
+  const user = Account.user, joined = !!(P.board?.on && P.board?.name), left = P.board?.on === false;
+  const keep = user ? "" : `<p class="muted" style="margin:0">You're playing as a guest on this device. <button type="button" class="btn ghost sm" data-signin>Sign in with Google</button> to keep your place and progress on every device.</p>`;
+  const what = `Anyone visiting CodeBay can see this name with your level, XP, coins and streak. Your email address and photo are never shown.`;
+  // above the board: who you are on it and how to change that, or how to get on it
   let top = "";
-  if(!user) top = `<section class="panel" style="max-width:720px"><h2 class="h3">${icon("trophy")} Race them</h2><p class="muted" style="margin:0">Sign in with Google, then join to put your name on the board. XP from lessons, exams, problems, steps and milestones counts, and it resets every Monday.</p><div class="row"><button class="gbtn" data-signin>${GOOGLE_G}<span>Sign in with Google</span></button></div></section>`;
-  else if(!joined){ const first = (user.name || "").trim().split(/\s+/)[0] || "Learner";
-    top = `<section class="panel" style="max-width:720px"><h2 class="h3">${icon("trophy")} Join the leaderboard</h2>
-      <p style="margin:0">Race other learners on progress: XP from lessons, exams, problems, steps and milestones, reset every Monday. Climb the leagues from Bronze to Legend, and finish in the top three to win ${PODIUM_PRIZE.join(" / ")} coins.</p>
-      <p class="muted" style="margin:0">The leaderboard is public: anyone visiting CodeBay, signed in or not, sees the name below, your title, level, XP, coins and streak. Your email address and photo are never shown. You can leave at any time, which removes your entry.</p>
-      <label style="display:grid;gap:6px"><span class="eyebrow">Name on the board</span><input class="pred" id="lbname" maxlength="24" value="${esc(P.board?.name || first)}" autocomplete="nickname"></label>
-      <div class="row"><button type="button" class="btn primary" id="lbjoin">Join as <span id="lbprev">${esc(P.board?.name || first)}</span></button></div></section>`; }
-  else if(!P.board.pub) top = `<section class="panel lbnotice" role="status"><h2 class="h3">${icon("eye")} The leaderboard is now public</h2>
+  if(joined && P.board.auto && !P.board.pub) top = `<section class="panel lbnotice" role="status" style="max-width:820px"><h2 class="h3">${icon("trophy")} You're on the leaderboard as ${esc(P.board.name)}</h2>
+      <p style="margin:0">Everyone who earns XP is added with a random name, so friends can race each other without setting anything up. Change it to whatever you like. ${what}</p>
+      <div class="row"><input class="pred" id="lbname" maxlength="24" value="${esc(P.board.name)}" autocomplete="nickname" aria-label="Name on the board" style="max-width:260px"><button type="button" class="btn primary sm" id="lbsave">Save the name</button><button type="button" class="btn sm" id="lbok">Keep ${esc(P.board.name)}</button><button type="button" class="btn ghost sm" id="lbout">Leave the leaderboard</button></div>${keep}</section>`;
+  else if(joined && !P.board.pub) top = `<section class="panel lbnotice" role="status"><h2 class="h3">${icon("eye")} The leaderboard is now public</h2>
       <p style="margin:0">When you joined, only signed-in learners could see the board. Now anyone visiting CodeBay can see your entry: <b>${esc(P.board.name)}</b>, your title, level, XP, coins and streak. Your email address and photo are still never shown.</p>
       <div class="row"><button type="button" class="btn primary sm" id="lbok">Keep me on the board</button><button type="button" class="btn ghost sm" id="lbout">Leave the leaderboard</button></div></section>`;
+  else if(left){ const first = P.board?.name || randomBoardName();
+    top = `<section class="panel" style="max-width:720px"><h2 class="h3">${icon("trophy")} Rejoin the leaderboard</h2>
+      <p style="margin:0">You left the board, so you aren't shown. Rejoin to race other learners: XP from lessons, exams, problems, steps and milestones, reset every Monday, with ${PODIUM_PRIZE.join(" / ")} coins for the top three.</p>
+      <p class="muted" style="margin:0">${what} You can leave again at any time.</p>
+      <label style="display:grid;gap:6px"><span class="eyebrow">Name on the board</span><input class="pred" id="lbname" maxlength="24" value="${esc(first)}" autocomplete="nickname"></label>
+      <div class="row"><button type="button" class="btn primary" id="lbjoin">Join as <span id="lbprev">${esc(first)}</span></button></div></section>`; }
+  else if(!joined) top = `<section class="panel" style="max-width:720px"><h2 class="h3">${icon("trophy")} Earn your first XP to get on the board</h2>
+      <p class="muted" style="margin:0">Finish a lesson, a bootcamp step or a problem and you'll appear here automatically, under a random name you can change. XP resets every Monday, and the top three win ${PODIUM_PRIZE.join(" / ")} coins.</p>${keep}</section>`;
   const wireTop = () => {
     body.querySelector("[data-signin]")?.addEventListener("click", () => Account.signIn());
     const inp = body.querySelector("#lbname"), prev = body.querySelector("#lbprev");
+    body.querySelector("#lbsave")?.addEventListener("click", async () => { const n = inp.value.trim(); if(!n){ inp.focus(); return; } await Board.join(n); render(); });
     if(inp && prev && !joined){ inp.oninput = () => { prev.textContent = inp.value.trim() || "…"; };
       body.querySelector("#lbjoin").onclick = async () => { const n = inp.value.trim(); if(!n){ inp.focus(); return; } await Board.join(n); Game.sync(); render(); }; }
     body.querySelector("#lbok")?.addEventListener("click", () => { P.board.pub = true; save("p", true); render(); });
@@ -357,7 +399,7 @@ async function rwBoard(body, s){
   body.innerHTML = `${top}${head}<section class="panel"><div class="loading" style="padding:12px 0">Loading the leaderboard…</div></section>`; wire(); wireTop();
   let d, prize = null, champs = null;
   try{
-    if(joined) await Board.publish(s);
+    if(joined) await Board.publish(s);   // also starts a guest session for someone who hasn't signed in
     [d, prize] = await Promise.all([Board.load(mode), joined ? Board.claimPrize().catch(() => null) : null]);
     if(mode === "week") champs = await Board.load("last").catch(() => null);
   }catch(e){
@@ -366,7 +408,7 @@ async function rwBoard(body, s){
   }
   if(route.v !== "rewards" || (route.id||"challenges") !== "board" || (BOARD_MODES.some(m => m.id === route.board) ? route.board : "week") !== mode) return;
   if(prize){ UI.toast(prize.place === 1 ? "You won last week" : `You finished #${prize.place} last week`, `+${prize.coins} coins`, "trophy", 6000); UI.confetti(160); Game.sync(); }
-  const {m, rows, above, below, myVal} = d, me = user?.uid || null, unit = m.unit;
+  const {m, rows, above, below, myVal} = d, me = Board.me(), unit = m.unit;
   const rank = joined ? d.rank : null, total = d.total;   // a non-member's "would be" rank isn't a place on the board
   const v = r => +r?.[m.field] || 0, u = n => unit === "days" && Math.abs(n) === 1 ? "day" : unit, fmt = n => `${(+n||0).toLocaleString()} ${u(+n||0)}`;
   const lg = r => leagueOf(+r?.weekXp || 0), chip = r => { const L = lg(r); return `<span class="lg" style="--lg:${L.col}">${L.name}</span>`; };
@@ -376,7 +418,7 @@ async function rwBoard(body, s){
   const lastWk = Rewards.between(Rewards.wkStart(today()) - 7, Rewards.wkStart(today()) - 1).xp, thisWk = Rewards.between(Rewards.wkStart(today()), today()).xp;
 
   // your standing: rank, movement, the person to catch and the person chasing you
-  const standing = rank == null ? `<p class="muted" style="margin:0">${mode==="last"?"You weren't on last week's board.":mode==="streak"?"Start a streak to appear here: finish a lesson, a question, a step or a problem today.":"You'll appear here once your entry updates."}</p>` : `
+  const standing = rank == null ? `<p class="muted" style="margin:0">${!me?"Sign in with Google to appear on the board: guest entries aren't switched on for this site yet.":mode==="last"?"You weren't on last week's board.":mode==="streak"?"Start a streak to appear here: finish a lesson, a question, a step or a problem today.":"You'll appear here once your entry updates."}</p>` : `
     <div class="stand"><div class="rkbig"><span>#${rank}</span><small>of ${total.toLocaleString()}</small></div>
       <div style="display:grid;gap:6px;min-width:0">
         <div class="row" style="gap:8px">${mv>0?`<span class="pill ok">▲ ${mv} since yesterday</span>`:mv<0?`<span class="pill bad">▼ ${-mv} since yesterday</span>`:""}<span class="pill">${fmt(myVal)}</span>${mode==="week"||mode==="last"?`<span class="lg" style="--lg:${myLeague.col}">${myLeague.name} league</span>`:""}</div>
@@ -405,9 +447,9 @@ async function rwBoard(body, s){
       <div class="row" style="gap:6px">${LEAGUES.map(([min,n,c])=>`<span class="lg" style="--lg:${c}">${n} · ${min.toLocaleString()}+ XP</span>`).join("")}</div>
       <p class="muted" style="margin:0">The top three of each week win ${PODIUM_PRIZE.join(", ")} coins (with at least ${PRIZE_MIN_XP} XP that week), collected the next time they open this board. Scores are sent by each learner's browser, so treat the board as friendly competition.</p></div></details>
     ${joined?`<section class="panel"><h2 class="h3">Your entry</h2><p class="muted" style="margin:0">Shown publicly as <b style="color:var(--ink)">${esc(P.board.name)}</b>${Rewards.title()?`, ${esc(Rewards.title())}`:""}. Change the name or leave the board here.</p>
-      <div class="row"><input class="pred" id="lbname" maxlength="24" value="${esc(P.board.name)}" style="max-width:260px"><button type="button" class="btn sm" id="lbren">Save the name</button><button type="button" class="btn ghost sm" id="lbleave">Leave the leaderboard</button></div></section>`:""}`;
+      <div class="row"><input class="pred" id="lbname2" maxlength="24" value="${esc(P.board.name)}" aria-label="Name on the board" style="max-width:260px"><button type="button" class="btn sm" id="lbren">Save the name</button><button type="button" class="btn ghost sm" id="lbleave">Leave the leaderboard</button></div>${top?"":keep}</section>`:""}`;
   wire(); wireTop();
-  body.querySelector("#lbren")?.addEventListener("click", async () => { const n = body.querySelector("#lbname").value.trim(); if(!n) return; await Board.join(n); render(); });
+  body.querySelector("#lbren")?.addEventListener("click", async () => { const n = body.querySelector("#lbname2").value.trim(); if(!n) return; await Board.join(n); render(); });
   body.querySelector("#lbleave")?.addEventListener("click", async () => { if(!confirm("Leave the leaderboard? Your entry is removed. Your coins and progress stay.")) return; await Board.leave(); render(); });
 }
 /* compact card for the Today page */
@@ -420,8 +462,8 @@ Rewards.todayCard = () => {
 };
 
 /* ================= HOME: this week's leaderboard ================= */
-// The landing page shows this week's race to everyone: the board is public (firestore.rules), and members are told so
-// when they join, or by a one-time notice if they joined while it was private.
+// The landing page shows this week's race to everyone. The board is public (firestore.rules) and everyone with XP is on
+// it under a random name; a one-time notice tells them the name, with ways to change it or leave.
 function lbCountdown(){ const s = Board.weekEndsIn(), d = Math.floor(s/86400), h = Math.floor(s%86400/3600), m = Math.floor(s%3600/60); return d ? `${d} d ${h} h` : h ? `${h} h ${m} min` : `${m} min`; }
 async function homeLeaderboard(host){
   if(!host || typeof Account === "undefined") return;
@@ -429,6 +471,7 @@ async function homeLeaderboard(host){
   await Promise.race([Account.ready, new Promise(r => setTimeout(r, 6000))]);
   if(!host.isConnected) return;
   if(!Account.enabled){ host.remove(); return; }
+  Board.ensure(Game.stats());
   const u = Account.user, joined = !!(P.board?.on && P.board?.name);
   const intro = `<div class="lbh-l">
       <span class="eyebrow">Leaderboard · this week</span>
@@ -436,7 +479,7 @@ async function homeLeaderboard(host){
       <p class="lede">Ranked by XP earned since Monday from lessons, exams, problems, bootcamp steps and projects. Everyone starts from zero each week.</p>
       <dl class="lbfacts"><div><dt>Resets in</dt><dd id="lbReset">${lbCountdown()}</dd></div><div><dt>Weekly prizes</dt><dd>${PODIUM_PRIZE.map(n=>n.toLocaleString()).join(" / ")} coins</dd></div></dl>
       <div class="lbleagues" aria-label="Leagues by XP this week">${LEAGUES.map(([min,n,c])=>`<span class="lg" style="--lg:${c}">${n} <small>${min.toLocaleString()}+</small></span>`).join("")}</div>
-      <div class="row"><button class="btn primary" data-rwgo="board">${icon("trophy","sm")}${u && joined ? "Open the leaderboard" : u ? "Join the leaderboard" : "See the leaderboard"}</button></div>
+      <div class="row"><button class="btn primary" data-rwgo="board">${icon("trophy","sm")}${joined ? "Open the leaderboard" : "See the leaderboard"}</button></div>
     </div>`;
   const shell = right => { host.innerHTML = intro + `<div class="lbh-r panel">${right}</div>`;
     host.querySelectorAll("[data-rwgo]").forEach(b => b.onclick = () => go({v: "rewards", id: b.dataset.rwgo}));
@@ -447,18 +490,18 @@ async function homeLeaderboard(host){
   try{ d = await Board.load("week"); }
   catch(e){ console.warn("home leaderboard", e?.code || e); if(host.isConnected) shell(`<p class="muted" style="margin:0">The leaderboard couldn't load right now.</p>`); return; }
   if(!host.isConnected || route.v !== "home") return;
-  const {rows, rank, total, above, myVal} = d, me = u?.uid || null, top = rows.slice(0, 5);
+  const {rows, rank, total, above, myVal} = d, me = Board.me(), top = rows.slice(0, 5);
   const xp = n => `${(+n||0).toLocaleString()} XP`, nm = r => esc(r?.name || "Learner");
   const chip = r => { const L = leagueOf(+r?.weekXp || 0); return `<span class="lg" style="--lg:${L.col}">${L.name}</span>`; };
   const line = (r, i, you) => `<li class="${you?"me":""}"><span class="rk">${i<3&&!you?`<span class="medal m${i+1}">${i+1}</span>`:i+1}</span><span class="av">${esc((r.name||"?").trim()[0]||"?").toUpperCase()}</span><span class="nm"><b>${nm(r)}${you?" (you)":""}</b><span class="muted">Lv ${+r.level||1} · ${icon("flame","sm")}${+r.streak||0}</span></span>${chip(r)}<b class="val">${xp(r.weekXp)}</b></li>`;
   const inTop = top.some(r => r.uid === me);
   const meLine = joined && !inTop && rank != null ? `<li class="gap">⋯</li>${line({name: P.board.name, level: Game.stats().level, streak: Game.stats().streak, weekXp: myVal}, rank - 1, true)}` : "";
-  const signIn = `<button class="gbtn" data-signin>${GOOGLE_G}<span>Sign in with Google</span></button>`;
-  const status = !u ? `<span>Sign in and join to take a place on the board.</span>${signIn}`
+  const place = !me ? `<span>Sign in with Google to appear on the board.</span><button class="gbtn" data-signin>${GOOGLE_G}<span>Sign in with Google</span></button>` : rank == null ? `You'll appear here in a moment.` : rank === 1 ? `${icon("trophy","sm")} You're in first place this week.` : `You're <b>#${rank}</b> of ${total.toLocaleString()}.${above ? ` <b>${xp((+above.weekXp||0) - myVal + 1)}</b> to pass ${nm(above)}.` : ""}`;
+  const status = joined && P.board.auto && !P.board.pub ? `<span>You're on the board as <b>${esc(P.board.name)}</b>.</span><button type="button" class="btn ghost sm" data-rwgo="board">Change your name</button>`
     : joined && !P.board.pub ? `${icon("eye","sm")} The leaderboard is now public. <button type="button" class="btn ghost sm" data-rwgo="board">Review your entry</button>`
-    : joined
-    ? (rank == null ? `You'll appear here once your entry updates.` : rank === 1 ? `${icon("trophy","sm")} You're in first place this week.` : `You're <b>#${rank}</b> of ${total.toLocaleString()}.${above ? ` <b>${xp((+above.weekXp||0) - myVal + 1)}</b> to pass ${nm(above)}.` : ""}`)
-    : (rank != null && myVal > 0 ? `With your ${xp(myVal)} this week you'd be <b>#${rank}</b> of ${total.toLocaleString()}. Join to show up.` : `Earn XP this week and join to take a place.`);
+    : joined ? place
+    : P.board?.on === false ? `<span>You left the leaderboard.</span><button type="button" class="btn ghost sm" data-rwgo="board">Rejoin</button>`
+    : `Earn your first XP and you'll appear here automatically.`;
   shell(top.length
     ? `<ol class="lb lbtop">${top.map((r, i) => line(r, i, r.uid === me)).join("")}${meLine}</ol><p class="lbstatus">${status}</p>`
     : `<p style="margin:0"><b>Nobody's on the board this week yet.</b></p><p class="muted" style="margin:0">The first learner to join this week takes first place.</p><p class="lbstatus">${status}</p>`);

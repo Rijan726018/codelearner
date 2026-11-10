@@ -14,7 +14,14 @@ function firebaseProvider(cfg){
     .then(([app, auth, fs]) => { const a = app.initializeApp(cfg); return {auth, fs, au: auth.getAuth(a), db: fs.getFirestore(a)}; }));
   const toUser = u => u ? {uid: u.uid, name: u.displayName || u.email || "You", email: u.email || "", photo: u.photoURL || ""} : null;
   return {
-    async init(onUser){ const {auth, au} = await load(); auth.onAuthStateChanged(au, u => onUser(toUser(u))); },
+    // A guest (anonymous) session only exists so someone who hasn't signed in can post their own leaderboard entry.
+    // To the rest of the app a guest is signed out: no cloud sync, no account menu.
+    async init(onUser){ const {auth, au} = await load(); auth.onAuthStateChanged(au, u => onUser(u && !u.isAnonymous ? toUser(u) : null)); },
+    async guestUid(create){
+      const {auth, au} = await load(); if(au.authStateReady) await au.authStateReady();
+      const u = au.currentUser; if(u) return u.isAnonymous ? u.uid : null;
+      return create ? (await auth.signInAnonymously(au)).user.uid : null;
+    },
     async signIn(){
       const {auth, au} = await load(); const gp = new auth.GoogleAuthProvider(); gp.setCustomParameters({prompt: "select_account"});
       try{ await auth.signInWithPopup(au, gp); }
@@ -108,6 +115,7 @@ const Account = (() => {
   let provider = null, user = null, busy = false, error = "";
   // settles once we know whether accounts are on and who (if anyone) is signed in, so views can wait for it
   let settle; const ready = new Promise(r => { settle = r; });
+  const beforeSignIn = [];
   const btn = () => document.getElementById("acctBtn"), menu = () => document.getElementById("acctMenu");
   function paint(){
     const b = btn(); if(!b) return;
@@ -136,6 +144,8 @@ const Account = (() => {
   }
   async function signIn(){
     if(!provider || busy) return; busy = true; error = ""; fillMenu();
+    // let other modules tidy up first (the leaderboard removes a guest's entry); capped so the popup still opens promptly
+    try{ await Promise.race([Promise.all(beforeSignIn.map(f => Promise.resolve().then(f).catch(() => {}))), new Promise(r => setTimeout(r, 1500))]); }catch(e){}
     try{ await provider.signIn(); }
     catch(e){ console.warn("Sign-in failed:", e?.code || e); error = e?.code === "auth/popup-closed-by-user" || e?.code === "auth/cancelled-popup-request" ? "" : e?.code === "auth/unauthorized-domain" ? "Sign-in isn't enabled for this web address yet." : "Sign-in didn't finish. Please try again."; }
     busy = false; fillMenu();
@@ -181,7 +191,9 @@ const Account = (() => {
       try{ await provider.init(onUser); }
       catch(e){ provider = null; paint(); setSync("Saved in this browser"); settle(); }
     },
-    get user(){ return user; }, get enabled(){ return !!provider; }, ready,
+    get user(){ return user; }, get enabled(){ return !!provider; }, ready, beforeSignIn,
+    // the guest's uid for the leaderboard (create: start a guest session if there isn't one); null when signed in or unavailable
+    guestUid(create){ return provider?.guestUid ? provider.guestUid(create).catch(e => { console.warn("Guest session unavailable:", e?.code || e); return null; }) : Promise.resolve(null); },
     // boards are public to read; writes go through Board, which only writes the signed-in person's own entry
     board(name){ return provider?.board ? provider.board(name) : null; },
     // auctions can be browsed signed out; writes need a user (auction.js checks)

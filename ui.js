@@ -258,7 +258,7 @@ const BADGES = [
   {id:"coins-1000", n:"Saver", d:"Hold 1,000 coins at once", i:"star", t:s=>typeof Rewards!=="undefined"&&Rewards.balance(s)>=1000},
   {id:"shop-1", n:"First Purchase", d:"Buy something in the rewards shop", i:"palette", t:()=>(P.buys||[]).length>=1},
   {id:"freeze-1", n:"Saved by the Freeze", d:"Have a streak freeze keep your streak alive", i:"shield", t:()=>Object.keys(P.frozen||{}).length>=1},
-  {id:"board-1", n:"On the Board", d:"Join the leaderboard", i:"users", t:()=>!!P.board?.on},
+  {id:"board-1", n:"On the Board", d:"Appear on the leaderboard", i:"users", t:()=>!!P.board?.on},
   {id:"podium-1", n:"Podium Finish", d:"Finish a week in the leaderboard's top three", i:"award", t:()=>Object.values(P.podium||{}).some(r=>r<=3)},
   {id:"champion-1", n:"Weekly Champion", d:"Finish a week at #1 on the leaderboard", i:"trophy", t:()=>Object.values(P.podium||{}).some(r=>r===1)}
 ];
