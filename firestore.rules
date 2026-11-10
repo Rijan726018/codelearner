@@ -10,9 +10,10 @@ service cloud.firestore {
                             && request.resource.data.json is string
                             && request.resource.data.json.size() < 900000;
     }
-    // Leaderboards (opt-in): boards/all and boards/w-YYYY-MM-DD (week starting Monday). Public: anyone can read them,
-    // signed in or not. Each person can write or delete only their own entry, which holds a chosen display name and
-    // numbers, never an email or photo.
+    // Leaderboards: boards/all and boards/w-YYYY-MM-DD (week starting Monday). Public: anyone can read them, signed in
+    // or not. Everyone with XP gets an entry under a random name unless they leave; someone who hasn't signed in writes
+    // theirs through a guest (anonymous) session, which is why the check is on the uid and not on the sign-in method.
+    // Each person can write or delete only their own entry, which holds a display name and numbers, never an email or photo.
     match /boards/{board}/entries/{uid} {
       allow read: if true;
       allow delete: if request.auth != null && request.auth.uid == uid;
