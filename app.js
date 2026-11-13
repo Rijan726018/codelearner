@@ -143,11 +143,13 @@ document.addEventListener("pointermove",e=>{ if(tip.hidden) return; const x=Math
 /* ---------- navigation ---------- */
 const routeHash = r => "#/"+r.v+(r.id?"/"+encodeURIComponent(r.id):"");
 function parseHash(){ const h=(location.hash||"").replace(/^#\/?/,""); if(!h) return null; const [v,id]=h.split("/"); return VIEWS[v]?{v, ...(id?{id:decodeURIComponent(id)}:{})}:null; }
-function go(r){ route=r; tip.hidden=true; Palette.close?.();
+// side panels (a career-path topic, a problem's "Explain it simply") belong to the page they were opened on
+const closeDrawers=()=>document.querySelectorAll(".drawer-bg,.drawer").forEach(x=>x.remove());
+function go(r){ route=r; tip.hidden=true; Palette.close?.(); closeDrawers();
   try{ if(location.hash!==routeHash(r)) history.pushState(null,"",routeHash(r)); }catch(e){}
   const swap=()=>{ render(); window.scrollTo({top:0}); };
   if(document.startViewTransition && !matchMedia("(prefers-reduced-motion: reduce)").matches) document.startViewTransition(swap); else swap(); }
-window.addEventListener("popstate",()=>{ const r=parseHash(); route=r||{v:"home"}; render(); });
+window.addEventListener("popstate",()=>{ const r=parseHash(); route=r||{v:"home"}; closeDrawers(); render(); });
 $("#tabs").addEventListener("click",e=>{ const b=e.target.closest("[data-v]"); if(b) go({v:b.dataset.v}); });
 function updateBadge(){ const n=dueCards().length, bd=$("#duebadge"); if(!bd) return; bd.hidden=!n; bd.textContent=n; }
 const TAB_OF = {lesson:"map", exam:"map", path:"paths", problem:"problems", course:"bootcamp", project:"build", make:"build", lot:"auction", sell:"auction"};
