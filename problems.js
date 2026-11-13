@@ -68,6 +68,78 @@ function exampleHTML(p, ex, i){
 }
 function caseInput(p, t){ return p.kind==="design" ? `${fmtV(t.ops)}\n${fmtV(t.args)}` : p.params.map((n,k)=>`${n} = ${fmtV(t.args[k])}`).join("\n"); }
 
+/* ---------- "Explain it simply": the problem in plain words, plus a card for every idea it uses ----------
+   Cards and the problem → cards map come from data/concepts.json (tools/build_concepts.py, which runs every example). */
+let PB_CONCEPTS = null;
+const loadConcepts = () => PB_CONCEPTS || (PB_CONCEPTS = fetch("data/concepts.json").then(r => r.ok ? r.json() : null).catch(() => null));
+function plainKind(v, p, name){
+  const list = p.cat === "linked-list" && Array.isArray(v) && /^(head|list\d*|l\d|a|b)$/i.test(name || "head");
+  const tree = p.cat === "trees" && Array.isArray(v) && /^(root|p|q|tree|subRoot|s|t)$/i.test(name || "root");
+  if(list) return "a linked list (shown here as the list of its values, front to back)";
+  if(tree) return "a binary tree (shown level by level, top to bottom; null means \"no child here\")";
+  if(v === null) return "nothing: None in Python, null in JavaScript";
+  if(typeof v === "boolean") return "true or false";
+  if(typeof v === "number") return Number.isInteger(v) ? "a whole number" : "a number with decimals";
+  if(typeof v === "string") return v.length === 1 ? "a single character" : "a piece of text (a string)";
+  if(Array.isArray(v)){
+    if(!v.length) return "a list (this one is empty)";
+    if(v.every(Array.isArray)) return v.every(r => r.every(x => typeof x === "string")) ? "a grid of characters (a list of rows)" : v.length && v.every(r => r.length === 2) ? "a list of pairs" : "a grid (a list of rows, each row a list)";
+    if(v.every(x => typeof x === "number")) return v.every(Number.isInteger) ? "a list of whole numbers" : "a list of numbers";
+    if(v.every(x => typeof x === "string")) return v.every(x => x.length === 1) ? "a list of single characters" : "a list of strings";
+    if(v.every(x => typeof x === "boolean")) return "a list of true/false values";
+  }
+  return "a value";
+}
+function plainWords(p){
+  const ex = (p.examples || [])[0]; if(!ex) return "";
+  const code = v => `<code>${esc(fmtV(v))}</code>`;
+  if(p.kind === "design"){
+    const cls = p.cls?.py || p.ops?.[0] || "the class";
+    return `<p>This one is different: instead of one function, you build a small machine, a <b>class</b> called <code>${esc(cls)}</code>. The tests create one and then press its buttons (call its methods) one after another, checking every answer.</p>
+      <div class="pw"><div><span class="eyebrow">The tests do this</span><ol>${ex.ops.map((op, i) => `<li><code>${esc(op)}(${esc(ex.args[i].map(fmtV).join(", "))})</code>${i === 0 ? " creates the object" : ex.exp[i] === null ? " (nothing to give back)" : ` should give back ${code(ex.exp[i])}`}</li>`).join("")}</ol></div></div>`;
+  }
+  const names = p.params || [];
+  return `<div class="pw"><div><span class="eyebrow">You get</span><ul>${names.map((n, k) => `<li><code>${esc(n)}</code>: ${plainKind(ex.args[k], p, n)}, like ${code(ex.args[k])}</li>`).join("")}</ul></div>
+    <div><span class="eyebrow">You give back</span><ul><li>${plainKind(ex.exp, p, names[0])}</li></ul></div></div>
+    <p class="pwex">For example, when ${names.map((n, k) => `${esc(n)} is ${code(ex.args[k])}`).join(" and ")}, the right answer is ${code(ex.exp)}.${(p.examples || []).length > 1 ? ` The other example${p.examples.length > 2 ? "s" : ""} on the Description tab ${p.examples.length > 2 ? "are" : "is"} worth working through by hand too.` : ""}</p>`;
+}
+function conceptCard(c, lang, open){
+  const code = c[lang === "js" ? "js" : "py"], out = c[lang === "js" ? "js_out" : "py_out"];
+  return `<details class="ccard"${open ? " open" : ""}><summary><span class="ct">${esc(c.title)}</span><span class="ck">${md(c.kid)}</span></summary>
+    <div class="cbody"><div class="prose">${c.how.map(x => `<p>${md(x)}</p>`).join("")}</div>
+      <div class="cex"><span class="eyebrow">Try it · ${lang === "js" ? "JavaScript" : "Python"}</span>${codeBlock(code, null, lang === "js" ? "javascript" : "python")}<span class="eyebrow">It prints</span><pre class="cout">${esc(out)}</pre></div>
+      <p class="cwatch">${icon("bug", "sm")}<span><b>Watch out:</b> ${md(c.watch)}</span></p></div></details>`;
+}
+async function explainProblem(p, toHints){
+  document.querySelector(".drawer-bg")?.remove(); document.querySelector(".drawer")?.remove();
+  const bg = document.createElement("div"); bg.className = "drawer-bg";
+  const dr = document.createElement("aside"); dr.className = "drawer explain"; dr.setAttribute("role", "dialog"); dr.setAttribute("aria-label", `Explain ${p.title} simply`); dr.tabIndex = -1;
+  document.body.append(bg, dr);
+  const close = () => { bg.remove(); dr.remove(); document.removeEventListener("keydown", esck); document.getElementById("pexplain")?.focus(); };
+  const esck = e => { if(e.key === "Escape") close(); };
+  document.addEventListener("keydown", esck); bg.onclick = close;
+  dr.innerHTML = `<span class="muted">Loading the explanations…</span>`;
+  const data = await loadConcepts(); if(!dr.isConnected) return;
+  let lang = pbLang === "js" ? "js" : "python";
+  const paint = () => {
+    const ids = data?.byProblem?.[p.id] || [], cards = ids.map(i => data.cards[i]).filter(Boolean);
+    const big = cards.filter(c => c.kind === "pattern" && c.id !== "big-o"), tools = cards.filter(c => c.kind === "block"), bigo = cards.find(c => c.id === "big-o");
+    dr.innerHTML = `<div class="row" style="justify-content:space-between"><span class="eyebrow">${icon("info", "sm")} Explain it simply</span><button class="iconbtn" id="dx" aria-label="Close">${icon("x")}</button></div>
+      <h2 class="h2">${esc(p.title)}</h2>
+      <div class="seg" role="group" aria-label="Language for examples"><button type="button" data-xl="python" aria-pressed="${lang === "python"}">Python</button><button type="button" data-xl="js" aria-pressed="${lang === "js"}">JavaScript</button></div>
+      <section class="xsec"><h3 class="h3">What the problem wants, in plain words</h3>${plainWords(p)}</section>
+      ${!data ? `<p class="muted">The idea cards didn't load. Check your connection and open this again.</p>` : ""}
+      ${big.length ? `<section class="xsec"><h3 class="h3">The big idea</h3><p class="muted xnote">The way of thinking that cracks this problem. Open a card to read more.</p>${big.map((c, i) => conceptCard(c, lang, i === 0)).join("")}</section>` : ""}
+      ${tools.length ? `<section class="xsec"><h3 class="h3">Tools the solution uses</h3><p class="muted xnote">Every piece of ${lang === "js" ? "JavaScript" : "Python"} a solution to this problem needs, in the order you'll meet them. Skip any you already know.</p>${tools.map(c => conceptCard(c, lang, false)).join("")}</section>` : ""}
+      ${bigo ? `<section class="xsec"><h3 class="h3">How fast is fast enough?</h3>${p.complexity ? `<p style="margin:0">A good solution here is <b>${esc(p.complexity)}</b>${p.constraints?.length ? `, given the limits: <code>${esc(p.constraints[0])}</code>` : ""}.</p>` : ""}${conceptCard(bigo, lang, false)}</section>` : ""}
+      <div class="row"><button class="btn primary" id="xhints">${icon("bulb", "sm")}Now try the hints</button><button class="btn ghost" id="xdone">Back to the problem</button></div>`;
+    dr.querySelector("#dx").onclick = close; dr.querySelector("#xdone").onclick = close;
+    dr.querySelector("#xhints").onclick = () => { close(); toHints?.(); };
+    dr.querySelectorAll("[data-xl]").forEach(b => b.onclick = () => { lang = b.dataset.xl; const top = dr.scrollTop; paint(); dr.scrollTop = top; });
+  };
+  paint(); dr.focus();
+}
+
 function viewProblem(el){
   const p=PB.byId[route.id]; if(!p){ go({v:"problems"}); return; }
   const idx=PB.list.indexOf(p), prev=PB.list[idx-1], next=PB.list[idx+1], cat=PB.catById[p.cat];
@@ -79,6 +151,7 @@ function viewProblem(el){
       <div class="row" style="justify-content:space-between"><span class="diff ${p.difficulty}">${p.difficulty}</span>${P.solved?.[p.id]?`<span class="pill ok">${icon("check","sm")}Solved in ${P.solved[p.id].lang==="js"?"JavaScript":"Python"}</span>`:P.tried?.[p.id]?`<span class="pill exam">Attempted</span>`:""}</div>
       <h1 class="h2">${p.n}. ${esc(p.title)}</h1>
       <div class="tags">${p.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join("")}</div>
+      <button type="button" class="explainbtn" id="pexplain" aria-haspopup="dialog">${icon("info")}<span><b>Explain it simply</b><small>What the problem wants, and every idea you need for it, in plain words</small></span>${icon("arrow","sm")}</button>
       <div class="tabs2" role="tablist">${[["desc","Description","book"],["hints","Hints","bulb"],["ed","Editorial","star"]].map(([k,t,i])=>`<button type="button" role="tab" data-tab="${k}" aria-selected="${tab===k}">${icon(i,"sm")}${t}</button>`).join("")}</div>
       <div id="ptab"></div>
       <div class="row" style="justify-content:space-between;border-top:1px solid var(--line);padding-top:12px">${prev?`<button class="btn ghost sm" data-problem="${prev.id}">${icon("back","sm")} Previous</button>`:"<span></span>"}${next?`<button class="btn ghost sm" data-problem="${next.id}">Next ${icon("arrow","sm")}</button>`:""}</div>
@@ -109,6 +182,7 @@ function viewProblem(el){
     bindVideos(box);
   };
   drawTab();
+  el.querySelector("#pexplain").onclick=()=>explainProblem(p, ()=>{ tab=route.tab="hints"; el.querySelectorAll("[data-tab]").forEach(x=>x.setAttribute("aria-selected",x.dataset.tab==="hints")); drawTab(); });
   el.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{ tab=route.tab=b.dataset.tab; el.querySelectorAll("[data-tab]").forEach(x=>x.setAttribute("aria-selected",x===b)); drawTab(); });
   const ed=mountEditor(el.querySelector("#ped"), {lang:L, code:p.starter[key], draftKey:`pb-${p.id}-${key}`, label:`${p.kind==="design"?p.cls[key]:p.fn[key]}()`, onRun:()=>judge(false), runLabel:"Run ▶", tall:true});
   el.querySelectorAll("[data-lang]").forEach(b=>b.onclick=()=>{ pbLang=b.dataset.lang; try{ localStorage.setItem("cl-lang",pbLang); }catch(e){} render(); });

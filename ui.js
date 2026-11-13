@@ -2,6 +2,7 @@
 /* ---------- UI kit: icons, theme, toasts, confetti, glow, reveal, nav, search palette, XP + badges, Home and Profile ---------- */
 const ICONS = {
   gavel:'<path d="m14 4 6 6"/><path d="m11.5 6.5 6 6"/><path d="m12.75 5.25-4.5 4.5 6 6 4.5-4.5"/><path d="m9.5 11.5-6.5 6.5 2 2 6.5-6.5"/><path d="M13 21h8"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5h.01"/>',
   home:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9.5 21v-6h5v6"/>',
   dash:'<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',
   map:'<path d="M9 4 3 6.5v13.5L9 17.5l6 2.5 6-2.5V4l-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/>',

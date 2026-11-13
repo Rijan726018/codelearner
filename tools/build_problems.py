@@ -100,3 +100,5 @@ if _errs: print("\n".join(_errs)); sys.exit(1)
 json.dump(_data, open("data/problems.json","w"), separators=(",",":"))
 from collections import Counter
 print(len(out), "problems", dict(Counter(r["difficulty"] for r in out)), os.path.getsize("data/problems.json"), "bytes")
+# the "Explain it simply" cards depend on the solutions above: rebuild and re-verify them
+import subprocess; subprocess.run([sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), "build_concepts.py")], check=True)
