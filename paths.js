@@ -8,7 +8,12 @@ const PATHS = {index:[], cache:{}, focusNode:null,
   current(){ let last=null; try{ last=localStorage.getItem("cl-lastpath"); }catch(e){}
     const scored=this.index.map(p=>({p, ...this.progress(p)})).filter(x=>x.done>0&&x.done<x.total).sort((a,b)=>b.done-a.done);
     const pick=scored.find(x=>x.p.id===last)||scored[0]||(last&&this.index.find(p=>p.id===last)?{p:this.index.find(p=>p.id===last),...this.progress(this.index.find(p=>p.id===last))}:null);
-    return pick?{...pick.p, done:pick.done, total:pick.total}:null; }
+    return pick?{...pick.p, done:pick.done, total:pick.total}:null; },
+  // Paths you follow, as many as you like: P.follow[id] = 2*time+1 when followed, 2*time when unfollowed. Merging two copies
+  // of the progress doc keeps the larger number (mergeDeep), which is the later choice, so a phone and a laptop agree.
+  isFollowed(id){ return (P.follow?.[id]||0)%2===1; },
+  setFollow(id,on){ P.follow=P.follow||{}; P.follow[id]=Date.now()*2+(on?1:0); save("p"); },
+  followed(){ return this.index.filter(p=>this.isFollowed(p.id)).sort((a,b)=>P.follow[a.id]-P.follow[b.id]).map(p=>({...p, ...this.progress(p)})); }
 };
 EXTRA_LOADERS.push(async()=>{ const d=await fetch("data/paths/index.json").then(r=>r.ok?r.json():null).catch(()=>null); if(d) PATHS.index=d.paths; PATHS.cats=d?.cats||[]; });
 SEARCH_SOURCES.push(()=>PATHS.index.map(p=>({t:p.title, sub:p.tagline, kind:"Career path", i:p.icon, kw:p.cat, r:{v:"path", id:p.id}})));
@@ -65,6 +70,7 @@ function viewPaths(el){
     <p class="lede">Every job in software, mapped. Each path is a phased curriculum: the topics to learn in order, free resources for each, a portfolio project per phase, and what interviews will ask. Click any topic to see details and track your progress.</p>
     <div class="row"><button class="btn grad" id="quiz">${icon("compass")}Not sure? Find your path</button><span class="muted" style="font-size:.9rem">Every path builds on the <button class="btn ghost sm" data-act="map">core curriculum</button></span></div></section>
   <section class="panel" id="quizbox" hidden></section>
+  ${(()=>{ const f=PATHS.followed(); return f.length?`<section style="display:grid;gap:14px"><div class="row" style="justify-content:space-between"><h2 class="h2">Your paths</h2><span class="muted" style="font-size:.9rem">Following ${f.length}. Open any path to follow or unfollow it.</span></div><div class="pgrid">${f.map(p=>pathCard(p)).join("")}</div></section>`:`<p class="muted" style="margin:0">Open a path and press <b>Follow</b> to add it to your paths. You can follow as many as you like, and each one shows on your Today page.</p>`; })()}
   <div class="chips"><button type="button" class="chip" data-pc="all" aria-pressed="${pathCat==="all"}">All paths</button>${cats.map(c=>`<button type="button" class="chip" data-pc="${esc(c)}" aria-pressed="${pathCat===c}">${esc(c)}</button>`).join("")}</div>
   ${cats.filter(c=>pathCat==="all"||pathCat===c).map(c=>`<section style="display:grid;gap:14px"><h2 class="h2">${esc(c)}</h2><div class="pgrid">${PATHS.index.filter(p=>p.cat===c).map(p=>pathCard(p)).join("")}</div></section>`).join("")}`;
   el.querySelectorAll("[data-pc]").forEach(b=>b.onclick=()=>{ pathCat=b.dataset.pc; render(); });
@@ -93,7 +99,7 @@ async function viewPath(el){
       <p class="lede">${esc(p.tagline)}</p>
       <div class="prose" style="max-width:80ch">${(p.about||[]).map(x=>`<p>${md(x)}</p>`).join("")}</div>
       <div style="display:grid;gap:6px;max-width:520px"><div class="row" style="justify-content:space-between"><span class="eyebrow">Your progress</span><span class="pill acc">${pr.done} / ${pr.total} topics · ${pct}%</span></div><div class="bar"><i style="width:${pct}%;background:var(--h)"></i></div></div>
-      <div class="row">${nextNode?`<button class="btn grad" data-node="${esc(nextNode.id)}">${icon("play","sm")}${pr.done?"Continue":"Start"}: ${esc(nextNode.t)}</button>`:`<span class="pill ok">${icon("award","sm")}Path complete. Go build and apply.</span>`}<button class="btn ghost" id="jump">${icon("list","sm")}Jump to roadmap</button></div>
+      <div class="row">${nextNode?`<button class="btn grad" data-node="${esc(nextNode.id)}">${icon("play","sm")}${pr.done?"Continue":"Start"}: ${esc(nextNode.t)}</button>`:`<span class="pill ok">${icon("award","sm")}Path complete. Go build and apply.</span>`}<button class="btn ${PATHS.isFollowed(p.id)?"":"primary"}" id="follow" aria-pressed="${PATHS.isFollowed(p.id)}">${PATHS.isFollowed(p.id)?`${icon("check","sm")}Following`:`${icon("plus","sm")}Follow this path`}</button><button class="btn ghost" id="jump">${icon("list","sm")}Jump to roadmap</button></div>
     </section>
     <div class="kv">
       <div><span class="eyebrow">What you'll do day to day</span><ul>${(p.day||[]).map(x=>`<li>${md(x)}</li>`).join("")}</ul></div>
@@ -115,6 +121,8 @@ async function viewPath(el){
       ${(p.certs||[]).length?`<section class="panel"><h2 class="h3">${icon("award")} Certifications worth knowing</h2><ul style="margin:0;padding-left:18px;display:grid;gap:6px">${p.certs.map(x=>`<li>${md(x)}</li>`).join("")}</ul><p class="muted" style="margin:0;font-size:.85rem">Optional. A strong portfolio usually matters more; certifications help most in security, cloud and some enterprise hiring.</p></section>`:""}
     </div>
     ${(p.related||[]).length?`<section style="display:grid;gap:14px"><h2 class="h2">Related paths</h2><div class="pgrid">${p.related.map(id=>PATHS.index.find(x=>x.id===id)).filter(Boolean).map(x=>pathCard(x)).join("")}</div></section>`:""}`;
+    el.querySelector("#follow").onclick=()=>{ const on=!PATHS.isFollowed(p.id); PATHS.setFollow(p.id,on); const n=PATHS.followed().length;
+      UI.toast(on?`Following ${p.title}`:`Stopped following ${p.title}`, on?`You follow ${n} path${n>1?"s":""}. Each one shows on your Today page.`:"Your progress on it is kept.", on?"check":"x"); draw(); };
     el.querySelector("#jump").onclick=()=>el.querySelector("#road").scrollIntoView({behavior:"smooth"});
     el.querySelectorAll("[data-node]").forEach(b=>b.onclick=()=>openNode(b.dataset.node));
   };

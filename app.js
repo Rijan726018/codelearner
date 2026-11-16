@@ -19,7 +19,7 @@ let INTERVALS = [1,3,7,16,35,90,180];
 
 /* ---------- state ---------- */
 const D = {stages:[], research:null, q:{}, mods:[], lessons:{}, modById:{}};
-const P0 = () => ({lessons:{}, notes:{}, ms:{}, exams:{}, log:{}, solved:{}, tried:{}, steps:{}, nodes:{}, badges:{}, xpSeen:null, time:{}, manual:[], goal:null, calib:{}, qa:{}, claimed:{}, buys:[], frozen:{}, equip:{}, board:{}, coinSeen:null, podium:{}, auction:{}});
+const P0 = () => ({lessons:{}, notes:{}, ms:{}, exams:{}, log:{}, solved:{}, tried:{}, steps:{}, nodes:{}, badges:{}, xpSeen:null, time:{}, manual:[], goal:null, calib:{}, qa:{}, claimed:{}, buys:[], frozen:{}, equip:{}, board:{}, coinSeen:null, podium:{}, auction:{}, follow:{}});
 const normP = d => { const z=P0(); Object.keys(z).forEach(k=>{ if(d && d[k]!=null) z[k]=d[k]; }); return z; };
 let P = P0();   // progress doc: core lessons, notes, milestones, exams, activity log, problems, bootcamp steps, roadmap nodes, badges, practice time, confidence calibration, rewards (see rewards.js)
 let S = {cards:{}};                                        // spaced-repetition doc
@@ -188,7 +188,8 @@ function viewToday(el){
   if(nl) cont.push({i:"map", k:"Core curriculum", t:nl.title, s:`${D.modById[nl.mid].title} · day ${nl.li+1}`, a:`data-lesson="${nl.id}"`});
   const ns=BC.nextStep?.(); if(ns) cont.push({i:"cap", k:"Bootcamp", t:ns.step.title, s:`${ns.course.title} · step ${ns.idx+1} of ${ns.course.steps.length}`, a:`data-course="${ns.course.id}" data-step="${ns.idx}"`});
   const np=PJ.next?.(); if(np) cont.push({i:"rocket", k:"Build & Learn", t:np.project.title, s:`Step ${np.idx+1} of ${np.project.steps.length}: ${np.step.title}`, a:`data-project="${np.project.id}"`});
-  const cp=PATHS.current?.(); if(cp) cont.push({i:cp.icon, k:"Career path", t:cp.title, s:`${cp.done} of ${cp.total} topics done`, a:`data-path="${cp.id}"`});
+  const fp=PATHS.followed?.()||[], cps=fp.length?fp:[PATHS.current?.()].filter(Boolean);
+  cps.forEach(cp=>cont.push({i:cp.icon, k:fp.length?"Your path":"Career path", t:cp.title, s:`${cp.done} of ${cp.total} topics done`, a:`data-path="${cp.id}"`}));
   const dp=PB.daily?.(); if(dp) cont.push({i:"braces", k:"Problem of the day", t:dp.title, s:`${dp.difficulty} · ${dp.tags.slice(0,2).join(", ")}${P.solved?.[dp.id]?" · solved ✓":""}`, a:`data-problem="${dp.id}"`});
   el.innerHTML = `
   <section class="head">

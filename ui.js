@@ -462,7 +462,7 @@ function viewHome(el){
 }
 function pathCard(p){
   const done=(p.phases||[]).reduce((a,ph)=>a+ph.nodes.filter(n=>P.nodes?.[p.id+":"+n]==="done").length,0), tot=(p.phases||[]).reduce((a,ph)=>a+ph.nodes.length,0);
-  return `<button type="button" class="pcard rv" style="--h:${esc(p.hue)}" data-path="${esc(p.id)}"><span class="row" style="justify-content:space-between;align-items:start"><span class="pico">${icon(p.icon,"lg")}</span>${done?`<span class="pill acc">${Math.round(100*done/Math.max(1,tot))}%</span>`:`<span class="pill">${esc(p.cat)}</span>`}</span>
+  return `<button type="button" class="pcard rv" style="--h:${esc(p.hue)}" data-path="${esc(p.id)}"><span class="row" style="justify-content:space-between;align-items:start"><span class="pico">${icon(p.icon,"lg")}</span><span class="row" style="gap:6px">${PATHS.isFollowed?.(p.id)?`<span class="pill ok">${icon("check","sm")}Following</span>`:""}${done?`<span class="pill acc">${Math.round(100*done/Math.max(1,tot))}%</span>`:`<span class="pill">${esc(p.cat)}</span>`}</span></span>
     <h3>${esc(p.title)}</h3><p>${esc(p.tagline)}</p><span class="meta"><span>${p.phases.length} phases</span><span>·</span><span>${tot} topics</span><span>·</span><span>${esc(p.duration)}</span></span>${done?`<span class="bar"><i style="width:${100*done/Math.max(1,tot)}%"></i></span>`:""}</button>`;
 }
 
