@@ -440,6 +440,13 @@ main>*{min-width:0}
 /* ---------- bootcamp ---------- */
 .course{all:unset;cursor:pointer;box-sizing:border-box;position:relative;overflow:hidden;border-radius:22px;border:1px solid var(--line);background:var(--surface);padding:24px;display:grid;gap:12px;align-content:start;transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s}
 .course:hover{transform:translateY(-4px);box-shadow:0 22px 60px -28px var(--h)}
+.cwrap{position:relative;display:grid}
+.cwrap .mainbtn{all:unset;cursor:pointer;position:absolute;top:30px;right:30px;display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:99px;font:600 12px var(--body);background:color-mix(in oklab,var(--surface) 82%,transparent);border:1px solid var(--line);color:var(--muted);backdrop-filter:blur(8px);transition:transform .25s cubic-bezier(.2,.8,.2,1),color .15s,border-color .15s}
+.cwrap:hover .mainbtn{transform:translateY(-4px)}
+.cwrap .mainbtn:hover,.cwrap .mainbtn:focus-visible{color:var(--ink);border-color:var(--line2)}
+.cwrap .mainbtn[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.cwrap .mainbtn[aria-pressed="true"] svg{fill:currentColor}
+.course.main{border-color:var(--ink)}
 .course .art{height:110px;border-radius:14px;margin:-6px -6px 4px;background:radial-gradient(circle at 20% 30%,color-mix(in oklab,var(--h) 55%,transparent),transparent 55%),radial-gradient(circle at 85% 70%,color-mix(in oklab,var(--h) 35%,transparent),transparent 55%),var(--sunk);display:grid;place-items:center;font:800 2.4rem var(--mono);color:color-mix(in oklab,var(--h) 80%,var(--ink));letter-spacing:-.04em}
 .stepper{display:flex;flex-wrap:wrap;gap:5px}
 .stepper button{all:unset;cursor:pointer;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font:600 11.5px var(--mono);background:var(--sunk);color:var(--muted);border:1px solid var(--line)}

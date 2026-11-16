@@ -4,7 +4,17 @@
    Projects group their steps into milestones and add a live demo of the finished app. ---------- */
 const BC = {courses:[], byId:{}, tracks:[],
   stepIndex(c){ return c.steps.findIndex(s=>!P.steps?.[s.id]); },
-  nextStep(){ let best=null; for(const c of this.courses){ const done=c.steps.filter(s=>P.steps?.[s.id]).length; const i=this.stepIndex(c); if(done>0 && i>=0) return {course:c, idx:i, step:c.steps[i]}; if(!best && i>=0) best={course:c, idx:i, step:c.steps[i]}; } return best; }
+  // Your choices, synced with your progress. Both maps hold 2*time+1 (on) or 2*time (off), so merging two devices keeps
+  // the latest choice (mergeDeep keeps the larger number). Only one course is main: setting one switches the others off.
+  picked(){ return this.tracks.filter(t=>(P.bcTracks?.[t.id]||0)%2===1).map(t=>t.id); },
+  pickTrack(id,on){ P.bcTracks=P.bcTracks||{}; P.bcTracks[id]=Date.now()*2+(on?1:0); save("p"); },
+  clearTracks(){ this.picked().forEach(id=>this.pickTrack(id,false)); },
+  main(){ let best=null, bt=0; Object.entries(P.bcMain||{}).forEach(([id,v])=>{ if(v%2===1 && v>bt && this.byId[id]){ best=this.byId[id]; bt=v; } }); return best; },
+  setMain(id,on){ const m=P.bcMain=P.bcMain||{}, t=Date.now()*2; Object.keys(m).forEach(k=>{ if(m[k]%2===1) m[k]=t; }); m[id]=t+(on?1:0); save("p"); },
+  // What "Continue" opens: your main course if it has steps left, else the next step in the tracks you picked, else anywhere
+  focusStep(){ const m=this.main(), i=m?this.stepIndex(m):-1; if(i>=0) return {course:m, idx:i, step:m.steps[i], main:true};
+    const pk=this.picked(); return this.nextStep(pk.length?this.courses.filter(c=>pk.includes(c.track)):this.courses); },
+  nextStep(list=this.courses){ let best=null; for(const c of list){ const done=c.steps.filter(s=>P.steps?.[s.id]).length; const i=this.stepIndex(c); if(done>0 && i>=0) return {course:c, idx:i, step:c.steps[i]}; if(!best && i>=0) best={course:c, idx:i, step:c.steps[i]}; } return best; }
 };
 const PJ = {list:[], byId:{},
   next(){ for(const p of this.list){ const d=courseDone(p), i=BC.stepIndex(p); if(d>0 && i>=0) return {project:p, idx:i, step:p.steps[i]}; } return null; }
@@ -29,26 +39,30 @@ SEARCH_SOURCES.push(()=>PJ.list.flatMap(p=>[{t:p.title, sub:`${p.level} · ${LAN
   ...p.steps.map((s,i)=>({t:s.title, sub:`Build: ${p.title} · step ${i+1}`, kind:"Step", i:"rocket", r:{v:"make", id:p.id, step:i}}))]));
 
 const courseDone = c => c.steps.filter(s=>P.steps?.[s.id]).length;
-let bcTrack="all";
 function viewBootcamp(el){
   if(!BC.courses.length){ el.innerHTML=`<div class="empty">The bootcamp didn't load. Reload the page to try again.</div>`; return; }
-  const total=BC.courses.reduce((a,c)=>a+c.steps.length,0), done=BC.courses.reduce((a,c)=>a+courseDone(c),0), ns=BC.nextStep();
+  const total=BC.courses.reduce((a,c)=>a+c.steps.length,0), done=BC.courses.reduce((a,c)=>a+courseDone(c),0), ns=BC.focusStep(), pk=BC.picked(), mc=BC.main();
   el.innerHTML=`<section class="head"><span class="eyebrow">Zero experience required</span><h1 class="h1">The <span class="gt">Bootcamp</span></h1>
     <p class="lede">Learn by doing, one tiny step at a time. Each step explains one idea, asks you to write a few lines, and checks your code instantly. By the end of a course you'll have built something real, entirely in your browser.</p>
-    <div class="row">${ns?`<button class="btn grad lg" data-course="${ns.course.id}" data-step="${ns.idx}">${icon("play")}${done?"Continue":"Start"}: ${esc(ns.course.title)}, step ${ns.idx+1}</button>`:`<span class="pill ok">Every course complete. You're a graduate.</span>`}<span class="pill acc">${done} / ${total} steps passed</span></div></section>
-  <div class="chips" role="group" aria-label="Track">${[{id:"all",name:"All tracks"},...BC.tracks].map(t=>`<button type="button" class="chip" data-bct="${t.id}" aria-pressed="${bcTrack===t.id}">${t.icon?icon(t.icon,"sm"):""}${esc(t.name)}</button>`).join("")}</div>
-  ${(BC.tracks.length?BC.tracks:[{id:"all",name:"Courses"}]).filter(t=>bcTrack==="all"||t.id===bcTrack).map(t=>{ const cs=BC.courses.filter(c=>t.id==="all"||c.track===t.id); if(!cs.length) return "";
+    <div class="row">${ns?`<button class="btn grad lg" data-course="${ns.course.id}" data-step="${ns.idx}">${icon("play")}${done?"Continue":"Start"}: ${esc(ns.course.title)}, step ${ns.idx+1}</button>`:`<span class="pill ok">Every course complete. You're a graduate.</span>`}<span class="pill acc">${done} / ${total} steps passed</span></div>
+    <p class="muted bcfocus" style="margin:0;font-size:.92rem">${mc?`${icon("star","sm")} Your main course is <b style="color:var(--ink)">${esc(mc.title)}</b>${ns&&!ns.main?" (finished, so Continue moves on to your tracks)":""}. Star a different course to switch, or press its star again to clear it.`:`Star a course to make it your main course: Continue and your Today page will always take you back to it.`}</p></section>
+  <div style="display:grid;gap:8px"><div class="chips" role="group" aria-label="Tracks">${[{id:"all",name:"All tracks"},...BC.tracks].map(t=>`<button type="button" class="chip" data-bct="${t.id}" aria-pressed="${t.id==="all"?!pk.length:pk.includes(t.id)}">${t.icon?icon(t.icon,"sm"):""}${esc(t.name)}</button>`).join("")}</div>
+    <span class="muted" style="font-size:.86rem">${pk.length?`Showing ${pk.length} of ${BC.tracks.length} tracks. Tap a track to add or remove it, or All tracks to see everything.`:"Tap tracks to pick the ones you're focusing on. You can pick more than one."}</span></div>
+  ${(BC.tracks.length?BC.tracks:[{id:"all",name:"Courses"}]).filter(t=>!pk.length||pk.includes(t.id)).map(t=>{ const cs=BC.courses.filter(c=>t.id==="all"||c.track===t.id); if(!cs.length) return "";
     const td=cs.reduce((a,c)=>a+courseDone(c),0), tt=cs.reduce((a,c)=>a+c.steps.length,0);
     return `<section class="bctrack" style="display:grid;gap:14px"><div class="sec-h"><div class="head"><span class="eyebrow">${cs.length} course${cs.length===1?"":"s"} · ${td} / ${tt} steps</span><h2 class="h2">${esc(t.name)}</h2></div>${t.blurb?`<p class="lede" style="max-width:52ch;margin:0">${esc(t.blurb)}</p>`:""}</div>
     <div class="grid2">${cs.map(c=>{ const i=BC.courses.indexOf(c), d=courseDone(c), pct=Math.round(100*d/c.steps.length);
-    return `<button type="button" class="course rv" style="--h:${esc(c.hue)}" data-course="${c.id}"><div class="art">${esc(c.art)}</div>
+    const isMain=mc===c;
+    return `<div class="cwrap rv"><button type="button" class="course ${isMain?"main":""}" style="--h:${esc(c.hue)}" data-course="${c.id}"><div class="art">${esc(c.art)}</div>
       <div class="row" style="justify-content:space-between"><span class="eyebrow">Course ${i+1} · ${esc(LANGNAME[c.lang]||c.lang)}${c.level?` · ${esc(c.level)}`:""}</span>${d===c.steps.length?`<span class="pill ok">${icon("award","sm")}Completed</span>`:d?`<span class="pill acc">${pct}%</span>`:`<span class="pill">${c.steps.length} steps · ~${esc(c.hours)}</span>`}</div>
       <h3 class="h3" style="font-size:1.35rem">${esc(c.title)}</h3><p class="muted" style="margin:0">${esc(c.desc)}</p>
       <div class="bar"><i style="width:${pct}%;background:var(--h)"></i></div>
-      <span class="muted" style="font-size:.86rem">${icon("rocket","sm")} You'll build: <b style="color:var(--ink)">${esc(c.project)}</b></span></button>`; }).join("")}</div></section>`; }).join("")}
+      <span class="muted" style="font-size:.86rem">${icon("rocket","sm")} You'll build: <b style="color:var(--ink)">${esc(c.project)}</b></span></button><button type="button" class="mainbtn" data-main="${c.id}" aria-pressed="${isMain}" title="${isMain?"Your main course. Press to clear":"Make this your main course"}">${icon("star","sm")}${isMain?"Main course":"Make main"}</button></div>`; }).join("")}</div></section>`; }).join("")}
   <section class="panel"><h2 class="h3">How the bootcamp fits the rest of CodeBay</h2>
     <div class="grid3">${[["cap","1. Bootcamp","Your first 10–20 hours: the syntax and the feeling of making things work."],["rocket","2. Build & Learn","Pick a real project and build it step by step, learning each idea at the moment you need it."],["map","3. Core curriculum","The 10,000-Hour Map: daily lessons, exams and spaced review, from Python basics to distributed systems."]].map(([i,t,d])=>`<div style="display:grid;gap:6px"><span class="row" style="gap:8px;color:var(--accent)">${icon(i)}<b style="color:var(--ink)">${t}</b></span><span class="muted" style="font-size:.92rem">${d}</span></div>`).join("")}</div></section>`;
-  el.querySelectorAll("[data-bct]").forEach(b=>b.onclick=()=>{ bcTrack=b.dataset.bct; render(); });
+  el.querySelectorAll("[data-bct]").forEach(b=>b.onclick=()=>{ const id=b.dataset.bct; if(id==="all") BC.clearTracks(); else BC.pickTrack(id, !BC.picked().includes(id)); render(); });
+  el.querySelectorAll("[data-main]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); const c=BC.byId[b.dataset.main], on=BC.main()!==c; BC.setMain(c.id,on);
+    UI.toast(on?`${c.title} is your main course`:"Main course cleared", on?"Continue and your Today page now take you here first.":"Continue picks the next step in your tracks.", on?"star":"x"); render(); });
 }
 function viewCourse(el){
   const c=BC.byId[route.id]; if(!c){ go({v:"bootcamp"}); return; }
