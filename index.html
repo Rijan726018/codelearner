@@ -858,6 +858,37 @@ select.sel{border:1px solid var(--line);border-radius:11px;padding:8px 10px;font
 .lb{list-style:none;margin:0;padding:0;display:grid;gap:4px}
 .lb li{display:grid;grid-template-columns:34px 34px minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:8px 10px;border-radius:12px}
 .lb li:nth-child(odd){background:var(--surface2)}
+/* mastery: concept levels, the warm-up, problem reviews */
+.lvl{display:inline-flex;align-items:center;gap:6px;font:600 11px var(--mono);padding:3px 9px;border-radius:99px;background:var(--sunk);color:var(--muted);white-space:nowrap}
+.lvl .dots{display:inline-flex;gap:2px}.lvl .dots i{width:6px;height:6px;border-radius:50%;background:var(--line2)}
+.lvl.l1 .dots i:nth-child(-n+1),.lvl.l2 .dots i:nth-child(-n+2),.lvl.l3 .dots i{background:var(--ink)}
+.lvl.l3{background:var(--ok-soft);color:var(--ok)}.lvl.l3 .dots i{background:var(--ok)}
+.lvl.l2,.lvl.l1{color:var(--ink)}
+.pill.sm{font-size:10px;padding:2px 7px;vertical-align:1px}
+#pwarm,.warm,.warm .cex{min-width:0}
+.warm pre{max-width:100%;overflow-x:auto}
+.warm{border-color:var(--line2);gap:12px}
+.warm .wkid{margin:0;font-size:1.02rem}
+.warm .wq{display:grid;gap:2px}
+.warm textarea{font:13px/1.5 var(--mono);resize:vertical;width:100%;box-sizing:border-box}
+.wfb{display:grid;gap:10px;padding:14px;border-radius:14px;border:1px solid var(--line);background:var(--surface2)}
+.wfb.ok{border-color:color-mix(in oklab,var(--ok) 45%,var(--line))}.wfb.no{border-color:var(--line2)}
+.wfb .btn{justify-self:start}
+.held{opacity:.35;pointer-events:none;filter:saturate(.4);transition:opacity .3s}
+.rvban{display:grid;gap:6px;padding:12px 14px;border-radius:14px;background:var(--accent-soft);border:1px solid var(--line)}
+.rvban .btn,.rvban .pill{justify-self:start}
+.rqlist{display:grid;gap:6px}
+.rqi{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:9px 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface)}
+.rqi:hover,.rqi:focus-visible{border-color:var(--line2);background:var(--surface2)}
+.rqi b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rqi .muted{font-size:.82rem;white-space:nowrap}
+@media (max-width:560px){.rqi{grid-template-columns:auto minmax(0,1fr) auto}.rqi .muted{display:none}}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.ctile{all:unset;box-sizing:border-box;cursor:pointer;display:grid;gap:8px;align-content:start;padding:14px;border-radius:16px;border:1px solid var(--line);background:var(--surface);transition:transform .2s cubic-bezier(.2,.8,.2,1),border-color .15s}
+.ctile:hover,.ctile:focus-visible{transform:translateY(-2px);border-color:var(--line2)}
+.ctile.l3{border-color:color-mix(in oklab,var(--ok) 35%,var(--line))}
+.ctile>.muted{font-size:.86rem}
+.cmeter{display:flex;gap:2px;height:6px;border-radius:4px;overflow:hidden;background:var(--sunk)}
+.cmeter i{display:block;background:var(--muted)}.cmeter i.m{background:var(--ok)}
 /* practice-time analytics: one categorical colour per section, fixed order (validated light and dark) */
 :root{--tc1:#2a78d6;--tc2:#eb6834;--tc3:#1baf7a;--tc4:#eda100;--tc5:#e87ba4;--tc6:#008300}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--tc1:#3987e5;--tc2:#d95926;--tc3:#199e70;--tc4:#c98500;--tc5:#d55181;--tc6:#0ca30c}}
@@ -1340,6 +1371,7 @@ h1.rising .gt .w>span{background:var(--grad);-webkit-background-clip:text;backgr
 <script src="runner.js" charset="utf-8"></script>
 <script src="judge.js" charset="utf-8"></script>
 <script src="problems.js" charset="utf-8"></script>
+<script src="mastery.js" charset="utf-8"></script>
 <script src="bootcamp.js" charset="utf-8"></script>
 <script src="paths.js" charset="utf-8"></script>
 <script src="clock.js" charset="utf-8"></script>

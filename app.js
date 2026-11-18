@@ -19,7 +19,7 @@ let INTERVALS = [1,3,7,16,35,90,180];
 
 /* ---------- state ---------- */
 const D = {stages:[], research:null, q:{}, mods:[], lessons:{}, modById:{}};
-const P0 = () => ({lessons:{}, notes:{}, ms:{}, exams:{}, log:{}, solved:{}, tried:{}, steps:{}, nodes:{}, badges:{}, xpSeen:null, time:{}, manual:[], goal:null, calib:{}, qa:{}, claimed:{}, buys:[], frozen:{}, equip:{}, board:{}, coinSeen:null, podium:{}, auction:{}, follow:{}, bcTracks:{}, bcMain:{}});
+const P0 = () => ({lessons:{}, notes:{}, ms:{}, exams:{}, log:{}, solved:{}, tried:{}, steps:{}, nodes:{}, badges:{}, xpSeen:null, time:{}, manual:[], goal:null, calib:{}, qa:{}, claimed:{}, buys:[], frozen:{}, equip:{}, board:{}, coinSeen:null, podium:{}, auction:{}, follow:{}, bcTracks:{}, bcMain:{}, mastery:{}, predict:{}, learned:{}});
 const normP = d => { const z=P0(); Object.keys(z).forEach(k=>{ if(d && d[k]!=null) z[k]=d[k]; }); return z; };
 let P = P0();   // progress doc: core lessons, notes, milestones, exams, activity log, problems, bootcamp steps, roadmap nodes, badges, practice time, confidence calibration, rewards (see rewards.js)
 let S = {cards:{}};                                        // spaced-repetition doc
@@ -151,8 +151,8 @@ function go(r){ route=r; tip.hidden=true; Palette.close?.(); closeDrawers();
   if(document.startViewTransition && !matchMedia("(prefers-reduced-motion: reduce)").matches) document.startViewTransition(swap); else swap(); }
 window.addEventListener("popstate",()=>{ const r=parseHash(); route=r||{v:"home"}; closeDrawers(); render(); });
 $("#tabs").addEventListener("click",e=>{ const b=e.target.closest("[data-v]"); if(b) go({v:b.dataset.v}); });
-function updateBadge(){ const n=dueCards().length, bd=$("#duebadge"); if(!bd) return; bd.hidden=!n; bd.textContent=n; }
-const TAB_OF = {lesson:"map", exam:"map", path:"paths", problem:"problems", course:"bootcamp", project:"build", make:"build", lot:"auction", sell:"auction"};
+function updateBadge(){ const n=dueCards().length+(typeof Mastery!=="undefined"&&PB.list.length?Mastery.due().length:0), bd=$("#duebadge"); if(!bd) return; bd.hidden=!n; bd.textContent=n; }
+const TAB_OF = {concepts:"problems", lesson:"map", exam:"map", path:"paths", problem:"problems", course:"bootcamp", project:"build", make:"build", lot:"auction", sell:"auction"};
 const currentTab = () => TAB_OF[route.v] || route.v;
 function render(){
   UI.syncNav(currentTab());
@@ -178,6 +178,8 @@ function viewToday(el){
   const greeting = deep ? "Deep-work day. Reviews first, then put most of today into your project." : (wd===2||wd===4) ? "Long day: reviews, then two lessons back to back. Projects start once you have a couple of lessons in." : "Short session: reviews first, then one lesson.";
   const items=[];
   items.push(`<li class="${due?"":"done"}"><div><h4>${due?`Review ${due} card${due>1?"s":""}`:"Reviews: all caught up"}</h4><p>${due?`About ${Math.max(2,Math.round(due*0.6))} min. Mixed topics, so you practise choosing the right idea.`:"New cards appear here as you finish lessons and exams."}</p></div>${due?`<button class="btn primary" data-act="review">Start review</button>`:""}</li>`);
+  const pdue=typeof Mastery!=="undefined"?Mastery.due():[];
+  if(pdue.length) items.push(`<li><div><h4>Re-solve ${pdue.length} problem${pdue.length>1?"s":""} from memory</h4><p>Blank editor, new example numbers, no hints. This is how a solution sticks${pdue.length>3?". Do 3 today if time is short":""}.</p></div><button class="btn primary" data-review="${pdue[0].id}">Start: ${esc(pdue[0].title)}</button></li>`);
   if(nl && !deep) items.push(`<li><div><h4>Lesson: ${esc(nl.title)}</h4><p>${esc(D.modById[nl.mid].title)} · Day ${nl.li+1} of ${D.modById[nl.mid].lessons.length} · ~${nl.minutes||60} min</p></div><button class="btn primary" data-lesson="${nl.id}">Open lesson</button></li>`);
   if(cm && !nl && !passed(cm)) items.push(`<li><div><h4>Exam: ${esc(cm.title)}</h4><p>You finished every lesson in this module. Score ${PASS*100}% to unlock the next one.</p></div><button class="btn exam" data-exam="${cm.id}">Take exam</button></li>`);
   if(projM && nextMs>=0) items.push(`<li><div><h4>Project: ${esc(projM.project.title)}</h4><p>Next milestone: ${esc(projM.project.milestones[nextMs])}</p></div><button class="btn" data-act="projects">Open projects</button></li>`);
@@ -518,7 +520,7 @@ function viewReview(el){
   if(!route.started){
     const total=Object.keys(S.cards).length, boxes=Array(INTERVALS.length).fill(0); Object.values(S.cards).forEach(c=>boxes[c.b]++);
     const mx=Math.max(1,...boxes);
-    el.innerHTML = `<section style="display:grid;gap:10px"><span class="eyebrow">Spaced repetition</span><h1 class="h1">${due.length?`${due.length} card${due.length>1?"s":""} due`:"All caught up"}</h1>
+    el.innerHTML = `${typeof reviewQueueHTML==="function"?reviewQueueHTML(false):""}<section style="display:grid;gap:10px"><span class="eyebrow">Spaced repetition</span><h1 class="h1">${due.length?`${due.length} card${due.length>1?"s":""} due`:"All caught up"}</h1>
       <p class="lede">Each card comes back just before you'd forget it. Get it right and the gap grows (${INTERVALS.join(" → ")} days). Miss it and it resets to tomorrow. Topics are shuffled together on purpose.</p></section>
       <div class="row">${due.length?`<button class="btn primary" id="go">Review ${Math.min(due.length,25)} now</button>`:`<button class="btn" data-act="map">Learn something new</button>`}<button class="btn ghost" data-act="practice">Practise by level instead</button></div>
       <section class="panel"><h2 class="h2">Your deck by box</h2>${total?`<div class="intervals">${boxes.map((n,k)=>`<div data-tip="Box ${k+1}: ${n} cards, next gap ${INTERVALS[k]} days"><span>${n}</span><i style="height:${8+100*n/mx}px"></i><span>${INTERVALS[k]}d</span></div>`).join("")}</div><p class="muted" style="margin:0;font-size:.85rem">${total} cards. Cards move right as you remember them for longer.</p>`:`<div class="empty">No cards yet. Finish a lesson's questions and they'll start appearing here.</div>`}</section>`;
