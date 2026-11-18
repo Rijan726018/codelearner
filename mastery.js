@@ -149,3 +149,59 @@ function conceptDrawer(data, lv, id){
 }
 VIEWS.concepts = viewConcepts;
 SEARCH_SOURCES.push(() => [{t:"Your concepts", sub:"Mastery level of every idea, and problem reviews due", kind:"Page", i:"layers", r:{v:"concepts"}}]);
+
+/* ---------- hint ladder: a nudge, then the idea behind it, then part of the code ----------
+   P.helps[problemId] = {r, d}: the highest rung opened (1 nudge, 2 idea, 3 code, 4 editorial) and when. A first solve
+   with no rung opened is a clean solve and earns a bonus of half the problem's XP; in a review, any rung means help. */
+const RUNGS = [["A nudge","Just enough to get you moving."],["The idea behind it","The pattern this problem needs, explained."],["Part of the code","The opening of one solution. You write the rest."]];
+const cleanBonus = p => Math.round((XPV[p?.difficulty] || 0) / 2);
+const Help = {
+  rung(id){ return P.helps?.[id]?.r || 0; },
+  use(id, r){ P.helps = P.helps || {}; const h = P.helps[id]; if(!h || h.r < r){ P.helps[id] = {r, d: today()}; save("p", true); } Mastery.helped[id] = true; },
+  clean(id){ return !this.rung(id); }
+};
+// the first ~40% of a reference solution's body, then a "your turn" line
+function partialCode(src, lang){
+  const lines = src.split("\n"), py = lang !== "js", isBody = (l, i) => i > 0 && l.trim() && !/^\s*[}\])]*;?\s*$/.test(l) && !/^\s*(#|\/\/)/.test(l);
+  const body = lines.map((l, i) => ({l, i})).filter(x => isBody(x.l, x.i));
+  if(body.length < 2) return lines.slice(0, 1).join("\n") + (py ? "\n    # ... the rest is yours" : "\n  // ... the rest is yours\n}");
+  const cut = body[Math.max(0, Math.ceil(body.length * 0.4) - 1)].i, nextB = body.find(x => x.i > cut), ind = (nextB ? nextB.l : body[body.length - 1].l).match(/^\s*/)[0];
+  return lines.slice(0, cut + 1).join("\n") + `\n${ind}${py ? "# ... the rest is yours" : "// ... the rest is yours"}`;
+}
+async function hintLadder(host, p, lang, onUse){
+  const L = lang === "js" ? "js" : "py", data = await loadConcepts(); if(!host.isConnected) return;
+  const big = (data?.byProblem?.[p.id] || []).map(i => data.cards[i]).find(c => c && c.kind === "pattern" && c.id !== "big-o");
+  const draw = () => { const r = Help.rung(p.id);
+    const body = k => k === 0 ? `<p>${md(p.hints[0] || "")}</p>`
+      : k === 1 ? `${p.hints[1] ? `<p>${md(p.hints[1])}</p>` : ""}${big ? conceptCard(big, L === "js" ? "js" : "python", true) : ""}`
+      : `<p class="muted" style="margin:0">The opening of one solution in ${L === "js" ? "JavaScript" : "Python"}. Finish it in your own words: don't just copy it.</p>${codeBlock(partialCode(p.solution[L], L), null, L === "js" ? "javascript" : "python")}`;
+    host.innerHTML = `<div class="ladder">${r ? "" : `<p class="lnote">${icon("star","sm")} Solve it with no hints for a <b>clean-solve bonus of +${cleanBonus(p)} XP</b>. Hints never block you: open them in order, only as far as you need.</p>`}
+      ${RUNGS.map(([t, s], k) => { const open = r > k, next = r === k;
+        return `<div class="rung ${open ? "open" : next ? "next" : "locked"}"><div class="rh"><span class="rn">${k + 1}</span><span><b>${t}</b><small>${s}</small></span>${next ? `<button type="button" class="btn sm" data-rung="${k + 1}">Show ${t.toLowerCase()}</button>` : !open ? `<span class="muted" style="font-size:.8rem">after step ${k}</span>` : ""}</div>${open ? `<div class="rb prose">${body(k)}</div>` : ""}</div>`; }).join("")}
+      ${r >= 3 ? `<p class="muted" style="margin:0;font-size:.88rem">Still stuck? The <b>Editorial</b> tab has the whole solution and why it works. Read it, close it, then write it again from memory.</p>` : ""}</div>`;
+    host.querySelectorAll("[data-rung]").forEach(b => b.onclick = () => { Help.use(p.id, +b.dataset.rung); onUse?.(); draw(); });
+  };
+  draw();
+}
+
+/* ---------- debug challenges: a solved problem's reference solution with one bug planted (tools/build_debug.mjs) ----------
+   P.debugged[problemId] = {d, lang, clean}. Unlocked once the problem is solved, so the code never spoils the problem. */
+XPV.debug = 20;
+let DEBUG_DATA = null, DEBUG_SYNC;   // DEBUG_SYNC: the loaded data, for pages that render synchronously
+const loadDebug = () => DEBUG_DATA || (DEBUG_DATA = fetch("data/debug.json").then(r => r.ok ? r.json() : null).catch(() => null).then(d => (DEBUG_SYNC = d)));
+const Debug = {
+  get(data, id, L){ return data?.problems?.[id]?.[L] || null; },
+  fixed(id){ return !!P.debugged?.[id]; },
+  between(a, b){ return Object.values(P.debugged || {}).filter(v => v?.d >= a && v?.d <= b).length; },
+  available(data, L){ return PB.list.filter(p => P.solved?.[p.id] && !this.fixed(p.id) && this.get(data, p.id, L)); }
+};
+async function debugPanel(host){
+  const data = await loadDebug(); if(!host.isConnected) return;
+  if(!data){ host.remove(); return; }
+  const L = pbLang === "js" ? "js" : "py", av = Debug.available(data, L), total = Object.keys(data.problems).length, fixed = Object.keys(P.debugged || {}).length;
+  host.innerHTML = `<div class="sec-h"><h2 class="h3">${icon("bug")} Debug challenges</h2><span class="muted" style="font-size:.86rem">${fixed} fixed · ${total} in all</span></div>
+    <p class="muted" style="margin:0">Working code with one bug planted in it. Run it, read the failing test, find the line and fix it. Each one unlocks when you've solved that problem, so it never gives an answer away. <b>+${XPV.debug} XP</b> each.</p>
+    ${av.length ? `<div class="rqlist">${av.slice(0, 4).map(p => `<button type="button" class="rqi" data-debug="${p.id}"><span class="diff ${p.difficulty}">${p.difficulty}</span><b>${esc(p.title)}</b><span class="muted">${esc(Debug.get(data, p.id, L).kind)}</span>${icon("arrow","sm")}</button>`).join("")}</div>${av.length > 4 ? `<span class="muted" style="font-size:.86rem">${av.length - 4} more ready.</span>` : ""}`
+      : `<p style="margin:0">${fixed ? "You've fixed every challenge you've unlocked. Solve more problems to unlock more." : "Solve any problem to unlock its debug challenge."}</p>`}`;
+}
+document.addEventListener("click", e => { const b = e.target.closest("[data-debug]"); if(b){ e.preventDefault(); go({v:"problem", id:b.dataset.debug, debug:1}); } });

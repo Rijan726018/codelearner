@@ -58,7 +58,7 @@ const Rewards = (() => {
   function between(a, b){
     const inR = v => { const d = dayOf(v); return d != null && d >= a && d <= b; };
     const pb = PB.byId || {}; let solved = 0, sxp = 0;
-    Object.entries(P.solved || {}).forEach(([id, v]) => { if(inR(v)){ solved++; sxp += XPV[pb[id]?.difficulty] || 0; } });
+    Object.entries(P.solved || {}).forEach(([id, v]) => { if(inR(v)){ solved++; const x = XPV[pb[id]?.difficulty] || 0; sxp += x + (v?.clean ? Math.round(x / 2) : 0); } });
     const lessons = Object.entries(P.lessons || {}).filter(([k, v]) => D.lessons[k] && inR(v)).length;
     const steps = Object.values(P.steps || {}).filter(inR).length, ms = Object.values(P.ms || {}).filter(inR).length;
     const exams = D.mods.filter(m => { const e = P.exams[m.id]; return e && e.best >= PASS && e.last >= a && e.last <= b; }).length;
@@ -69,8 +69,8 @@ const Rewards = (() => {
       sec += Object.values(per[k] || {}).reduce((x, y) => x + y, 0);
       qa += P.qa?.[k]?.n || 0; sure += P.qa?.[k]?.sure || 0; }
     const pod = PB.daily?.(); const podDone = pod && inR(P.solved?.[pod.id]) ? 1 : 0;
-    const rvp = typeof Mastery !== "undefined" ? Mastery.passesBetween(a, b) : 0;
-    return {lessons, solved, steps, ms, exams, days, sec, qa, sure, pod: podDone, reviews: rvp, xp: lessons*XPV.lesson + sxp + steps*XPV.step + ms*XPV.milestone + exams*XPV.exam + rvp*(XPV.review || 0)};
+    const rvp = typeof Mastery !== "undefined" ? Mastery.passesBetween(a, b) : 0, dbx = typeof Debug !== "undefined" ? Debug.between(a, b) : 0;
+    return {lessons, solved, steps, ms, exams, days, sec, qa, sure, pod: podDone, reviews: rvp, xp: lessons*XPV.lesson + sxp + steps*XPV.step + ms*XPV.milestone + exams*XPV.exam + rvp*(XPV.review || 0) + dbx*(XPV.debug || 0)};
   }
   // three daily challenges and three weekly ones, the same for everyone on a given date
   function pickDaily(t){

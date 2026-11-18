@@ -889,6 +889,32 @@ select.sel{border:1px solid var(--line);border-radius:11px;padding:8px 10px;font
 .ctile>.muted{font-size:.86rem}
 .cmeter{display:flex;gap:2px;height:6px;border-radius:4px;overflow:hidden;background:var(--sunk)}
 .cmeter i{display:block;background:var(--muted)}.cmeter i.m{background:var(--ok)}
+/* hint ladder */
+.ladder{display:grid;gap:8px}
+.ladder .lnote{margin:0;font-size:.9rem;padding:10px 12px;border-radius:12px;background:var(--surface2);border:1px solid var(--line)}
+.rung{border:1px solid var(--line);border-radius:14px;background:var(--surface);overflow:hidden}
+.rung.locked{opacity:.55}
+.rung .rh{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 12px}
+.rung .rh small{display:block;color:var(--muted);font-size:.82rem}
+.rung .rn{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font:600 12px var(--mono);background:var(--sunk);color:var(--muted)}
+.rung.open .rn,.rung.next .rn{background:var(--ink);color:var(--bg)}
+.rung .rb{padding:0 14px 14px;display:grid;gap:10px;min-width:0}
+.rung .rb pre{max-width:100%;overflow-x:auto}
+/* debug challenges */
+.dbgban{background:color-mix(in oklab,var(--bad) 10%,var(--surface))}
+.dbgbtn{justify-self:start}
+#dbgclues{gap:8px;align-items:center}
+/* focus timer */
+#focuspill{position:fixed;left:16px;bottom:16px;z-index:150;display:flex;align-items:center;gap:8px;padding:7px 8px 7px 14px;border-radius:99px;background:var(--surface);border:1px solid var(--line2);box-shadow:var(--shadow);font:600 13px var(--mono)}
+#focuspill b{font-variant-numeric:tabular-nums;font-weight:600}
+#focuspill .fp-dot{width:8px;height:8px;border-radius:50%;background:var(--ok);animation:fpulse 2s ease-in-out infinite}
+#focuspill.break .fp-dot{background:var(--accent);animation:none}
+#focuspill button{all:unset;cursor:pointer;font:600 12px var(--body);padding:5px 10px;border-radius:99px;background:var(--sunk);color:var(--ink)}
+#focuspill button:hover,#focuspill button:focus-visible{background:var(--line2)}
+@keyframes fpulse{50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){#focuspill .fp-dot{animation:none}}
+.drawer.recap{width:min(560px,100vw)}
+.drawer.recap .kpis b{display:flex;align-items:center;gap:6px}
 /* practice-time analytics: one categorical colour per section, fixed order (validated light and dark) */
 :root{--tc1:#2a78d6;--tc2:#eb6834;--tc3:#1baf7a;--tc4:#eda100;--tc5:#e87ba4;--tc6:#008300}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--tc1:#3987e5;--tc2:#d95926;--tc3:#199e70;--tc4:#c98500;--tc5:#d55181;--tc6:#0ca30c}}
@@ -1375,6 +1401,7 @@ h1.rising .gt .w>span{background:var(--grad);-webkit-background-clip:text;backgr
 <script src="bootcamp.js" charset="utf-8"></script>
 <script src="paths.js" charset="utf-8"></script>
 <script src="clock.js" charset="utf-8"></script>
+<script src="session.js" charset="utf-8"></script>
 <script src="firebase-config.js" charset="utf-8"></script>
 <script src="cloud.js" charset="utf-8"></script>
 <script src="rewards.js" charset="utf-8"></script>

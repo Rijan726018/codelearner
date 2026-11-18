@@ -19,7 +19,7 @@ let INTERVALS = [1,3,7,16,35,90,180];
 
 /* ---------- state ---------- */
 const D = {stages:[], research:null, q:{}, mods:[], lessons:{}, modById:{}};
-const P0 = () => ({lessons:{}, notes:{}, ms:{}, exams:{}, log:{}, solved:{}, tried:{}, steps:{}, nodes:{}, badges:{}, xpSeen:null, time:{}, manual:[], goal:null, calib:{}, qa:{}, claimed:{}, buys:[], frozen:{}, equip:{}, board:{}, coinSeen:null, podium:{}, auction:{}, follow:{}, bcTracks:{}, bcMain:{}, mastery:{}, predict:{}, learned:{}});
+const P0 = () => ({lessons:{}, notes:{}, ms:{}, exams:{}, log:{}, solved:{}, tried:{}, steps:{}, nodes:{}, badges:{}, xpSeen:null, time:{}, manual:[], goal:null, calib:{}, qa:{}, claimed:{}, buys:[], frozen:{}, equip:{}, board:{}, coinSeen:null, podium:{}, auction:{}, follow:{}, bcTracks:{}, bcMain:{}, mastery:{}, predict:{}, learned:{}, helps:{}, debugged:{}});
 const normP = d => { const z=P0(); Object.keys(z).forEach(k=>{ if(d && d[k]!=null) z[k]=d[k]; }); return z; };
 let P = P0();   // progress doc: core lessons, notes, milestones, exams, activity log, problems, bootcamp steps, roadmap nodes, badges, practice time, confidence calibration, rewards (see rewards.js)
 let S = {cards:{}};                                        // spaced-repetition doc
@@ -205,6 +205,7 @@ function viewToday(el){
     <span class="muted" style="font-size:.88rem">${(g.next-g.xp).toLocaleString()} XP to level ${g.level+1} · ${Object.keys(P.badges||{}).length} badges · <button class="btn ghost sm" data-act="profile">View profile</button></span></div></div></section>
   ${typeof Rewards!=="undefined"?Rewards.todayCard():""}
   ${typeof clockCard==="function"?clockCard():""}
+  ${typeof focusCard==="function"?focusCard():""}
   <div class="stats">
     <div class="stat">${icon("flame")}<b>${streak()}</b><span>day streak</span></div>
     <div class="stat">${icon("refresh")}<b>${due}</b><span>reviews due</span></div>
