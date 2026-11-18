@@ -142,7 +142,7 @@ const NAV = [
   {v:"paths", t:"Paths", i:"route"}, {v:"problems", t:"Problems", i:"braces"}, {v:"bootcamp", t:"Bootcamp", i:"cap"}, {v:"build", t:"Build", i:"rocket"}, {v:"editor", t:"Editor", i:"terminal"}, {v:"auction", t:"Auction", i:"gavel"},
   {v:"review", t:"Review", i:"refresh", badge:true}, {v:"rewards", t:"Rewards", i:"target"}
 ];
-const NAV_MORE = [{v:"home", t:"Home", i:"home"}, {v:"concepts", t:"Your concepts", i:"layers"}, {v:"practice", t:"Practice by level", i:"target"}, {v:"projects", t:"Projects", i:"rocket"}, {v:"clock", t:"Practice clock", i:"clock"}, {v:"method", t:"The Method", i:"book"}, {v:"profile", t:"Profile & badges", i:"award"}, {v:"rewards", id:"board", t:"Leaderboard", i:"trophy"}, {v:"rewards", id:"shop", t:"Rewards shop", i:"palette"}];
+const NAV_MORE = [{v:"home", t:"Home", i:"home"}, {v:"concepts", t:"Your concepts", i:"layers"}, {v:"focus", t:"Focus session", i:"clock"}, {v:"practice", t:"Practice by level", i:"target"}, {v:"projects", t:"Projects", i:"rocket"}, {v:"clock", t:"Practice clock", i:"clock"}, {v:"method", t:"The Method", i:"book"}, {v:"profile", t:"Profile & badges", i:"award"}, {v:"rewards", id:"board", t:"Leaderboard", i:"trophy"}, {v:"rewards", id:"shop", t:"Rewards shop", i:"palette"}];
 UI.buildNav = () => {
   document.getElementById("tabs").innerHTML = NAV.map(n=>`<button type="button" data-v="${n.v}">${icon(n.i)}<span>${n.t}</span>${n.badge?`<span class="badge" id="duebadge" hidden>0</span>`:""}</button>`).join("");
   const r=document.querySelector(".top-r"); const m=document.createElement("div"); m.className="more";
@@ -275,14 +275,14 @@ const Game = {
     const ms=Object.keys(P.ms||{}).length;
     const cards=Object.values(S.cards||{}); const strongCards=cards.filter(c=>c.b>=1).length;
     const pb=PB.byId||{}; let solved=0, easy=0, medium=0, hard=0, pxp=0;
-    Object.keys(P.solved||{}).forEach(id=>{ const p=pb[id]; if(!p) return; solved++; pxp+=XPV[p.difficulty]||0; if(p.difficulty==="Easy") easy++; else if(p.difficulty==="Medium") medium++; else hard++; });
+    Object.keys(P.solved||{}).forEach(id=>{ const p=pb[id]; if(!p) return; solved++; pxp+=(XPV[p.difficulty]||0)+(P.solved[id]?.clean?Math.round((XPV[p.difficulty]||0)/2):0); if(p.difficulty==="Easy") easy++; else if(p.difficulty==="Medium") medium++; else hard++; });
     const steps=Object.keys(P.steps||{}).length;
     const built=PJ.list.filter(p=>p.steps.length&&p.steps.every(s=>P.steps?.[s.id])).length;
     const bc=BC.courses||[]; const courses=bc.filter(c=>c.steps.every(s=>P.steps?.[s.id])).length;
     const pidx=PATHS.index||[]; let phases=0, paths=0;
     pidx.forEach(p=>{ let all=true; (p.phases||[]).forEach(ph=>{ const ok=ph.nodes.length&&ph.nodes.every(n=>P.nodes?.[p.id+":"+n]==="done"); if(ok) phases++; else all=false; }); if(all&&p.phases?.length) paths++; });
     const nodes=Object.values(P.nodes||{}).filter(v=>v==="done").length;
-    const parts={lessons:lessons*XPV.lesson, exams:exams*XPV.exam, projects:ms*XPV.milestone, reviews:strongCards*XPV.card, problems:pxp, bootcamp:steps*XPV.step, paths:nodes*XPV.node, mastery:(typeof Mastery!=="undefined"?Mastery.totalPasses():0)*(XPV.review||0)};
+    const parts={lessons:lessons*XPV.lesson, exams:exams*XPV.exam, projects:ms*XPV.milestone, reviews:strongCards*XPV.card, problems:pxp, bootcamp:steps*XPV.step, paths:nodes*XPV.node, mastery:(typeof Mastery!=="undefined"?Mastery.totalPasses():0)*(XPV.review||0), debug:Object.keys(P.debugged||{}).length*(XPV.debug||0)};
     const xp=Object.values(parts).reduce((a,b)=>a+b,0), level=this.levelOf(xp);
     return {lessons, lessonsTotal:Object.keys(D.lessons).length, exams, examsTotal:D.mods.length, ms, strongCards, solved, easy, medium, hard, steps, courses, coursesTotal:bc.length,
       nodes, phases, paths, built, projectsTotal:PJ.list.length, hours:typeof Clock!=="undefined"?Clock.stats().hours:0, streak:streak(), bestStreak:Math.max(this.bestStreak(), streak()), xp, level, parts,

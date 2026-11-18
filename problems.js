@@ -34,6 +34,7 @@ function viewProblems(el){
   el.innerHTML=`<section class="head"><span class="eyebrow">Problem set · judged in your browser</span><h1 class="h1">Sharpen your <span class="gt">problem solving</span></h1>
     <p class="lede">${PB.list.length} hand-picked problems across the ${PB.cats.length} patterns that cover most coding interviews. Write Python or JavaScript, run the examples, then submit against hidden tests. Every problem has hints and a full editorial.</p></section>
   ${reviewQueueHTML(false)}
+  <section class="panel" id="dbgpanel"><div class="loading" style="padding:4px 0">Loading debug challenges…</div></section>
   <div class="grid2">
     <section class="panel">${diffRing()}</section>
     <section class="panel glow" style="background:linear-gradient(135deg,var(--surface),var(--surface2))"><div class="row" style="justify-content:space-between"><span class="eyebrow" style="color:var(--hot)">${icon("cal","sm")} Problem of the day</span><span class="diff ${dp.difficulty}">${dp.difficulty}</span></div>
@@ -59,6 +60,7 @@ function viewProblems(el){
   el.querySelectorAll("[data-diff]").forEach(b=>b.onclick=()=>{ f.diff=b.dataset.diff; el.querySelectorAll("[data-diff]").forEach(x=>x.setAttribute("aria-pressed",x===b)); drawList(); });
   el.querySelectorAll("[data-st]").forEach(b=>b.onclick=()=>{ f.status=b.dataset.st; el.querySelectorAll("[data-st]").forEach(x=>x.setAttribute("aria-pressed",x===b)); drawList(); });
   el.querySelector("#pq").oninput=e=>{ f.q=e.target.value; drawList(); };
+  debugPanel(el.querySelector("#dbgpanel"));
   el.querySelector("#rand").onclick=()=>{ const pool=PB.list.filter(p=>!P.solved?.[p.id]); const p=(pool.length?pool:PB.list)[Math.floor(Math.random()*(pool.length||PB.list.length))]; go({v:"problem", id:p.id}); };
   bindVideos(el);
 }
@@ -147,7 +149,10 @@ function viewProblem(el){
   const L = pbLang==="js" ? "js" : "python", key = L==="python"?"py":"js";
   let tab = route.tab || "desc";
   // review: re-solve from a blank editor with other example numbers; any help opened means it won't count toward Mastered
-  const rv = !!route.review && Mastery.isDue(p.id), dueNow = !rv && Mastery.isDue(p.id), exs = rv ? Mastery.reviewExamples(p) : p.examples;
+  // debug challenge: the reference solution with one planted bug, only once the problem is solved (data/debug.json)
+  if(route.debug && P.solved?.[p.id] && DEBUG_SYNC === undefined){ el.innerHTML=`<div class="loading">Loading the debug challenge…</div>`; loadDebug().then(d=>{ DEBUG_SYNC=d; if(route.v==="problem"&&route.id===p.id) render(); }); return; }
+  const dbg = route.debug && P.solved?.[p.id] ? Debug.get(DEBUG_SYNC, p.id, key) : null;
+  const rv = !dbg && !!route.review && Mastery.isDue(p.id), dueNow = !rv && Mastery.isDue(p.id), exs = rv ? Mastery.reviewExamples(p) : p.examples;
   const warm = !rv && !P.solved?.[p.id] && !P.predict?.[p.id];
   const helped = () => !!Mastery.helped[p.id], useHelp = () => { Mastery.helped[p.id] = true; el.querySelector("#rvstate")?.replaceWith(Object.assign(document.createElement("span"), {className:"pill bad", id:"rvstate", textContent:"Help used: this review won't count toward Mastered"})); };
   const gate = what => `<div class="empty" style="display:grid;gap:12px;justify-items:center">${icon("lock","xl")}<b>${what} are hidden during a review.</b><span>The point is to rebuild the solution from memory. You can still look: this review then counts as practice, and the problem comes back tomorrow instead of moving toward Mastered.</span><button class="btn" id="usehelp">Show them anyway</button></div>`;
@@ -158,6 +163,10 @@ function viewProblem(el){
       <div class="row" style="justify-content:space-between"><span class="diff ${p.difficulty}">${p.difficulty}</span>${rv?`<span class="pill acc">${icon("refresh","sm")}Review · from memory</span>`:Mastery.mastered(p.id)?`<span class="pill ok">${icon("star","sm")}Mastered</span>`:P.solved?.[p.id]?`<span class="pill ok">${icon("check","sm")}Solved in ${P.solved[p.id].lang==="js"?"JavaScript":"Python"}</span>`:P.tried?.[p.id]?`<span class="pill exam">Attempted</span>`:""}</div>
       <h1 class="h2">${p.n}. ${esc(p.title)}</h1>
       <div class="tags">${p.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join("")}</div>
+      ${dbg?`<div class="rvban dbgban" role="status"><b>${icon("bug","sm")} Debug challenge</b><span>This is a working solution with <b>one bug</b> planted in it. Run it, read the failing test, find the line and fix it with the smallest change you can.${Debug.fixed(p.id)?" You've fixed this one before.":""}</span>
+          <div class="row" id="dbgclues"><button type="button" class="btn sm" id="dbgk">Where to look?</button></div></div>`
+        :route.debug&&P.solved?.[p.id]?`<div class="rvban" role="status"><b>${icon("bug","sm")} No debug challenge here in ${L==="js"?"JavaScript":"Python"}</b><span>Try the other language, or another solved problem.</span></div>`
+        :P.solved?.[p.id]&&!rv&&!dueNow?`<button type="button" class="btn ghost sm dbgbtn" data-debug="${p.id}">${icon("bug","sm")}${Debug.fixed(p.id)?"Debug challenge · fixed":"Try its debug challenge"}</button>`:""}
       ${rv?`<div class="rvban" role="status"><b>${icon("refresh","sm")} Re-solve it from memory</b><span>Blank editor, different example numbers, no hints. Pass without opening any help and this problem is <b>${Mastery.mastered(p.id)?"still Mastered":"Mastered"}</b>, with the next review in ${PR_GAPS[Math.min((Mastery.rec(p.id).stage||0)+1, PR_GAPS.length-1)]} days.</span><span class="pill ok" id="rvstate">From memory so far</span></div>`
         :dueNow?`<div class="rvban" role="status"><b>${icon("refresh","sm")} Due for review</b><span>You solved this ${Mastery.rec(p.id).passes?.length?"and reviewed it before":"earlier"}. Re-solve it from a blank editor to ${Mastery.mastered(p.id)?"keep it Mastered":"master it"}.</span><button type="button" class="btn primary sm" data-review="${p.id}">Start the review</button></div>`:""}
       <button type="button" class="explainbtn" id="pexplain" aria-haspopup="dialog">${icon("info")}<span><b>Explain it simply</b><small>What the problem wants, and every idea you need for it, in plain words</small></span>${icon("arrow","sm")}</button>
@@ -180,7 +189,7 @@ function viewProblem(el){
       <div style="margin-top:6px"><span class="eyebrow">Constraints</span><ul style="margin:8px 0 0;padding-left:18px;font:13px/1.7 var(--mono)">${p.constraints.map(c=>`<li>${esc(c)}</li>`).join("")}</ul></div>
       <p class="muted" style="font-size:.86rem;margin:10px 0 0">Pattern: <button class="btn ghost sm" data-act="problems" id="patlink">${esc(cat.name)}</button></p>`;
     else if(rv && !helped() && tab!=="desc"){ box.innerHTML=gate(tab==="hints"?"Hints":"The editorial and solution"); box.querySelector("#usehelp").onclick=()=>{ useHelp(); drawTab(); }; return; }
-    else if(tab==="hints") box.innerHTML=`<div style="display:grid;gap:10px">${p.hints.map((h,i)=>`<details class="hint"><summary>${icon("bulb","sm")}Hint ${i+1}</summary><div>${md(h)}</div></details>`).join("")}
+    else if(tab==="hints") box.innerHTML=`<div style="display:grid;gap:10px"><div id="ladder"></div>
       ${(p.mistakes||[]).length?`<details class="hint"><summary>${icon("bug","sm")}Common mistakes on this problem</summary><div class="mist" style="margin-top:8px">${p.mistakes.map(x=>`<div class="mi"><div class="w"><span class="eyebrow">Tempting</span><p>${md(x.wrong)}</p></div><div class="r"><span class="eyebrow">Instead</span><p>${md(x.right)}</p></div></div>`).join("")}</div></details>`:""}
       <details class="hint"><summary>${icon("layers","sm")}The ${esc(cat.name)} pattern</summary><div class="prose">${cat.pattern.map(x=>`<p>${md(x)}</p>`).join("")}${codeBlock(cat.template)}</div>${cat.video?`<div style="display:grid;gap:8px;margin-top:10px"><span class="eyebrow">Watch: the pattern</span>${videoBlock({title:cat.name, video:cat.video, q:`${cat.name} coding interview pattern`})}</div>`:""}</details>
       <p class="muted" style="margin:0;font-size:.86rem">Want to see someone talk through it? <a href="${esc(ytSearch({q:`${p.title} leetcode explained`}))}" target="_blank" rel="noopener">Search YouTube for a ${esc(p.title)} walkthrough</a>, ideally after you've tried it.</p></div>`;
@@ -188,17 +197,25 @@ function viewProblem(el){
       box.innerHTML = show ? `${p.takeaway?`<div class="recall" style="margin-bottom:12px"><span class="eyebrow">Key takeaway</span><p>${md(p.takeaway)}</p></div>`:""}<div class="prose" style="gap:12px">${p.editorial.map(x=>`<p>${md(x)}</p>`).join("")}<p><b>Complexity:</b> ${md(p.complexity)}</p></div>
         <div class="seg" style="margin:12px 0 8px"><button type="button" data-sl="py" aria-pressed="${key==="py"}">Python</button><button type="button" data-sl="js" aria-pressed="${key==="js"}">JavaScript</button></div><div id="solcode">${codeBlock(p.solution[key])}</div>`
       : `<div class="empty" style="display:grid;gap:12px;justify-items:center">${icon("lock","xl")}<b>The editorial unlocks when you solve it.</b><span>Struggling productively is where the learning happens. Try the hints first. Still stuck after 20 minutes? Reading a solution is fine, then close it and write it again from memory tomorrow.</span><button class="btn" id="reveal">Reveal anyway</button></div>`;
-      box.querySelector("#reveal")?.addEventListener("click",()=>{ route.reveal=true; drawTab(); });
+      box.querySelector("#reveal")?.addEventListener("click",()=>{ route.reveal=true; Help.use(p.id, 4); drawTab(); });
       box.querySelectorAll("[data-sl]").forEach(b=>b.onclick=()=>{ box.querySelectorAll("[data-sl]").forEach(x=>x.setAttribute("aria-pressed",x===b)); box.querySelector("#solcode").innerHTML=codeBlock(p.solution[b.dataset.sl]); }); }
     el.querySelector("#patlink")?.addEventListener("click",()=>{ pbFilter.cat=p.cat; });
+    const lad=box.querySelector("#ladder"); if(lad) hintLadder(lad, p, key, ()=>{ if(rv) useHelp(); });
+    // the mistakes and the pattern guide are help too: they count as the "idea" rung on an unsolved problem
+    box.querySelectorAll("details.hint").forEach(d=>d.addEventListener("toggle",()=>{ if(d.open && !P.solved?.[p.id]) Help.use(p.id, 2); }));
     bindVideos(box);
   };
   drawTab();
-  el.querySelector("#pexplain").onclick=()=>{ if(rv && !helped()){ if(!confirm("Open the explanation? This review will then count as practice, not toward Mastered.")) return; useHelp(); } explainProblem(p, ()=>{ tab=route.tab="hints"; el.querySelectorAll("[data-tab]").forEach(x=>x.setAttribute("aria-selected",x.dataset.tab==="hints")); drawTab(); }); };
+  el.querySelector("#pexplain").onclick=()=>{ if(!P.solved?.[p.id]) Help.use(p.id, 2); if(rv && !helped()){ if(!confirm("Open the explanation? This review will then count as practice, not toward Mastered.")) return; useHelp(); } explainProblem(p, ()=>{ tab=route.tab="hints"; el.querySelectorAll("[data-tab]").forEach(x=>x.setAttribute("aria-selected",x.dataset.tab==="hints")); drawTab(); }); };
   el.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{ tab=route.tab=b.dataset.tab; el.querySelectorAll("[data-tab]").forEach(x=>x.setAttribute("aria-selected",x===b)); drawTab(); });
-  const ed=mountEditor(el.querySelector("#ped"), {lang:L, code:p.starter[key], draftKey:rv?`pbr-${p.id}-${key}-${today()}`:`pb-${p.id}-${key}`, label:`${p.kind==="design"?p.cls[key]:p.fn[key]}()`, onRun:()=>judge(false), runLabel:"Run ▶", tall:true});
+  const ed=mountEditor(el.querySelector("#ped"), {lang:L, code:dbg?dbg.code:p.starter[key], draftKey:dbg?`pbd-${p.id}-${key}`:rv?`pbr-${p.id}-${key}-${today()}`:`pb-${p.id}-${key}`, label:`${p.kind==="design"?p.cls[key]:p.fn[key]}()`, onRun:()=>judge(false), runLabel:"Run ▶", tall:true});
   el.querySelectorAll("[data-lang]").forEach(b=>b.onclick=()=>{ pbLang=b.dataset.lang; try{ localStorage.setItem("cl-lang",pbLang); }catch(e){} render(); });
   const res=el.querySelector("#pres"), runB=el.querySelector("#prun"), subB=el.querySelector("#psub");
+  // debug clues, one at a time: where to look, then which line
+  let clues=0; const clueBox=el.querySelector("#dbgclues");
+  const drawClues=()=>{ if(!clueBox) return; clueBox.innerHTML = `${clues>=1?`<span class="pill">Look at ${esc(dbg.kind)}</span>`:""}${clues>=2?`<span class="pill">Line ${dbg.line}</span>`:""}${clues===0?`<button type="button" class="btn sm" id="dbgk">Where to look?</button>`:clues===1?`<button type="button" class="btn sm" id="dbgk">Which line?</button>`:""}<span class="muted" style="font-size:.82rem">${dbg.fails} of ${dbg.total} tests fail</span>`;
+    clueBox.querySelector("#dbgk")?.addEventListener("click",()=>{ clues++; drawClues(); }); };
+  drawClues();
   // a new problem starts with a warm-up: the big idea, a worked example and a prediction, with the editor held back
   if(warm){ const work=[el.querySelector("#ped"), runB, subB, el.querySelector("[data-lang]")?.parentElement]; work.forEach(x=>x&&x.classList.add("held"));
     warmUp(el.querySelector("#pwarm"), p, L, ()=>{ work.forEach(x=>x&&x.classList.remove("held")); ed.refresh(); ed.focus(); }); }
@@ -211,7 +228,8 @@ function viewProblem(el){
     runB.disabled=subB.disabled=false;
     if(full){ P.tried=P.tried||{}; P.tried[p.id]=1; }
     const ac=r.status==="Accepted", first=!P.solved?.[p.id];
-    if(full && ac){ P.solved=P.solved||{}; if(first){ P.solved[p.id]={d:today(), lang:L==="js"?"js":"py"}; logActivity(3); Mastery.firstSolve(p.id); } }
+    if(full && ac){ P.solved=P.solved||{}; if(first){ P.solved[p.id]={d:today(), lang:L==="js"?"js":"py", ...(Help.clean(p.id)?{clean:1}:{})}; logActivity(3); Mastery.firstSolve(p.id); } }
+    const dbgFirst = full && ac && dbg && !Debug.fixed(p.id); if(dbgFirst){ P.debugged=P.debugged||{}; P.debugged[p.id]={d:today(), lang:key, ...(clues?{}:{clean:1})}; logActivity(1); }
     const rvr = full && ac && rv ? Mastery.finish(p.id, helped()) : null; if(rvr?.pass) logActivity(2);
     if(full){ logActivity(1); save("p"); }
     const passed=r.res?r.res.filter(x=>x.ok).length:0;
@@ -221,7 +239,9 @@ function viewProblem(el){
       ${r.fatal?`<p style="margin:0">${esc(r.fatal)} Keep the name from the starter code.</p>`:""}
       ${rvr?`<div class="wfb ${rvr.pass?"ok":"no"}">${rvr.pass?`<b>${icon("star","sm")} ${rvr.first?"Mastered.":"Still Mastered."}</b> You rebuilt it from memory without help: <b>+${XPV.review} XP</b>. It comes back in ${rvr.next} days.`:`<b>Solved, with help.</b> That counts as practice: it comes back tomorrow for another go from memory.`}
         <div class="row">${(n=>n?`<button class="btn primary" data-review="${n.id}">Next review: ${esc(n.title)} ${icon("arrow","sm")}</button>`:`<span class="muted">No more reviews due today.</span>`)(Mastery.due()[0])}<button class="btn ghost" data-act="concepts">${icon("layers","sm")}Your concepts</button></div></div>`:""}
-      ${full&&ac&&!rvr?`<p style="margin:0">${first?`Accepted on your first solve: <b>+${XPV[p.difficulty]} XP</b>. `:""}All ${r.res.length} tests passed, including the hidden ones. Read the editorial to compare approaches${next?", or move on":""}.</p><div class="row"><button class="btn" data-tab-go="ed">${icon("star","sm")}Read the editorial</button>${next?`<button class="btn primary" data-problem="${next.id}">Next problem ${icon("arrow","sm")}</button>`:""}</div>`:""}
+      ${full&&ac&&dbg?`<div class="wfb ok"><b>${icon("bug","sm")} Bug fixed.</b> ${dbgFirst?`<b>+${XPV.debug} XP.</b> `:""}${clues?"":"No clues needed. "}The bug was ${esc(dbg.kind)} on line ${dbg.line}.
+        <div class="row">${(n=>n?`<button class="btn primary" data-debug="${n.id}">Next debug challenge: ${esc(n.title)} ${icon("arrow","sm")}</button>`:`<span class="muted">No more unlocked challenges. Solve more problems to unlock them.</span>`)(Debug.available(DEBUG_SYNC, key)[0])}<button class="btn ghost" data-act="problems">Problems</button></div></div>`:""}
+      ${full&&ac&&!rvr&&!dbg?`<p style="margin:0">${first?`Accepted on your first solve: <b>+${XPV[p.difficulty]} XP</b>${P.solved[p.id].clean?` and a <b>clean-solve bonus of +${cleanBonus(p)} XP</b> for using no hints`:""}. `:""}All ${r.res.length} tests passed, including the hidden ones. Read the editorial to compare approaches${next?", or move on":""}.</p><div class="row"><button class="btn" data-tab-go="ed">${icon("star","sm")}Read the editorial</button>${next?`<button class="btn primary" data-problem="${next.id}">Next problem ${icon("arrow","sm")}</button>`:""}</div>`:""}
       ${!full&&ac?`<p class="muted" style="margin:0">Examples pass. Now <b>Submit</b> to run the hidden tests, which include edge cases and larger inputs.</p>`:""}
       ${showCases.length?`<div class="tests">${showCases.map(({x,t,i})=>`<div class="tcase ${x.ok?"p":"f"}"><div class="hd">${x.ok?`<span class="ok">✓</span>`:`<span class="no">✗</span>`}${full?`Failing test ${i+1} of ${tests.length}`:`Example ${i+1}`}${x.ms!=null?`<span class="muted" style="margin-left:auto;font:500 11px var(--mono)">${x.ms} ms</span>`:""}</div>
         <span class="muted">Input</span><span style="white-space:pre-wrap">${esc(caseInput(p,t))}</span><span class="muted">Expected</span><span>${esc(fmtV(t.exp))}</span>${x.err?`<span class="muted">Error</span><span style="color:var(--bad)">${esc(x.err)}</span>`:`<span class="muted">Your output</span><span>${esc(fmtV(x.got))}</span>`}</div>`).join("")}</div>`:""}
@@ -230,7 +250,7 @@ function viewProblem(el){
       ${r.status==="Time Limit Exceeded"?`<p style="margin:0">Your code ran too long. Look for an infinite loop, or an approach slower than the constraints allow. Check the hints for the intended complexity.</p>`:""}
     </div>`;
     res.querySelector("[data-tab-go]")?.addEventListener("click",()=>{ tab=route.tab="ed"; el.querySelectorAll("[data-tab]").forEach(x=>x.setAttribute("aria-selected",x.dataset.tab==="ed")); drawTab(); el.querySelector(".desc").scrollIntoView({behavior:"smooth"}); });
-    if(full && ac && (first || rvr?.first)) UI.confetti();
+    if(full && ac && (first || rvr?.first || dbgFirst)) UI.confetti();
     res.scrollIntoView({behavior:"smooth", block:"nearest"});
   }
   runB.onclick=()=>judge(false); subB.onclick=()=>judge(true);
