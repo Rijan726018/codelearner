@@ -64,7 +64,20 @@ const Clock = (() => {
     const finish = perDay > 0 ? new Date(Date.now() + left / perDay * 86400000) : null;
     return {total, hours: total/3600, today: daySec(t), week, last30, perDay, goalMin, goalStreak, finish, byCat, days: ds, todayKey: tk};
   }
-  return {stats, flush, on(f){ subs.add(f); return () => subs.delete(f); }, get pending(){ return {...pending}; }};
+  // What the leaderboard publishes: measured seconds only (all time and since `from`, a day number), split by section,
+  // with time logged by hand kept apart because nobody can check it.
+  function summary(from){
+    const ds = days(), out = {secs: 0, weekSecs: 0, cats: {}, wcats: {}, self: 0}, fk = dayKey(from);
+    Object.entries(ds).forEach(([k, d]) => Object.entries(d).forEach(([c, s]) => {
+      if(c === "offline"){ out.self += s; return; }
+      if(!CLOCK_CATS[c]) return;
+      out.secs += s; out.cats[c] = (out.cats[c] || 0) + s;
+      if(k >= fk){ out.weekSecs += s; out.wcats[c] = (out.wcats[c] || 0) + s; }
+    }));
+    const r = n => Math.round(n), rm = m => Object.fromEntries(Object.entries(m).map(([c, s]) => [c, r(s)]).filter(([, s]) => s > 0));
+    return {secs: r(out.secs), weekSecs: r(out.weekSecs), cats: rm(out.cats), wcats: rm(out.wcats), self: r(out.self)};
+  }
+  return {stats, summary, flush, on(f){ subs.add(f); return () => subs.delete(f); }, get pending(){ return {...pending}; }};
 })();
 
 const fmtDur = s => { s = Math.round(s); if(s < 60) return s > 0 ? "<1 min" : "0 min"; const h = Math.floor(s/3600), m = Math.floor(s%3600/60); return h ? `${h} h${m ? ` ${m} min` : ""}` : `${m} min`; };
