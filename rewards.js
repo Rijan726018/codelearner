@@ -69,7 +69,8 @@ const Rewards = (() => {
       sec += Object.values(per[k] || {}).reduce((x, y) => x + y, 0);
       qa += P.qa?.[k]?.n || 0; sure += P.qa?.[k]?.sure || 0; }
     const pod = PB.daily?.(); const podDone = pod && inR(P.solved?.[pod.id]) ? 1 : 0;
-    return {lessons, solved, steps, ms, exams, days, sec, qa, sure, pod: podDone, xp: lessons*XPV.lesson + sxp + steps*XPV.step + ms*XPV.milestone + exams*XPV.exam};
+    const rvp = typeof Mastery !== "undefined" ? Mastery.passesBetween(a, b) : 0;
+    return {lessons, solved, steps, ms, exams, days, sec, qa, sure, pod: podDone, reviews: rvp, xp: lessons*XPV.lesson + sxp + steps*XPV.step + ms*XPV.milestone + exams*XPV.exam + rvp*(XPV.review || 0)};
   }
   // three daily challenges and three weekly ones, the same for everyone on a given date
   function pickDaily(t){
