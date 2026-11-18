@@ -74,6 +74,16 @@ await t("anyone, signed out, can read the leaderboard", () => assertSucceeds(get
 await t("signed out can't write an entry", () => assertFails(setDoc(doc(db(null), "boards", "all", "entries", "ann"), entry())));
 await t("nobody writes someone else's entry", () => assertFails(setDoc(doc(db("eve"), "boards", "all", "entries", "ann"), entry())));
 await t("entries still can't carry extra fields (like an email)", () => assertFails(setDoc(doc(db("ann"), "boards", "all", "entries", "ann"), entry({ email: "ann@example.com" }))));
+// practice time on the board: optional, bounded, and only the six measured sections
+const tm = (over = {}) => entry({ secs: 7200, weekSecs: 1800, cats: { learn: 3600, problems: 3600 }, wcats: { problems: 1800 }, self: 600, wk: "w-2026-11-16", ...over });
+await t("an entry with practice time is accepted", () => assertSucceeds(setDoc(doc(db("ann"), "boards", "all", "entries", "ann"), tm())));
+await t("an entry without practice time still works (older pages)", () => assertSucceeds(setDoc(doc(db("ann"), "boards", "w-2026-11-16", "entries", "ann"), entry())));
+await t("weekly time can't exceed all-time time", () => assertFails(setDoc(doc(db("ann"), "boards", "all", "entries", "ann"), tm({ weekSecs: 9000 }))));
+await t("weekly time can't exceed a week", () => assertFails(setDoc(doc(db("ann"), "boards", "all", "entries", "ann"), tm({ secs: 900000, weekSecs: 700000 }))));
+await t("negative or fractional time is refused", () => assertFails(setDoc(doc(db("ann"), "boards", "all", "entries", "ann"), tm({ secs: -5 }))));
+await t("time split can't carry unknown sections", () => assertFails(setDoc(doc(db("ann"), "boards", "all", "entries", "ann"), tm({ cats: { learn: 60, gaming: 999 } }))));
+await t("time split values must be whole seconds", () => assertFails(setDoc(doc(db("ann"), "boards", "all", "entries", "ann"), tm({ wcats: { learn: "lots" } }))));
+await t("week id must look like a week", () => assertFails(setDoc(doc(db("ann"), "boards", "all", "entries", "ann"), tm({ wk: "always" }))));
 await t("only the owner deletes their entry", () => assertFails(deleteDoc(doc(db("eve"), "boards", "all", "entries", "ann"))));
 await t("existing per-user docs still work", () => assertSucceeds(setDoc(doc(db("sam"), "users", "sam", "docs", "v2progress"), { json: "{}", updated: serverTimestamp() })));
 await t("other people's docs still locked", () => assertFails(getDoc(doc(db("eve"), "users", "sam", "docs", "v2progress"))));

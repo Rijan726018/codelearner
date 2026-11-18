@@ -171,6 +171,8 @@ const BOARD_MODES = [
   {id:"week",   t:"This week",    field:"weekXp", unit:"XP",    sub:"XP earned since Monday from lessons, exams, problems, steps and milestones. Resets every Monday."},
   {id:"all",    t:"All time",     field:"xp",     unit:"XP",    sub:"Total XP since you started."},
   {id:"streak", t:"Streaks",      field:"streak", unit:"days",  sub:"Current daily streaks. A streak that's been idle for more than a day drops off."},
+  {id:"hours",  t:"Hours this week", field:"weekSecs", unit:"time", sub:"Practice time measured since Monday (see Analytics for how it's counted). Resets every Monday."},
+  {id:"hoursAll", t:"Hours all time", field:"secs",   unit:"time", sub:"All practice time measured on CodeBay since you started. Time logged by hand isn't counted."},
   {id:"coins",  t:"Coins earned", field:"coins",  unit:"coins", sub:"Every coin earned, before anything spent in the shop."},
   {id:"last",   t:"Last week",    field:"weekXp", unit:"XP",    sub:"Final standings for last week. The top three collect a prize."}
 ];
@@ -186,7 +188,7 @@ function randomBoardName(){
   return NAME_A[r(NAME_A.length)] + NAME_B[r(NAME_B.length)] + String(10 + r(90));
 }
 const Board = (() => {
-  let timer = null, lastSent = "", cache = {}, guestId = null;
+  let timer = null, lastSent = "", cache = {}, guestId = null, timeOff = false;   // timeOff: the site's rules predate practice time
   const ws = () => Rewards.wkStart(today());
   const weekId = () => "w-" + dayKey(ws()), lastWeekId = () => "w-" + dayKey(ws() - 7);
   const can = () => typeof Account !== "undefined" && Account.enabled && !!Account.board("all");
@@ -205,10 +207,13 @@ const Board = (() => {
     P.board = {...(P.board || {}), on: true, auto: true, name: P.board?.name || randomBoardName()}; save("p", true);
     return true;
   }
-  const boardOf = m => m.id === "week" ? weekId() : m.id === "last" ? lastWeekId() : "all";
-  const entry = s => {
+  const boardOf = m => m.id === "week" || m.id === "hours" ? weekId() : m.id === "last" ? lastWeekId() : "all";
+  const entry = (s, withTime = !timeOff) => {
     const w = Rewards.between(ws(), today());
-    return {name: (P.board?.name || "").slice(0, 24), title: Rewards.title(), xp: s.xp, level: s.level, coins: Rewards.earned(s), streak: s.streak, weekXp: w.xp};
+    const e = {name: (P.board?.name || "").slice(0, 24), title: Rewards.title(), xp: s.xp, level: s.level, coins: Rewards.earned(s), streak: s.streak, weekXp: w.xp};
+    // practice time (clock.js): measured seconds all time and this week, split by section, plus hand-logged time on its own
+    if(withTime && typeof Clock !== "undefined") Object.assign(e, Clock.summary(ws()), {wk: weekId()});
+    return e;
   };
   function queue(s){
     if(!auto(s)) return;
@@ -220,7 +225,14 @@ const Board = (() => {
     try{
       const uidv = await uid(true); if(!uidv) return;   // guests need Anonymous sign-in switched on in Firebase
       const e = entry(s), key = JSON.stringify([uidv, weekId(), e]); if(key === lastSent) return;
-      await Promise.all([Account.board("all").put(uidv, e), Account.board(weekId()).put(uidv, e)]); lastSent = key; cache = {};
+      const put = x => Promise.all([Account.board("all").put(uidv, x), Account.board(weekId()).put(uidv, x)]);
+      try{ await put(e); }
+      catch(err){
+        // rules published before practice time existed reject the new fields: keep the board working without them
+        if(err?.code !== "permission-denied" || timeOff) throw err;
+        timeOff = true; await put(entry(s, false));
+      }
+      lastSent = key; cache = {};
     }catch(err){ console.warn("Leaderboard update failed:", err?.code || err); }
   }
   // A guest who signs in with Google becomes that account on the board, so their guest entry goes first.
@@ -279,11 +291,16 @@ const Board = (() => {
     if(uidv){ try{ await Promise.all([Account.board("all").remove(uidv), Account.board(weekId()).remove(uidv)]); }catch(e){} }
   }
   const weekEndsIn = () => { const end = new Date((ws() + 7)*86400000); const local = new Date(end.getUTCFullYear(), end.getUTCMonth(), end.getUTCDate()); return Math.max(0, (local - new Date())/1000); };
-  return {queue, publish, load, claimPrize, movement, join, leave, weekId, lastWeekId, can, weekEndsIn, me, uid, ensure: auto};
+  // Analytics: everyone's practice time for one period, read straight from the public board
+  async function times(period){
+    const name = period === "week" ? weekId() : "all", field = period === "week" ? "weekSecs" : "secs";
+    return cached("times:" + name, () => Account.board(name).top(field, 100));
+  }
+  return {queue, publish, load, claimPrize, movement, join, leave, weekId, lastWeekId, can, weekEndsIn, me, uid, ensure: auto, times, get timeOff(){ return timeOff; }};
 })();
 
 /* ================= REWARDS PAGE ================= */
-const RW_TABS = [["challenges","Challenges","target"],["board","Leaderboard","trophy"],["shop","Shop","palette"],["earn","How coins work","list"]];
+const RW_TABS = [["challenges","Challenges","target"],["board","Leaderboard","trophy"],["analytics","Analytics","chart"],["shop","Shop","palette"],["earn","How coins work","list"]];
 function chalRow(c, compact){
   const pct = Math.min(100, 100*c.have/c.goal), fmt = n => c.unit === "min" ? fmtDur(n*60) : n.toLocaleString();
   return `<div class="chal ${c.done?"done":""}"><span class="ci">${icon(c.done?"check":c.i)}</span><div class="cb"><b>${esc(c.t)}</b><span class="bar"><i style="width:${pct}%"></i></span><span class="cm">${fmt(Math.min(c.have, c.goal))} / ${fmt(c.goal)}</span></div>
@@ -303,6 +320,7 @@ function viewRewards(el){
   if(tab === "challenges") rwChallenges(body, s, c);
   else if(tab === "shop") rwShop(body, s, bal);
   else if(tab === "earn") rwEarn(body, s);
+  else if(tab === "analytics") rwAnalytics(body);
   else rwBoard(body, s);
 }
 function rwChallenges(body, s, c){
@@ -358,8 +376,9 @@ function rwEarn(body, s){
 }
 async function rwBoard(body, s){
   const mode = BOARD_MODES.some(m => m.id === route.board) ? route.board : "week";
-  const head = `<div class="chips" role="group" aria-label="Leaderboard">${BOARD_MODES.map(m=>`<button type="button" class="chip" data-bm="${m.id}" aria-pressed="${mode===m.id}">${m.t}</button>`).join("")}</div>`;
-  const wire = () => body.querySelectorAll("[data-bm]").forEach(b => b.onclick = () => { route.board = b.dataset.bm; render(); });
+  const head = `<div class="row" style="justify-content:space-between;align-items:start;gap:10px"><div class="chips" role="group" aria-label="Leaderboard">${BOARD_MODES.map(m=>`<button type="button" class="chip" data-bm="${m.id}" aria-pressed="${mode===m.id}">${m.t}</button>`).join("")}</div><button type="button" class="btn sm" data-rtab="analytics">${icon("chart","sm")}Analytics</button></div>`;
+  const wire = () => { body.querySelectorAll("[data-bm]").forEach(b => b.onclick = () => { route.board = b.dataset.bm; render(); });
+    body.querySelectorAll("[data-rtab]").forEach(b => b.onclick = () => go({v:"rewards", id:b.dataset.rtab})); };
   // opened straight from a link, this runs before sign-in has been checked: wait for that first (a few seconds at most)
   if(typeof Account !== "undefined" && !Account.enabled){
     body.innerHTML = `${head}<section class="panel"><div class="loading" style="padding:12px 0">Loading the leaderboard…</div></section>`;
@@ -410,7 +429,9 @@ async function rwBoard(body, s){
   if(prize){ UI.toast(prize.place === 1 ? "You won last week" : `You finished #${prize.place} last week`, `+${prize.coins} coins`, "trophy", 6000); UI.confetti(160); Game.sync(); }
   const {m, rows, above, below, myVal} = d, me = Board.me(), unit = m.unit;
   const rank = joined ? d.rank : null, total = d.total;   // a non-member's "would be" rank isn't a place on the board
-  const v = r => +r?.[m.field] || 0, u = n => unit === "days" && Math.abs(n) === 1 ? "day" : unit, fmt = n => `${(+n||0).toLocaleString()} ${u(+n||0)}`;
+  const v = r => +r?.[m.field] || 0, u = n => unit === "days" && Math.abs(n) === 1 ? "day" : unit, fmt = n => unit === "time" ? fmtDur(+n||0) : `${(+n||0).toLocaleString()} ${u(+n||0)}`;
+  // practice time on every row: this week's (only if the entry is from this week) and the total
+  const hrs = r => { if(r?.secs == null) return ""; const wk = r.wk === Board.weekId() ? +r.weekSecs || 0 : 0; return ` · ${icon("clock","sm")}${fmtDur(wk)} this week · ${fmtHours(+r.secs||0)} h total`; };
   const lg = r => leagueOf(+r?.weekXp || 0), chip = r => { const L = lg(r); return `<span class="lg" style="--lg:${L.col}">${L.name}</span>`; };
   const nm = r => `${esc(r?.name || "Learner")}`;
   const mv = joined ? Board.movement(mode, rank) : 0;
@@ -429,8 +450,8 @@ async function rwBoard(body, s){
     ${mode==="week"&&myLeague.next?`<div style="display:grid;gap:4px"><div class="row" style="justify-content:space-between"><span class="muted" style="font-size:.85rem">${(myLeague.next[0]-thisWk).toLocaleString()} XP to ${myLeague.next[1]}</span><span class="muted" style="font-size:.85rem">${myLeague.name} → ${myLeague.next[1]}</span></div><div class="bar"><i style="width:${Math.min(100,100*(thisWk-LEAGUES[myLeague.i][0])/(myLeague.next[0]-LEAGUES[myLeague.i][0]))}%;background:${myLeague.next[2]}"></i></div></div>`:""}`;
 
   const podium = rows.slice(0, 3), rest = rows.slice(3);
-  const pod = podium.length ? `<div class="podium">${[1,0,2].filter(i=>podium[i]).map(i=>{ const r=podium[i]; return `<div class="pd p${i+1} ${r.uid===me?"me":""}"><span class="av">${esc((r.name||"?").trim()[0]||"?").toUpperCase()}</span><b>${nm(r)}${r.uid===me?" (you)":""}</b>${r.title?`<span class="muted" style="font-size:.78rem">${esc(r.title)}</span>`:""}<span class="pv">${fmt(v(r))}</span>${(mode==="week"||mode==="last")?`<span class="muted" style="font-size:.78rem">${PODIUM_PRIZE[i]} coin prize</span>`:""}<div class="step"><span>${i+1}</span></div></div>`; }).join("")}</div>` : "";
-  const row = (r, i) => `<li class="${r.uid===me?"me":""}"><span class="rk">${i+1}</span><span class="av">${esc((r.name||"?").trim()[0]||"?").toUpperCase()}</span><span class="nm"><b>${nm(r)}${r.uid===me?" (you)":""}</b><span class="muted">${r.title?esc(r.title)+" · ":""}Lv ${+r.level||1} · ${icon("flame","sm")}${+r.streak||0}</span></span>${chip(r)}<b class="val">${fmt(v(r))}</b></li>`;
+  const pod = podium.length ? `<div class="podium">${[1,0,2].filter(i=>podium[i]).map(i=>{ const r=podium[i]; return `<div class="pd p${i+1} ${r.uid===me?"me":""}"><span class="av">${esc((r.name||"?").trim()[0]||"?").toUpperCase()}</span><b>${nm(r)}${r.uid===me?" (you)":""}</b>${r.title?`<span class="muted" style="font-size:.78rem">${esc(r.title)}</span>`:""}<span class="pv">${fmt(v(r))}</span>${r.secs!=null&&m.unit!=="time"?`<span class="muted" style="font-size:.78rem">${icon("clock","sm")} ${fmtHours(+r.secs||0)} h total</span>`:""}${(mode==="week"||mode==="last")?`<span class="muted" style="font-size:.78rem">${PODIUM_PRIZE[i]} coin prize</span>`:""}<div class="step"><span>${i+1}</span></div></div>`; }).join("")}</div>` : "";
+  const row = (r, i) => `<li class="${r.uid===me?"me":""}"><span class="rk">${i+1}</span><span class="av">${esc((r.name||"?").trim()[0]||"?").toUpperCase()}</span><span class="nm"><b>${nm(r)}${r.uid===me?" (you)":""}</b><span class="muted">${r.title?esc(r.title)+" · ":""}Lv ${+r.level||1} · ${icon("flame","sm")}${+r.streak||0}${hrs(r)}</span></span>${chip(r)}<b class="val">${fmt(v(r))}</b></li>`;
   const meRow = rank != null && rank > rows.length ? `<li class="gap">⋯</li><li class="me"><span class="rk">${rank}</span><span class="av">${esc((P.board.name||"?")[0]).toUpperCase()}</span><span class="nm"><b>${esc(P.board.name)} (you)</b><span class="muted">Lv ${s.level} · ${icon("flame","sm")}${s.streak}</span></span><span class="lg" style="--lg:${myLeague.col}">${myLeague.name}</span><b class="val">${fmt(myVal)}</b></li>` : "";
   const champStrip = champs && champs.rows.length ? `<section class="panel"><div class="sec-h"><h2 class="h3">${icon("trophy")} Last week's winners</h2><button type="button" class="btn ghost sm" data-bm="last">Final standings</button></div>
     <div class="row" style="gap:8px">${champs.rows.slice(0,3).map((r,i)=>`<span class="pill ${i===0?"acc":""}">#${i+1} ${nm(r)} · ${fmt(v(r))}</span>`).join("")}</div></section>` : "";
@@ -452,6 +473,75 @@ async function rwBoard(body, s){
   body.querySelector("#lbren")?.addEventListener("click", async () => { const n = body.querySelector("#lbname2").value.trim(); if(!n) return; await Board.join(n); render(); });
   body.querySelector("#lbleave")?.addEventListener("click", async () => { if(!confirm("Leave the leaderboard? Your entry is removed. Your coins and progress stay.")) return; await Board.leave(); render(); });
 }
+/* ================= ANALYTICS: who practises how much, and on what ================= */
+// Reads the same public board entries: measured seconds per section (Clock.summary), so nothing new is shared.
+const TIME_CATS = ["learn","review","problems","bootcamp","build","editor"];   // fixed order = fixed colour slot
+const tcName = c => CLOCK_CATS[c]?.t || c;
+function timeBar(cats, total, big){
+  if(!total) return `<span class="tbar empty${big?" big":""}"></span>`;
+  return `<span class="tbar${big?" big":""}" role="img" aria-label="${esc(TIME_CATS.filter(c=>cats[c]).map(c=>`${tcName(c)} ${fmtDur(cats[c])}`).join(", "))}">${TIME_CATS.filter(c=>cats[c]>0).map(c=>
+    `<i class="tc-${c}" style="flex-grow:${cats[c]}" data-tip="${esc(tcName(c))}: ${fmtDur(cats[c])} (${Math.round(100*cats[c]/total)}%)"></i>`).join("")}</span>`;
+}
+const topCat = cats => { const e = TIME_CATS.map(c => [c, +cats?.[c] || 0]).sort((a, b) => b[1] - a[1])[0]; return e && e[1] > 0 ? e[0] : null; };
+async function rwAnalytics(body){
+  const period = route.ap === "all" ? "all" : "week";
+  const chips = `<div class="chips" role="group" aria-label="Period">${[["week","This week"],["all","All time"]].map(([id,t])=>`<button type="button" class="chip" data-ap="${id}" aria-pressed="${period===id}">${t}</button>`).join("")}</div>`;
+  const how = `<details class="panel" id="howtime" ${route.how?"open":""}><summary><b>${icon("info","sm")} How practice time is counted</b></summary><div class="prose" style="margin-top:10px;max-width:78ch">
+    <p>CodeBay's practice clock runs in your browser and adds <b>5 seconds every 5 seconds</b> while all of these are true:</p>
+    <ul><li>The CodeBay tab is open and <b>visible</b> (another tab or a minimised window pauses it).</li>
+    <li>You've <b>typed, clicked, scrolled or moved the mouse in the last 2 minutes</b>, or your code is still running. Walk away and it stops after 2 minutes.</li>
+    <li>You're on a learning page. The section decides the bucket: <b>Core lessons &amp; exams</b> (Learn, lessons, exams, practice), <b>Reviews</b>, <b>Problems</b>, <b>Bootcamp</b>, <b>Build &amp; Learn</b> and the <b>Editor</b>. The home page, Paths, Rewards and this page don't count.</li></ul>
+    <p>Time is saved to your progress about once a minute and when you leave the page, and synced to your account if you're signed in. The leaderboard entry is updated from it a few seconds later, so the numbers here can lag by a minute or two.</p>
+    <p><b>This week</b> starts on Monday, the same as the XP race. <b>All time</b> is everything since you started.</p>
+    <p>Time you add by hand on the practice clock (coding elsewhere, reading, another course) is shown separately as <i>logged by hand</i> and is <b>not</b> counted in anyone's hours, because nobody can check it. Like XP, the numbers are sent by each person's browser, so treat them as friendly motivation.</p></div></details>`;
+  const wire = () => { body.querySelectorAll("[data-ap]").forEach(b => b.onclick = () => { route.ap = b.dataset.ap; render(); });
+    body.querySelectorAll("[data-rtab]").forEach(b => b.onclick = () => go({v:"rewards", id:b.dataset.rtab}));
+    body.querySelector("#howtime")?.addEventListener("toggle", e => { route.how = e.target.open; });
+    tipLayer(body); };
+  // you, from this browser's own clock: always available, signed in or not
+  const mine = Clock.summary(Rewards.wkStart(today())), mc = period === "week" ? mine.wcats : mine.cats, mt = period === "week" ? mine.weekSecs : mine.secs;
+  const you = `<section class="panel"><div class="sec-h"><h2 class="h3">${icon("user")} You, ${period==="week"?"this week":"all time"}</h2><button type="button" class="btn ghost sm" data-act="clock">${icon("clock","sm")}Open the practice clock</button></div>
+    <div class="kpis"><div><b>${fmtDur(mine.weekSecs)}</b><span>this week</span></div><div><b>${fmtHours(mine.secs)} h</b><span>all time</span></div><div><b>${topCat(mc)?esc(tcName(topCat(mc))):"–"}</b><span>most time ${period==="week"?"this week":"overall"}</span></div>${mine.self?`<div><b>${fmtDur(mine.self)}</b><span>logged by hand (not counted)</span></div>`:""}</div>
+    ${timeBar(mc, mt, true)}${catTable(mc, mt)}</section>`;
+  body.innerHTML = `<div class="row" style="justify-content:space-between;gap:10px">${chips}<button type="button" class="btn ghost sm" data-rtab="board">${icon("trophy","sm")}Back to the leaderboard</button></div>${you}<section class="panel"><div class="loading" style="padding:12px 0">Loading everyone's practice time…</div></section>${how}`; wire();
+  if(typeof Account !== "undefined" && !Account.enabled){ await Promise.race([Account.ready, new Promise(r => setTimeout(r, 6000))]); if(!body.isConnected) return; }
+  if(typeof Account === "undefined" || !Account.enabled){ body.querySelector(".loading").parentElement.innerHTML = `<p class="muted" style="margin:0">Everyone's time comes from the leaderboard, which needs accounts. This copy of CodeBay runs without them.</p>`; return; }
+  let rows;
+  try{ if(P.board?.on) await Board.publish(); rows = await Board.times(period); }
+  catch(e){ const box = body.querySelector(".loading")?.parentElement; if(box) box.innerHTML = `<p class="muted" style="margin:0">${e?.code==="permission-denied"?"Practice time isn't switched on for the leaderboard yet: the site's Firestore rules need updating (see the README).":"Everyone's practice time didn't load. Check your connection and open this tab again."}</p>`; return; }
+  if(route.v !== "rewards" || route.id !== "analytics" || (route.ap === "all" ? "all" : "week") !== period) return;
+  const me = Board.me(), wk = Board.weekId();
+  const T = r => period === "week" ? (r.wk === wk ? +r.weekSecs || 0 : 0) : +r.secs || 0;
+  const C = r => (period === "week" ? (r.wk === wk ? r.wcats : null) : r.cats) || {};
+  rows = rows.filter(r => T(r) > 0);
+  const total = rows.reduce((a, r) => a + T(r), 0), agg = {};
+  rows.forEach(r => Object.entries(C(r)).forEach(([c, s]) => { if(TIME_CATS.includes(c)) agg[c] = (agg[c] || 0) + (+s || 0); }));
+  const aggT = TIME_CATS.reduce((a, c) => a + (agg[c] || 0), 0), top = topCat(agg);
+  const nm = r => esc(r?.name || "Learner");
+  const everyone = rows.length ? `<section class="panel"><div class="sec-h"><h2 class="h3">${icon("chart")} Where everyone's time goes</h2><span class="muted" style="font-size:.85rem">${rows.length} learner${rows.length>1?"s":""} with practice time ${period==="week"?"since Monday":"so far"}</span></div>
+      <div class="kpis"><div><b>${fmtHours(total)} h</b><span>practised in total</span></div><div><b>${fmtDur(total/rows.length)}</b><span>average per learner</span></div><div><b>${top?esc(tcName(top)):"–"}</b><span>where the most time goes${top?` (${Math.round(100*agg[top]/aggT)}%)`:""}</span></div><div><b>${nm(rows[0])}</b><span>most practice: ${fmtDur(T(rows[0]))}</span></div></div>
+      ${timeBar(agg, aggT, true)}${catTable(agg, aggT)}</section>
+    <section class="panel"><div class="sec-h"><h2 class="h3">${icon("users")} Everyone, by practice time</h2><span class="muted" style="font-size:.85rem">Hover a bar for the split. Tap a name for every section.</span></div>
+      <ol class="talist">${rows.map((r, i) => { const c = C(r), t = T(r), tc = topCat(c), other = period === "week" ? `${fmtHours(+r.secs||0)} h all time` : `${fmtDur(r.wk === wk ? +r.weekSecs||0 : 0)} this week`;
+        return `<li class="${r.uid===me?"me":""}"><details><summary><span class="rk">${i+1}</span><span class="nm"><b>${nm(r)}${r.uid===me?" (you)":""}</b><span class="muted">${other}${tc?` · mostly ${esc(tcName(tc))}`:""}${+r.self?` · ${fmtDur(+r.self)} logged by hand`:""}</span></span>${timeBar(c, t)}<b class="val">${fmtDur(t)}</b></summary>${catTable(c, t)}</details></li>`; }).join("")}</ol></section>`
+    : `<section class="panel"><h2 class="h3">${icon("chart")} Where everyone's time goes</h2><p class="muted" style="margin:0">${Board.timeOff?"Practice time isn't on the leaderboard yet: the site's Firestore rules need updating (see the README).":`Nobody has practice time on the board ${period==="week"?"this week":"yet"}. Entries pick it up the next time each learner opens CodeBay.`}</p></section>`;
+  body.innerHTML = `<div class="row" style="justify-content:space-between;gap:10px">${chips}<button type="button" class="btn ghost sm" data-rtab="board">${icon("trophy","sm")}Back to the leaderboard</button></div>${everyone}${you}${how}`; wire();
+}
+// the legend doubles as the table: colour, section, time and share
+function catTable(cats, total){
+  if(!total) return `<p class="muted" style="margin:0">No practice time measured ${route.ap==="all"?"yet":"this week yet"}.</p>`;
+  return `<table class="ttable"><thead><tr><th>Section</th><th>Time</th><th>Share</th></tr></thead><tbody>${TIME_CATS.filter(c=>cats[c]>0).sort((a,b)=>cats[b]-cats[a]).map(c=>`<tr><td><span class="sw tc-${c}"></span>${esc(tcName(c))}</td><td>${fmtDur(cats[c])}</td><td>${Math.round(100*cats[c]/total)}%</td></tr>`).join("")}</tbody></table>`;
+}
+// one floating tooltip for every bar segment
+function tipLayer(root){
+  let tip = document.getElementById("vtip"); if(!tip){ tip = document.createElement("div"); tip.id = "vtip"; tip.setAttribute("role", "tooltip"); document.body.append(tip); }
+  root.querySelectorAll("[data-tip]").forEach(seg => {
+    seg.onpointerenter = seg.onpointermove = e => { tip.textContent = seg.dataset.tip; tip.style.opacity = 1;
+      const w = tip.offsetWidth; tip.style.left = Math.min(innerWidth - w - 8, Math.max(8, e.clientX - w/2)) + "px"; tip.style.top = (e.clientY - 40) + "px"; };
+    seg.onpointerleave = () => { tip.style.opacity = 0; };
+  });
+}
+
 /* compact card for the Today page */
 Rewards.todayCard = () => {
   const c = Rewards.challenges(), bal = Rewards.balance(), done = c.daily.filter(x => x.done).length;

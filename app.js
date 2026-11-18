@@ -144,7 +144,7 @@ document.addEventListener("pointermove",e=>{ if(tip.hidden) return; const x=Math
 const routeHash = r => "#/"+r.v+(r.id?"/"+encodeURIComponent(r.id):"");
 function parseHash(){ const h=(location.hash||"").replace(/^#\/?/,""); if(!h) return null; const [v,id]=h.split("/"); return VIEWS[v]?{v, ...(id?{id:decodeURIComponent(id)}:{})}:null; }
 // side panels (a career-path topic, a problem's "Explain it simply") belong to the page they were opened on
-const closeDrawers=()=>document.querySelectorAll(".drawer-bg,.drawer").forEach(x=>x.remove());
+const closeDrawers=()=>document.querySelectorAll(".drawer-bg,.drawer,#vtip").forEach(x=>x.remove());
 function go(r){ route=r; tip.hidden=true; Palette.close?.(); closeDrawers();
   try{ if(location.hash!==routeHash(r)) history.pushState(null,"",routeHash(r)); }catch(e){}
   const swap=()=>{ render(); window.scrollTo({top:0}); };

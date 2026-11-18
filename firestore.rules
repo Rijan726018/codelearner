@@ -19,7 +19,8 @@ service cloud.firestore {
       allow delete: if request.auth != null && request.auth.uid == uid;
       allow create, update: if request.auth != null && request.auth.uid == uid
                             && board.matches('all|w-[0-9]{4}-[0-9]{2}-[0-9]{2}')
-                            && request.resource.data.keys().hasOnly(['name', 'title', 'xp', 'level', 'coins', 'streak', 'weekXp', 'updated'])
+                            && request.resource.data.keys().hasOnly(['name', 'title', 'xp', 'level', 'coins', 'streak', 'weekXp', 'updated',
+                                                                     'secs', 'weekSecs', 'cats', 'wcats', 'self', 'wk'])
                             && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 24
                             && request.resource.data.title is string && request.resource.data.title.size() <= 24
                             && request.resource.data.xp is int && request.resource.data.xp >= 0 && request.resource.data.xp <= 10000000
@@ -27,7 +28,24 @@ service cloud.firestore {
                             && request.resource.data.coins is int && request.resource.data.coins >= 0 && request.resource.data.coins <= 100000000
                             && request.resource.data.streak is int && request.resource.data.streak >= 0 && request.resource.data.streak <= 100000
                             && request.resource.data.weekXp is int && request.resource.data.weekXp >= 0 && request.resource.data.weekXp <= request.resource.data.xp
-                            && request.resource.data.updated == request.time;
+                            && request.resource.data.updated == request.time
+                            && practiceTime(request.resource.data);
+    }
+    // Practice time (clock.js), all optional so older pages keep working: measured seconds all time and this week, the
+    // same split by section, time logged by hand on its own, and which week the weekly numbers belong to.
+    function secs(v, max) { return v is int && v >= 0 && v <= max; }
+    function catSecs(m) {
+      return m is map && m.keys().hasOnly(['learn', 'review', 'problems', 'bootcamp', 'build', 'editor'])
+        && (!('learn' in m) || secs(m.learn, 36000000)) && (!('review' in m) || secs(m.review, 36000000))
+        && (!('problems' in m) || secs(m.problems, 36000000)) && (!('bootcamp' in m) || secs(m.bootcamp, 36000000))
+        && (!('build' in m) || secs(m.build, 36000000)) && (!('editor' in m) || secs(m.editor, 36000000));
+    }
+    function practiceTime(d) {
+      return (!('secs' in d) || secs(d.secs, 36000000))
+        && (!('weekSecs' in d) || (secs(d.weekSecs, 604800) && 'secs' in d && d.weekSecs <= d.secs))
+        && (!('cats' in d) || catSecs(d.cats)) && (!('wcats' in d) || catSecs(d.wcats))
+        && (!('self' in d) || secs(d.self, 36000000))
+        && (!('wk' in d) || (d.wk is string && d.wk.matches('w-[0-9]{4}-[0-9]{2}-[0-9]{2}')));
     }
 
     // ---------- Code Auction ----------
