@@ -28,6 +28,8 @@ function firebaseProvider(cfg){
       catch(e){ if(["auth/popup-blocked", "auth/operation-not-supported-in-this-environment"].includes(e.code)) await auth.signInWithRedirect(au, gp); else throw e; }
     },
     async signOut(){ const {auth, au} = await load(); await auth.signOut(au); },
+    // a short-lived Google-signed token proving who is signed in (the AI build server checks it); null for guests
+    async idToken(){ const {au} = await load(); const u = au.currentUser; return u && !u.isAnonymous ? u.getIdToken() : null; },
     collection(uid){
       return {doc: id => ({
         async get(){ const {fs, db} = await load(); const snap = await fs.getDoc(fs.doc(db, "users", uid, "docs", id)); const d = snap.exists() ? snap.data() : null;
@@ -196,6 +198,7 @@ const Account = (() => {
     guestUid(create){ return provider?.guestUid ? provider.guestUid(create).catch(e => { console.warn("Guest session unavailable:", e?.code || e); return null; }) : Promise.resolve(null); },
     // boards are public to read; writes go through Board, which only writes the signed-in person's own entry
     board(name){ return provider?.board ? provider.board(name) : null; },
+    idToken(){ return user && provider?.idToken ? provider.idToken().catch(() => null) : Promise.resolve(null); },
     // auctions can be browsed signed out; writes need a user (auction.js checks)
     auctions(){ return provider?.auctions ? provider.auctions() : null; },
     signIn, signOut,
