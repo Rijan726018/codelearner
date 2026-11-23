@@ -184,17 +184,20 @@ function viewBuild(el){
   el.innerHTML=`<section class="head"><span class="eyebrow">Build &amp; Learn · ${PJ.list.length} guided projects · ${PJ.list.reduce((a,p)=>a+p.steps.length,0)} steps</span><h1 class="h1">Pick a project. <span class="gt">Learn by building it.</span></h1>
     <p class="lede">Choose something you'd actually want to make. You get the full pathway: milestones, one small step at a time, the concept explained right when you need it, instant checks on your code, hints when you're stuck, and a working app at the end.</p>
     <div class="row">${nx?`<button class="btn grad lg" data-make="${nx.project.id}" data-step="${nx.idx}">${icon("play")}Continue ${esc(nx.project.title)}, step ${nx.idx+1}</button>`:""}<span class="pill acc">${built} of ${PJ.list.length} projects built</span></div></section>
+  ${typeof aibPanel==="function"?aibPanel():""}
   <section class="panel"><div class="grid3">${[["target","1. Choose","Pick a project by language and level. Each one lists the skills it teaches."],["layers","2. Build in milestones","Every milestone ends with something that works. Each step teaches one concept, then you write the code."],["checkc","3. Get unstuck","Checks tell you exactly what's missing. Hints, worked examples and a full solution are there when you need them."]].map(([i,t,d])=>`<div style="display:grid;gap:6px"><span class="row" style="gap:8px;color:var(--accent)">${icon(i)}<b style="color:var(--ink)">${t}</b></span><span class="muted" style="font-size:.92rem">${d}</span></div>`).join("")}</div></section>
   <div class="row" style="justify-content:space-between">
     <div class="chips" role="group" aria-label="Language"><button type="button" class="chip" data-bl="all" aria-pressed="${f.lang==="all"}">All languages</button>${langs.map(l=>`<button type="button" class="chip" data-bl="${l}" aria-pressed="${f.lang===l}">${esc(LANGNAME[l]||l)}</button>`).join("")}</div>
     <div class="seg" role="group" aria-label="Level">${["all",...LEVELS_B].map(l=>`<button type="button" data-blv="${l}" aria-pressed="${f.level===l}">${l==="all"?"Any level":l}</button>`).join("")}</div>
   </div>
   ${list.length?`<div class="grid3 pj">${list.map(projectCard).join("")}</div>`:`<div class="empty">No projects match those filters.</div>`}`;
+  if(typeof wireAib==="function") wireAib(el);
   el.querySelectorAll("[data-bl]").forEach(b=>b.onclick=()=>{ f.lang=b.dataset.bl; render(); });
   el.querySelectorAll("[data-blv]").forEach(b=>b.onclick=()=>{ f.level=b.dataset.blv; render(); });
 }
 function viewProject(el){
   const p=PJ.byId[route.id]; if(!p){ go({v:"build"}); return; }
+  if(p.ai){ go({v:"make", id:p.id}); return; }   // AI builds (aibuild.js) open straight into their steps
   const d=courseDone(p), nextI=BC.stepIndex(p), pct=Math.round(100*d/p.steps.length);
   const mods=(p.core||[]).map(id=>D.modById[id]).filter(Boolean);
   const visual=p.lang==="web"||p.lang==="html";
@@ -240,8 +243,8 @@ function projectExtras(p){
 }
 function viewMake(el){
   const p=PJ.byId[route.id]; if(!p){ go({v:"build"}); return; }
-  stepWorkspace(el, p, {crumbs:`<button data-act="build">Build &amp; Learn</button><span>›</span><button data-project="${p.id}">${esc(p.title)}</button>`, back:"build", backLabel:"Pick your next project",
-    after:`<button class="btn" data-project="${p.id}">See stretch goals</button><button class="btn" data-ws-from="${p.id}">${icon("terminal")}Keep building in the Editor</button>`, done:`You built <b>${esc(p.title)}</b> from an empty file. Open the project page for stretch goals and how to publish it.`});
+  stepWorkspace(el, p, {crumbs:`<button data-act="build">Build &amp; Learn</button><span>›</span>${p.ai?`<span>${icon("sparkles","sm")} ${esc(p.title)}</span>`:`<button data-project="${p.id}">${esc(p.title)}</button>`}`, back:"build", backLabel:"Pick your next project",
+    after:`${p.ai?"":`<button class="btn" data-project="${p.id}">See stretch goals</button>`}<button class="btn" data-ws-from="${p.id}">${icon("terminal")}Keep building in the Editor</button>`, done:`You built <b>${esc(p.title)}</b> from an empty file. Open the project page for stretch goals and how to publish it.`});
 }
 document.addEventListener("click",e=>{ const t=e.target.closest("[data-make]"); if(!t||t.getAttribute("aria-disabled")==="true") return; go({v:"make", id:t.dataset.make, ...(t.dataset.step!=null?{step:+t.dataset.step}:{})}); });
 VIEWS.bootcamp=viewBootcamp; VIEWS.course=viewCourse; VIEWS.build=viewBuild; VIEWS.project=viewProject; VIEWS.make=viewMake;

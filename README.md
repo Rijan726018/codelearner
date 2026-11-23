@@ -107,6 +107,7 @@ Not built yet: payments (Stripe Connect with escrow would replace the deal threa
 | `problems.js`, `bootcamp.js`, `paths.js` | The Problems, Bootcamp and Build & Learn, and Career Paths views |
 | `mastery.js` | Warm-up predictions, the problem review queue, concept mastery levels (Your concepts), the hint ladder and debug challenges |
 | `session.js` | Focus sessions: the 50-minute timer, break prompt and session recap |
+| `aibuild.js` | Build anything: Claude designs a Build & Learn project for any idea at the learner's level, verified step by step in the browser judge before it's shown |
 | `launch.js` | The Today page launch area: hero with the next step and a live editor, drifting syntax tokens, the 60-second puzzle, count-up stats and tilting cards |
 | `py-worker.js`, `sql-worker.js` | Run Python (Pyodide) and SQL (sql.js) off the main thread |
 | `data/s0.json` … `data/s8.json`, `data/research.json` | Core curriculum content and the learning-science summary |
@@ -128,6 +129,8 @@ python3 tools/merge_lessons.py                                       # merges le
 python3 tools/merge_extras.py                                        # merges project and pattern videos, project and problem mistakes and takeaways
 python3 tools/validate.py data/s*.json                               # core curriculum schema
 ```
+
+**Build anything** (`aibuild.js`, server in the private `codebay` repo at `api/build.js`). On the Build & Learn page, type what you want to build, pick Python, JavaScript or a web page and a level (one is suggested from your progress), and Claude designs a project for it: milestones, small steps that each teach one idea, a working solution per step and automatic checks, pitched to what you already know (your solved problems and mastered concepts are sent along). Before you see it, the browser runs every step through CodeBay's own judge: each step's solution must pass all its checks and the code it starts from must fail at least one. Failures go back to Claude for up to two repair rounds; if a late step still fails, the project is cut before it, and if an early one does, nothing is shown. Builds are saved in the browser and your account, and their steps count like any other. It needs Google sign-in, and the server needs `ANTHROPIC_API_KEY` in Vercel (see the codebay README for the switches: model, daily limit, an email allowlist). Each build costs Claude API credit, so set a monthly spend limit on the key.
 
 **Mastery** (`mastery.js`). Built on three habits that make knowledge stick:
 - *Predict first.* The first time you open a problem, a warm-up shows one concept card (the big idea you haven't met yet, else a tool), its worked example, and asks what it prints before the editor unlocks. Your answer is compared to the card's verified output, ignoring spacing and quote style. You can skip it.

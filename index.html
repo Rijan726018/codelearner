@@ -937,6 +937,17 @@ select.sel{border:1px solid var(--line);border-radius:11px;padding:8px 10px;font
 .anim .ccard,.anim .tstat{transform:perspective(800px) rotateX(var(--rx,0)) rotateY(var(--ry,0));will-change:transform}
 .ccard.tilt,.tstat.tilt{background-image:radial-gradient(240px circle at var(--mx) var(--my),color-mix(in oklab,var(--ink) 7%,transparent),transparent 70%);border-color:var(--line2)}
 @media (prefers-reduced-motion:reduce){.launch::before,.lh2,.lgo::after,.lflame svg,.tstat.hot .ti svg{animation:none}.lterm,.launch:hover .lterm{transform:none}}
+/* Build anything (aibuild.js) */
+.aib{gap:14px;border-color:var(--line2);background:linear-gradient(160deg,var(--surface2),var(--surface) 60%)}
+.aibin{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px}
+.aibin input{font-size:1.05rem;padding:14px 16px;border-radius:14px}
+@media (max-width:560px){.aibin{grid-template-columns:minmax(0,1fr)}}
+.aibstat{display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:14px;background:var(--surface2);border:1px solid var(--line)}
+.aibstat.err{border-color:color-mix(in oklab,var(--bad) 40%,var(--line));color:var(--ink)}.aibstat.err svg{color:var(--bad);flex:none}
+.aibstat .spin{flex:none;width:16px;height:16px;border-radius:50%;border:2px solid var(--line2);border-top-color:var(--ink);animation:aispin .8s linear infinite}
+@keyframes aispin{to{transform:rotate(360deg)}}
+.aibmine{display:grid;gap:6px}
+.aibrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;align-items:center}
 .hladder{display:grid;gap:8px}
 .hladder .lnote{margin:0;font-size:.9rem;padding:10px 12px;border-radius:12px;background:var(--surface2);border:1px solid var(--line)}
 .rung{border:1px solid var(--line);border-radius:14px;background:var(--surface);overflow:hidden}
@@ -1450,6 +1461,7 @@ h1.rising .gt .w>span{background:var(--grad);-webkit-background-clip:text;backgr
 <script src="clock.js" charset="utf-8"></script>
 <script src="session.js" charset="utf-8"></script>
 <script src="launch.js" charset="utf-8"></script>
+<script src="aibuild.js" charset="utf-8"></script>
 <script src="firebase-config.js" charset="utf-8"></script>
 <script src="cloud.js" charset="utf-8"></script>
 <script src="rewards.js" charset="utf-8"></script>
