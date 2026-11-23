@@ -194,28 +194,17 @@ function viewToday(el){
   cps.forEach(cp=>cont.push({i:cp.icon, k:fp.length?"Your path":"Career path", t:cp.title, s:`${cp.done} of ${cp.total} topics done`, a:`data-path="${cp.id}"`}));
   const dp=PB.daily?.(); if(dp) cont.push({i:"braces", k:"Problem of the day", t:dp.title, s:`${dp.difficulty} · ${dp.tags.slice(0,2).join(", ")}${P.solved?.[dp.id]?" · solved ✓":""}`, a:`data-problem="${dp.id}"`});
   el.innerHTML = `
-  <section class="head">
-    <span class="eyebrow">${new Date().toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"})}</span>
-    <h1 class="h1">${lessonsN?`Stage ${cm?cm.si:0}: <span class="gt">${esc(META[cm?cm.si:0].name)}</span>`:`Welcome, <span class="gt">${esc(Game.rank(g.level))}</span>`}</h1>
-    <p class="lede">${greeting} ${lessonsN?"":"Already know some programming? Open Learn and test out of any module you can pass, so you only spend time on what's new to you."}</p>
-  </section>
-  <section class="panel glow" style="background:linear-gradient(135deg,var(--surface),var(--surface2))"><div class="lvcardx">${Game.ringSVG(g,128)}<div style="display:grid;gap:8px;min-width:0">
-    <span class="eyebrow">${esc(Game.rank(g.level))}</span><b class="h2"><span class="gt">${g.xp.toLocaleString()}</span> XP</b>
-    <div class="bar"><i style="width:${100*(g.xp-g.cur)/Math.max(1,g.next-g.cur)}%"></i></div>
-    <span class="muted" style="font-size:.88rem">${(g.next-g.xp).toLocaleString()} XP to level ${g.level+1} · ${Object.keys(P.badges||{}).length} badges · <button class="btn ghost sm" data-act="profile">View profile</button></span></div></div></section>
-  ${typeof Rewards!=="undefined"?Rewards.todayCard():""}
-  ${typeof clockCard==="function"?clockCard():""}
-  ${typeof focusCard==="function"?focusCard():""}
-  <div class="stats">
-    <div class="stat">${icon("flame")}<b>${streak()}</b><span>day streak</span></div>
-    <div class="stat">${icon("refresh")}<b>${due}</b><span>reviews due</span></div>
-    <div class="stat">${icon("book")}<b>${lessonsN}<small class="muted" style="font-size:.9rem"> / ${lessonsTotal}</small></b><span>lessons done</span></div>
-    <div class="stat">${icon("braces")}<b>${g.solved}<small class="muted" style="font-size:.9rem"> / ${PB.list.length||0}</small></b><span>problems solved</span></div>
+  ${typeof Launch!=="undefined"?Launch.hero(g):""}
+  <div class="tgrid">
+    <section class="panel tpuzzle" id="tpuzzle"><div class="loading" style="padding:4px 0">Finding you a puzzle…</div></section>
+    <div class="tside">${typeof focusCard==="function"?focusCard():""}${typeof clockCard==="function"?clockCard():""}</div>
   </div>
   ${cont.length?`<section style="display:grid;gap:12px"><h2 class="h2">Pick up where you left off</h2><div class="cont">${cont.map(c=>`<button type="button" class="ccard glow" ${c.a}><span class="row" style="gap:8px;color:var(--accent)">${icon(c.i)}<span class="eyebrow" style="color:inherit">${esc(c.k)}</span></span><b>${esc(c.t)}</b><span>${esc(c.s)}</span></button>`).join("")}</div></section>`:""}
+  ${typeof Rewards!=="undefined"?Rewards.todayCard():""}
   <div class="grid2">
     <section class="panel" style="grid-column:1/-1">
       <div class="row" style="justify-content:space-between"><h2 class="h2">Today's session</h2><span class="pill ${doneToday?"ok":""}">${doneToday?`${doneToday} reps logged today`:"Nothing logged yet today"}</span></div>
+      <p class="muted" style="margin:0">${greeting} ${lessonsN?"":"Already know some programming? Open Learn and test out of any module you can pass, so you only spend time on what's new to you."}</p>
       <ol class="plan">${items.join("")}</ol>
       ${cm?`<p class="muted" style="margin:0;font-size:.88rem">Current module: <b>${esc(cm.title)}</b>, ${lessonsDone(cm)}/${cm.lessons.length} lessons${lessonsLeft?"":" · exam ready"}.</p>`:""}
     </section>
@@ -223,6 +212,7 @@ function viewToday(el){
     <section class="panel"><h2 class="h2">Reviews coming up</h2>${forecast()}</section>
     <section class="panel" style="grid-column:1/-1"><div class="row" style="justify-content:space-between"><h2 class="h2">Mastery by stage</h2><span class="legend"><i style="background:var(--accent)"></i> lessons done</span></div>${mastery()}</section>
   </div>`;
+  if(typeof Launch!=="undefined") Launch.mount(el);
 }
 function heatmap(){
   const weeks=18, t=today(); let s0=t-(weeks*7-1); s0-=new Date(s0*86400000).getUTCDay();

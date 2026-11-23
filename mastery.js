@@ -175,7 +175,7 @@ async function hintLadder(host, p, lang, onUse){
     const body = k => k === 0 ? `<p>${md(p.hints[0] || "")}</p>`
       : k === 1 ? `${p.hints[1] ? `<p>${md(p.hints[1])}</p>` : ""}${big ? conceptCard(big, L === "js" ? "js" : "python", true) : ""}`
       : `<p class="muted" style="margin:0">The opening of one solution in ${L === "js" ? "JavaScript" : "Python"}. Finish it in your own words: don't just copy it.</p>${codeBlock(partialCode(p.solution[L], L), null, L === "js" ? "javascript" : "python")}`;
-    host.innerHTML = `<div class="ladder">${r ? "" : `<p class="lnote">${icon("star","sm")} Solve it with no hints for a <b>clean-solve bonus of +${cleanBonus(p)} XP</b>. Hints never block you: open them in order, only as far as you need.</p>`}
+    host.innerHTML = `<div class="hladder">${r ? "" : `<p class="lnote">${icon("star","sm")} Solve it with no hints for a <b>clean-solve bonus of +${cleanBonus(p)} XP</b>. Hints never block you: open them in order, only as far as you need.</p>`}
       ${RUNGS.map(([t, s], k) => { const open = r > k, next = r === k;
         return `<div class="rung ${open ? "open" : next ? "next" : "locked"}"><div class="rh"><span class="rn">${k + 1}</span><span><b>${t}</b><small>${s}</small></span>${next ? `<button type="button" class="btn sm" data-rung="${k + 1}">Show ${t.toLowerCase()}</button>` : !open ? `<span class="muted" style="font-size:.8rem">after step ${k}</span>` : ""}</div>${open ? `<div class="rb prose">${body(k)}</div>` : ""}</div>`; }).join("")}
       ${r >= 3 ? `<p class="muted" style="margin:0;font-size:.88rem">Still stuck? The <b>Editorial</b> tab has the whole solution and why it works. Read it, close it, then write it again from memory.</p>` : ""}</div>`;

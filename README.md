@@ -107,6 +107,7 @@ Not built yet: payments (Stripe Connect with escrow would replace the deal threa
 | `problems.js`, `bootcamp.js`, `paths.js` | The Problems, Bootcamp and Build & Learn, and Career Paths views |
 | `mastery.js` | Warm-up predictions, the problem review queue, concept mastery levels (Your concepts), the hint ladder and debug challenges |
 | `session.js` | Focus sessions: the 50-minute timer, break prompt and session recap |
+| `launch.js` | The Today page launch area: hero with the next step and a live editor, drifting syntax tokens, the 60-second puzzle, count-up stats and tilting cards |
 | `py-worker.js`, `sql-worker.js` | Run Python (Pyodide) and SQL (sql.js) off the main thread |
 | `data/s0.json` … `data/s8.json`, `data/research.json` | Core curriculum content and the learning-science summary |
 | `data/problems.json`, `data/bootcamp.json`, `data/projects.json`, `data/paths/` | Generated content (see below) |
